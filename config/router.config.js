@@ -270,6 +270,11 @@ export default [
             name: 'map2',
             component: './Map/Map2',
           },
+          {
+            path: '/map/map3',
+            name: 'map3',
+            component: './Map/Map3',
+          },
         ],
       },
       {

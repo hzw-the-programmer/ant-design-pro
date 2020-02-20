@@ -38,4 +38,5 @@ export default {
   'menu.map': '地图',
   'menu.map.map1': 'Map1',
   'menu.map.map2': 'Map2',
+  'menu.map.map3': 'Map3',
 };
