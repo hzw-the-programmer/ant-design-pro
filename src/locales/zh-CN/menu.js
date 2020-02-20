@@ -35,4 +35,7 @@ export default {
   'menu.account.settings': '个人设置',
   'menu.account.trigger': '触发报错',
   'menu.account.logout': '退出登录',
+  'menu.map': '地图',
+  'menu.map.map1': 'Map1',
+  'menu.map.map2': 'Map2',
 };

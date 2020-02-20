@@ -258,12 +258,17 @@ export default [
       {
         path: '/map',
         name: 'map',
-        icon: 'map',
+        icon: 'dashboard',
         routes: [
           {
-            path: '/map/edit',
-            name: 'edit',
-            component: './Map/Edit',
+            path: '/map/map1',
+            name: 'map1',
+            component: './Map/Map1',
+          },
+          {
+            path: '/map/map2',
+            name: 'map2',
+            component: './Map/Map2',
           },
         ],
       },
