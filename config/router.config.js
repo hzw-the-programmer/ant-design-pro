@@ -256,6 +256,18 @@ export default [
         ],
       },
       {
+        path: '/map',
+        name: 'map',
+        icon: 'map',
+        routes: [
+          {
+            path: '/map/edit',
+            name: 'edit',
+            component: './Map/Edit',
+          },
+        ],
+      },
+      {
         component: '404',
       },
     ],
