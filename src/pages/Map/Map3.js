@@ -41,7 +41,9 @@ class Map3 extends Component {
     this.vector = new HeatmapLayer({
       source: new VectorSource({
         url: './2012_Earthquakes_Mag5.kml',
-        format: new KML()
+        format: new KML({
+          extractStyles: false
+        })
       }),
       radius: parseInt(radius, 10),
       blur: parseInt(blur, 10),
