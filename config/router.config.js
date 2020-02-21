@@ -285,6 +285,11 @@ export default [
             name: 'map5',
             component: './Map/Map5',
           },
+          {
+            path: '/map/map6',
+            name: 'map6',
+            component: './Map/Map6',
+          },
         ],
       },
       {
