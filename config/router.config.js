@@ -280,6 +280,11 @@ export default [
             name: 'map4',
             component: './Map/Map4',
           },
+          {
+            path: '/map/map5',
+            name: 'map5',
+            component: './Map/Map5',
+          },
         ],
       },
       {
