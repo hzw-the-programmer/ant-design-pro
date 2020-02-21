@@ -275,6 +275,11 @@ export default [
             name: 'map3',
             component: './Map/Map3',
           },
+          {
+            path: '/map/map4',
+            name: 'map4',
+            component: './Map/Map4',
+          },
         ],
       },
       {

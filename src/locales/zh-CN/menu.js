@@ -39,4 +39,5 @@ export default {
   'menu.map.map1': 'Map1',
   'menu.map.map2': 'Map2',
   'menu.map.map3': 'Map3',
+  'menu.map.map4': 'Map4',
 };
