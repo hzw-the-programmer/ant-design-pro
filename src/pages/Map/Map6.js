@@ -4,7 +4,7 @@ import Map from 'ol/Map';
 import View from 'ol/View';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { OSM as OSMSource, Vector as VectorSource } from 'ol/source';
-import { Draw, Snap } from 'ol/interaction';
+import { Draw, Snap, Modify } from 'ol/interaction';
 
 class Map6 extends Component {
   constructor(props) {
@@ -53,6 +53,9 @@ class Map6 extends Component {
       layers: [raster, vector],
     });
 
+    this.map.addInteraction(new Modify({
+      source: this.vectorSource
+    }))
     this.addInteraction(this.state.type);
   }
 
