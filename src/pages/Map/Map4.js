@@ -49,7 +49,7 @@ class Map4 extends Component {
   }
 
   componentDidMount() {
-    const center = [-5639523.95, -3501274.52];
+    this.center = [-5639523.95, -3501274.52];
 
     const key = 'get_your_own_D6rA4zTHduk6KOKTXzGB';
     const attributions =
@@ -61,7 +61,7 @@ class Map4 extends Component {
     this.map = new Map({
       target: this.mapRef.current,
       view: new View({
-        center,
+        center: this.center,
         zoom: 10,
         minZoom: 2,
         maxZoom: 19,
@@ -212,6 +212,7 @@ class Map4 extends Component {
     this.now = new Date().getTime();
     this.vectorLayer.on('postrender', this.moveFeature);
     this.geoMarker.setStyle(null);
+    this.map.getView().setCenter(this.center);
     this.map.render();
     this.setState({
       animating: true,
