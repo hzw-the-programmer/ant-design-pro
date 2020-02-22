@@ -6,14 +6,17 @@ import { Image as ImageLayer, Vector as VectorLayer } from 'ol/layer';
 import Static from 'ol/source/ImageStatic';
 import VectorSource from 'ol/source/Vector';
 import Projection from 'ol/proj/Projection';
-import { getCenter } from 'ol/extent';
-import { Draw } from 'ol/interaction';
-import { toStringXY } from 'ol/coordinate';
+import { getCenter, getTopLeft, getWidth, getHeight } from 'ol/extent';
+import Draw, { createBox } from 'ol/interaction/Draw';
+import { createStringXY } from 'ol/coordinate';
+import { defaults as defaultControls } from 'ol/control';
+import MousePosition from 'ol/control/MousePosition';
 
 class Map8 extends Component {
   constructor(props) {
     super(props);
     this.mapRef = React.createRef();
+    this.posRef = React.createRef();
     this.handleAddFeature = this.handleAddFeature.bind(this);
     this.state = {};
   }
@@ -30,6 +33,12 @@ class Map8 extends Component {
     const vectorSource = new VectorSource();
     vectorSource.on('addfeature', this.handleAddFeature);
 
+    const mousePosition = new MousePosition({
+      coordinateFormat: createStringXY(4),
+      target: this.posRef.current,
+      className: 'custom-mouse-position',
+    });
+
     this.map = new Map({
       target: this.mapRef.current,
       view: new View({
@@ -41,7 +50,7 @@ class Map8 extends Component {
         new ImageLayer({
           source: new Static({
             // attributions: '© <a href="http://xkcd.com/license.html">xkcd</a>',
-            url: 'https://imgs.xkcd.com/comics/online_communities.png',
+            url: './online_communities.png',
             imageExtent: extent,
             // projection,
           }),
@@ -50,28 +59,48 @@ class Map8 extends Component {
           source: vectorSource,
         }),
       ],
+      controls: defaultControls().extend([mousePosition]),
     });
 
     this.map.addInteraction(
       new Draw({
-        type: 'Point',
+        type: 'Circle',
         source: vectorSource,
+        geometryFunction: createBox(),
       })
     );
   }
 
   handleAddFeature(event) {
+    const extent = event.feature.getGeometry().getExtent();
     this.setState({
-      coordinates: event.feature.getGeometry().getCoordinates(),
+      rect: {
+        x: getTopLeft(extent)[0],
+        y: getTopLeft(extent)[1],
+        w: getWidth(extent),
+        h: getHeight(extent),
+      },
     });
   }
 
   render() {
-    const { coordinates } = this.state;
+    const { rect } = this.state;
     return (
       <div>
         <div ref={this.mapRef} style={{ width: '100%', height: '400px' }} />
-        <span>{coordinates ? toStringXY(coordinates) : ''}</span>
+        <div ref={this.posRef} />
+        {rect ? (
+          <div>
+            x: <span>{rect.x}</span>
+            <br />
+            y: <span>{rect.y}</span>
+            <br />
+            w: <span>{rect.w}</span>
+            <br />
+            h: <span>{rect.h}</span>
+            <br />
+          </div>
+        ) : null}
       </div>
     );
   }
