@@ -91,7 +91,7 @@ class Map7 extends Component {
         EPSG:3857
         <div>{coords ? toStringXY(coords, 4) : ''}</div>
         <br />
-        EPSG:4326
+        Longitude Latitude
         <div>{coords ? toStringXY(toLonLat(coords), 4) : ''}</div>
       </div>
     );
