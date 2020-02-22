@@ -14,6 +14,8 @@ import Feature from 'ol/Feature';
 import MousePosition from 'ol/control/MousePosition';
 import { defaults as defaultControls } from 'ol/control';
 import Polygon from 'ol/geom/Polygon';
+import Point from 'ol/geom/Point';
+import { Style, Stroke, Fill, Text } from 'ol/style';
 
 @connect(({ map }) => ({
   map,
@@ -50,12 +52,35 @@ class Map10 extends Component {
       }),
     });
 
-    this.vectorSource = new VectorSource();
-    const vectorLayer = new VectorLayer({
-      source: this.vectorSource,
+    const bgStyle = new Style({
+      stroke: new Stroke({
+        color: '#3399cc',
+        width: 1.25,
+      }),
+      fill: new Fill({
+        color: [255, 255, 255, 0.4],
+      }),
     });
 
-    const layers = [layer, vectorLayer];
+    this.vectorLayer = new VectorLayer({
+      source: new VectorSource(),
+      style(feature) {
+        const name = feature.get('name');
+        if (name) {
+          return new Style({
+            text: new Text({
+              text: `${name}\n共${feature.get('total')}人`,
+              textAlign: 'left',
+              textBaseline: 'top',
+              // padding: [10, 10, 10, 10],
+            }),
+          });
+        }
+        return bgStyle;
+      },
+    });
+
+    const layers = [layer, this.vectorLayer];
 
     const mousePositionControl = new MousePosition();
 
@@ -72,13 +97,20 @@ class Map10 extends Component {
     const {
       map: { regions },
     } = this.props;
+
     regions.forEach(region => {
       const l = region.rect.x;
       const b = region.rect.y - region.rect.h;
       const r = region.rect.x + region.rect.w;
       const t = region.rect.y;
       const polygonFeature = new Feature(new Polygon([[[l, b], [r, b], [r, t], [l, t]]]));
-      this.vectorSource.addFeature(polygonFeature);
+      this.vectorLayer.getSource().addFeature(polygonFeature);
+      const pointFeature = new Feature({
+        geometry: new Point([l, t]),
+        name: region.name,
+        total: region.total,
+      });
+      this.vectorLayer.getSource().addFeature(pointFeature);
     });
   }
 
