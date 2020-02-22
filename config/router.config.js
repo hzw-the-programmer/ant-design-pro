@@ -300,6 +300,11 @@ export default [
             name: 'map8',
             component: './Map/Map8',
           },
+          {
+            path: '/map/map9',
+            name: 'map9',
+            component: './Map/Map9',
+          },
         ],
       },
       {
