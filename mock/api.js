@@ -317,6 +317,19 @@ const getActivities = [
   },
 ];
 
+const getRegions = [
+  {
+    name: '防疫隔离区',
+    rect: { x: 400, y: 630, w: 200, h: 100 },
+    total: 3,
+  },
+  {
+    name: '病房101',
+    rect: { x: 400, y: 430, w: 200, h: 100 },
+    total: 2,
+  },
+];
+
 function getFakeCaptcha(req, res) {
   return res.json('captcha-xxx');
 }
@@ -333,4 +346,5 @@ export default {
   'GET /api/fake_list': getFakeList,
   'POST /api/fake_list': postFakeList,
   'GET /api/captcha': getFakeCaptcha,
+  'GET /api/regions': getRegions,
 };

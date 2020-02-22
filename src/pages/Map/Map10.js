@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import { connect } from 'dva';
+
 import Map from 'ol/Map';
 import View from 'ol/View';
 import ImageLayer from 'ol/layer/Image';
@@ -9,11 +11,13 @@ import { getCenter } from 'ol/extent';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import Feature from 'ol/Feature';
-import Point from 'ol/geom/Point';
 import MousePosition from 'ol/control/MousePosition';
 import { defaults as defaultControls } from 'ol/control';
 import Polygon from 'ol/geom/Polygon';
 
+@connect(({ map }) => ({
+  map,
+}))
 class Map10 extends Component {
   constructor(props) {
     super(props);
@@ -21,6 +25,11 @@ class Map10 extends Component {
   }
 
   componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'map/fetchRegions',
+    });
+
     const extent = [0, 0, 1024, 968];
     const center = getCenter(extent);
     const projection = new Projection({
@@ -41,18 +50,10 @@ class Map10 extends Component {
       }),
     });
 
-    const vectorSource = new VectorSource();
+    this.vectorSource = new VectorSource();
     const vectorLayer = new VectorLayer({
-      source: vectorSource,
+      source: this.vectorSource,
     });
-
-    const pointFeature = new Feature(new Point(center));
-    vectorSource.addFeature(pointFeature);
-
-    const polygonFeature = new Feature(
-      new Polygon([[[250, 530], [450, 530], [450, 630], [250, 630]]])
-    );
-    vectorSource.addFeature(polygonFeature);
 
     const layers = [layer, vectorLayer];
 
@@ -63,6 +64,21 @@ class Map10 extends Component {
       view,
       layers,
       controls: defaultControls().extend([mousePositionControl]),
+    });
+  }
+
+  // componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate() {
+    const {
+      map: { regions },
+    } = this.props;
+    regions.forEach(region => {
+      const l = region.rect.x;
+      const b = region.rect.y - region.rect.h;
+      const r = region.rect.x + region.rect.w;
+      const t = region.rect.y;
+      const polygonFeature = new Feature(new Polygon([[[l, b], [r, b], [r, t], [l, t]]]));
+      this.vectorSource.addFeature(polygonFeature);
     });
   }
 
