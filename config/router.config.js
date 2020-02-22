@@ -295,6 +295,11 @@ export default [
             name: 'map7',
             component: './Map/Map7',
           },
+          {
+            path: '/map/map8',
+            name: 'map8',
+            component: './Map/Map8',
+          },
         ],
       },
       {
