@@ -4,6 +4,7 @@ import Map from 'ol/Map';
 import View from 'ol/View';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
+import { fromLonLat } from 'ol/proj';
 
 class Map7 extends Component {
   constructor(props) {
@@ -17,10 +18,13 @@ class Map7 extends Component {
 
   componentDidMount() {
     const washingtonLonLat = [-77.036667, 38.895];
+    const washingtonWebMercator = fromLonLat(washingtonLonLat);
+    console.log(washingtonWebMercator);
+
     this.map = new Map({
       target: this.mapRef.current,
       view: new View({
-        center: washingtonLonLat,
+        center: washingtonWebMercator,
         zoom: 12,
       }),
       layers: [
