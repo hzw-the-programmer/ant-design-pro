@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import { connect } from 'dva';
+import { Switch, Card } from 'antd';
 
 import Map from 'ol/Map';
 import View from 'ol/View';
@@ -25,10 +26,15 @@ class Map10 extends Component {
   constructor(props) {
     super(props);
     this.mapRef = React.createRef();
+    this.state = {
+      showHeatmap: false,
+    };
+    this.toggleHeatmap = this.toggleHeatmap.bind(this);
   }
 
   componentDidMount() {
     const { dispatch } = this.props;
+    const { showHeatmap } = this.state;
 
     this.timerId = setInterval(() => {
       dispatch({
@@ -91,6 +97,7 @@ class Map10 extends Component {
 
     this.heatmapLayer = new HeatmapLayer({
       source: this.peopleSource,
+      visible: showHeatmap,
     });
 
     const layers = [mapLayer, this.regionLayer, this.peopleLayer, this.heatmapLayer];
@@ -142,8 +149,30 @@ class Map10 extends Component {
     clearInterval(this.timerId);
   }
 
+  toggleHeatmap() {
+    const { showHeatmap } = this.state;
+    this.setState({
+      showHeatmap: !showHeatmap,
+    });
+    this.heatmapLayer.setVisible(!showHeatmap);
+  }
+
   render() {
-    return <div ref={this.mapRef} style={{ width: '100%', height: '400px' }} />;
+    const { showHeatmap } = this.state;
+    const {
+      map: { rti },
+    } = this.props;
+
+    return (
+      <div>
+        <div ref={this.mapRef} style={{ width: '100%', height: '400px' }} />
+        <Switch checked={showHeatmap} onChange={this.toggleHeatmap} />
+        <Card>
+          <div style={{ textAlign: 'center' }}>总人数</div>
+          <div style={{ textAlign: 'center', fontSize: 50 }}>{rti.people && rti.people.length}</div>
+        </Card>
+      </div>
+    );
   }
 }
 
