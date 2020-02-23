@@ -16,6 +16,7 @@ import { defaults as defaultControls } from 'ol/control';
 import Polygon from 'ol/geom/Polygon';
 import Point from 'ol/geom/Point';
 import { Style, Stroke, Fill, Text } from 'ol/style';
+import HeatmapLayer from 'ol/layer/Heatmap';
 
 @connect(({ map }) => ({
   map,
@@ -28,9 +29,12 @@ class Map10 extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    dispatch({
-      type: 'map/fetchRegions',
-    });
+
+    this.timerId = setInterval(() => {
+      dispatch({
+        type: 'map/fetchRTI',
+      });
+    }, 1000);
 
     const extent = [0, 0, 1024, 968];
     const center = getCenter(extent);
@@ -45,14 +49,14 @@ class Map10 extends Component {
       projection,
     });
 
-    const layer = new ImageLayer({
+    const mapLayer = new ImageLayer({
       source: new ImageStatic({
         url: './online_communities.png',
         imageExtent: extent,
       }),
     });
 
-    const bgStyle = new Style({
+    const regionBgStyle = new Style({
       stroke: new Stroke({
         color: '#3399cc',
         width: 1.25,
@@ -62,7 +66,7 @@ class Map10 extends Component {
       }),
     });
 
-    this.vectorLayer = new VectorLayer({
+    this.regionLayer = new VectorLayer({
       source: new VectorSource(),
       style(feature) {
         const name = feature.get('name');
@@ -76,11 +80,20 @@ class Map10 extends Component {
             }),
           });
         }
-        return bgStyle;
+        return regionBgStyle;
       },
     });
 
-    const layers = [layer, this.vectorLayer];
+    this.peopleSource = new VectorSource();
+    this.peopleLayer = new VectorLayer({
+      source: this.peopleSource,
+    });
+
+    this.heatmapLayer = new HeatmapLayer({
+      source: this.peopleSource,
+    });
+
+    const layers = [mapLayer, this.regionLayer, this.peopleLayer, this.heatmapLayer];
 
     const mousePositionControl = new MousePosition();
 
@@ -95,23 +108,38 @@ class Map10 extends Component {
   // componentDidUpdate(prevProps, prevState, snapshot) {
   componentDidUpdate() {
     const {
-      map: { regions },
+      map: { rti },
     } = this.props;
 
-    regions.forEach(region => {
+    this.regionLayer.getSource().clear();
+    rti.regions.forEach(region => {
       const l = region.rect.x;
       const b = region.rect.y - region.rect.h;
       const r = region.rect.x + region.rect.w;
       const t = region.rect.y;
       const polygonFeature = new Feature(new Polygon([[[l, b], [r, b], [r, t], [l, t]]]));
-      this.vectorLayer.getSource().addFeature(polygonFeature);
+      this.regionLayer.getSource().addFeature(polygonFeature);
       const pointFeature = new Feature({
         geometry: new Point([l, t]),
         name: region.name,
         total: region.total,
       });
-      this.vectorLayer.getSource().addFeature(pointFeature);
+      this.regionLayer.getSource().addFeature(pointFeature);
     });
+
+    this.peopleSource.clear();
+    rti.people.forEach(person => {
+      const pointFeature = new Feature({
+        geometry: new Point([person.pos.x, person.pos.y]),
+        type: person.type,
+      });
+      this.peopleSource.addFeature(pointFeature);
+    });
+  }
+
+  componentWillUnmount() {
+    this.map.setTarget(undefined);
+    clearInterval(this.timerId);
   }
 
   render() {

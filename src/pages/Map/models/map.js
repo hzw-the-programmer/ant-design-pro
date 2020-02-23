@@ -1,27 +1,27 @@
-import { queryRegions } from '@/services/api';
+import { queryRTI } from '@/services/api';
 
 export default {
   namespace: 'map',
 
   state: {
-    regions: [],
+    rti: {},
   },
 
   effects: {
-    *fetchRegions(_, { call, put }) {
-      const response = yield call(queryRegions);
+    *fetchRTI(_, { call, put }) {
+      const response = yield call(queryRTI);
       yield put({
-        type: 'saveRegions',
+        type: 'saveRTI',
         payload: response,
       });
     },
   },
 
   reducers: {
-    saveRegions(state, action) {
+    saveRTI(state, action) {
       return {
         ...state,
-        regions: action.payload,
+        rti: action.payload,
       };
     },
   },

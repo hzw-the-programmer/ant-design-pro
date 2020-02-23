@@ -125,6 +125,6 @@ export async function getFakeCaptcha(mobile) {
   return request(`/api/captcha?mobile=${mobile}`);
 }
 
-export async function queryRegions() {
-  return request('/api/regions');
+export async function queryRTI() {
+  return request('/api/rti');
 }

@@ -317,18 +317,62 @@ const getActivities = [
   },
 ];
 
-const getRegions = [
-  {
-    name: '防疫隔离区',
-    rect: { x: 400, y: 630, w: 200, h: 100 },
-    total: 3,
-  },
-  {
-    name: '病房101',
-    rect: { x: 400, y: 430, w: 200, h: 100 },
-    total: 2,
-  },
-];
+const getRTI = {
+  regions: [
+    {
+      name: '防疫隔离区',
+      rect: { x: 400, y: 630, w: 200, h: 100 },
+      total: 3,
+    },
+    {
+      name: '病房101',
+      rect: { x: 400, y: 430, w: 200, h: 100 },
+      total: 2,
+    },
+  ],
+  people: [
+    {
+      pos: { x: 450, y: 600 },
+      type: 0,
+    },
+    {
+      pos: { x: 500, y: 600 },
+      type: 1,
+    },
+    {
+      pos: { x: 550, y: 600 },
+      type: 2,
+    },
+    {
+      pos: { x: 500, y: 400 },
+      type: 1,
+    },
+    {
+      pos: { x: 550, y: 400 },
+      type: 2,
+    },
+    {
+      pos: { x: 600, y: 500 },
+      type: 2,
+    },
+    {
+      pos: { x: 550, y: 450 },
+      type: 2,
+    },
+    {
+      pos: { x: 550, y: 500 },
+      type: 2,
+    },
+    {
+      pos: { x: 573, y: 480 },
+      type: 2,
+    },
+    {
+      pos: { x: 571, y: 505 },
+      type: 2,
+    },
+  ],
+};
 
 function getFakeCaptcha(req, res) {
   return res.json('captcha-xxx');
@@ -346,5 +390,5 @@ export default {
   'GET /api/fake_list': getFakeList,
   'POST /api/fake_list': postFakeList,
   'GET /api/captcha': getFakeCaptcha,
-  'GET /api/regions': getRegions,
+  'GET /api/rti': getRTI,
 };
