@@ -21,38 +21,6 @@ import HeatmapLayer from 'ol/layer/Heatmap';
 
 import ReactEcharts from 'echarts-for-react';
 
-const options = {
-  title: {
-    text: '区域占比',
-    x: 'center',
-  },
-  tooltip: {
-    trigger: 'item',
-    formatter: '{a} <br/>{b} : {c} ({d}%)',
-  },
-  legend: {
-    orient: 'vertical',
-    left: 'left',
-    data: [],
-  },
-  series: [
-    {
-      name: '区域占比',
-      type: 'pie',
-      radius: '55%',
-      center: ['50%', '60%'],
-      data: [],
-      itemStyle: {
-        emphasis: {
-          shadowBlur: 10,
-          shadowOffsetX: 0,
-          shadowColor: 'rgba(0, 0, 0, 0.5)',
-        },
-      },
-    },
-  ],
-};
-
 @connect(({ map }) => ({
   map,
 }))
@@ -188,8 +156,37 @@ class Map10 extends Component {
       map: { rti },
     } = this.props;
 
-    options.legend.data = [];
-    options.series[0].data = [];
+    const options = {
+      title: {
+        text: '区域占比',
+        x: 'center',
+      },
+      tooltip: {
+        trigger: 'item',
+        formatter: '{a} <br/>{b} : {c} ({d}%)',
+      },
+      legend: {
+        orient: 'vertical',
+        left: 'left',
+        data: [],
+      },
+      series: [
+        {
+          name: '区域占比',
+          type: 'pie',
+          radius: '55%',
+          center: ['50%', '60%'],
+          data: [],
+          itemStyle: {
+            emphasis: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)',
+            },
+          },
+        },
+      ],
+    };
     if (!rti.regions) return options;
 
     rti.regions.forEach(region => {
