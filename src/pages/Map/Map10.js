@@ -21,13 +21,14 @@ import HeatmapLayer from 'ol/layer/Heatmap';
 
 import ReactEcharts from 'echarts-for-react';
 
+import styles from './Map10.less';
+
 @connect(({ map }) => ({
   map,
 }))
 class Map10 extends Component {
   constructor(props) {
     super(props);
-    this.mapRef = React.createRef();
     this.state = {
       showHeatmap: false,
     };
@@ -107,7 +108,7 @@ class Map10 extends Component {
     const mousePositionControl = new MousePosition();
 
     this.map = new Map({
-      target: this.mapRef.current,
+      target: 'map',
       view,
       layers,
       controls: defaultControls().extend([mousePositionControl]),
@@ -218,7 +219,7 @@ class Map10 extends Component {
 
     return (
       <div>
-        <div ref={this.mapRef} style={{ width: '100%', height: '400px' }} />
+        <div id="map" className={styles.map} />
         <Switch checked={showHeatmap} onChange={this.toggleHeatmap} />
         <Card>
           <div style={{ textAlign: 'center' }}>总人数</div>
