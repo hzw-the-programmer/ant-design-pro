@@ -46,17 +46,25 @@ function createLayer(url, extent) {
 class Map12 extends Component {
   componentDidMount() {
     this.map = createMap('map');
+    this.count = 0;
   }
 
   onClick() {
-    if (this.map.getLayers().getLength() === 0) {
-      const view = createView([0, 0, 1024, 968]);
-      const layer = createLayer('./online_communities.png', [0, 0, 1024, 968]);
+    this.map.getLayers().clear();
+    if (this.count % 2 === 0) {
+      const extent = [0, 0, 668, 550];
+      const view = createView(extent);
+      const layer = createLayer('./hospitalMap2.png', extent);
       this.map.setView(view);
-      this.map.addLayer(layer);
+      this.map.getLayers().insertAt(0, layer);
     } else {
-      this.map.getLayers().clear();
+      const extent = [0, 0, 1650, 1275];
+      const view = createView(extent);
+      const layer = createLayer('./PRMC-2nd-floor-map-8-2013.png', extent);
+      this.map.setView(view);
+      this.map.getLayers().insertAt(0, layer);
     }
+    this.count += 1;
   }
 
   render() {
