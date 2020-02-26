@@ -128,3 +128,7 @@ export async function getFakeCaptcha(mobile) {
 export async function queryRTI() {
   return request('/api/rti');
 }
+
+export async function queryPlaces() {
+  return request('/api/places');
+}

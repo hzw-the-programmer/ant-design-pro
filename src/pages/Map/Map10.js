@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import { connect } from 'dva';
-import { Switch, Card } from 'antd';
+import { Switch, Card, Cascader } from 'antd';
 
 import Map from 'ol/Map';
 import View from 'ol/View';
@@ -33,17 +33,16 @@ class Map10 extends Component {
       showHeatmap: false,
     };
     this.toggleHeatmap = this.toggleHeatmap.bind(this);
+    this.changePlace = this.changePlace.bind(this);
   }
 
   componentDidMount() {
     const { dispatch } = this.props;
     const { showHeatmap } = this.state;
 
-    this.timerId = setInterval(() => {
-      dispatch({
-        type: 'map/fetchRTI',
-      });
-    }, 1000);
+    dispatch({
+      type: 'map/fetchPlaces',
+    });
 
     const extent = [0, 0, 1024, 968];
     const center = getCenter(extent);
@@ -149,7 +148,6 @@ class Map10 extends Component {
 
   componentWillUnmount() {
     this.map.setTarget(undefined);
-    clearInterval(this.timerId);
   }
 
   getOption() {
@@ -211,14 +209,25 @@ class Map10 extends Component {
     this.heatmapLayer.setVisible(!showHeatmap);
   }
 
+  changePlace(value) {
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'map/changePlace',
+    });
+
+    console.log(value);
+  }
+
   render() {
     const { showHeatmap } = this.state;
     const {
-      map: { rti },
+      map: { rti, places },
     } = this.props;
 
     return (
       <div>
+        <Cascader options={places} onChange={this.changePlace} placeholder="请选择地址" />
         <div id="map" className={styles.map} />
         <Switch checked={showHeatmap} onChange={this.toggleHeatmap} />
         <Card>

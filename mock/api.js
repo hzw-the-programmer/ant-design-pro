@@ -374,6 +374,29 @@ const getRTI = {
   ],
 };
 
+function getPlaces(req, res) {
+  const places = [];
+  const buildings = ['门诊楼', '住院楼'];
+  let count = 1;
+  for (let i = 0; i < buildings.length; i += 1) {
+    const building = {
+      value: count,
+      label: buildings[i],
+      children: [],
+    };
+    count += 1;
+    for (let j = 0; j < 10; j += 1) {
+      building.children.push({
+        value: count,
+        label: `${j + 1}层`,
+      });
+      count += 1;
+    }
+    places.push(building);
+  }
+  res.json(places);
+}
+
 function getFakeCaptcha(req, res) {
   return res.json('captcha-xxx');
 }
@@ -391,4 +414,5 @@ export default {
   'POST /api/fake_list': postFakeList,
   'GET /api/captcha': getFakeCaptcha,
   'GET /api/rti': getRTI,
+  'GET /api/places': getPlaces,
 };
