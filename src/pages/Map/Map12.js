@@ -44,17 +44,19 @@ function createLayer(url, extent) {
 }
 
 class Map12 extends Component {
-  componentDidMount() {}
+  componentDidMount() {
+    this.map = createMap('map');
+  }
 
   onClick() {
-    if (this.map) {
-      this.map.setTarget(undefined);
+    if (this.map.getLayers().getLength() === 0) {
+      const view = createView([0, 0, 1024, 968]);
+      const layer = createLayer('./online_communities.png', [0, 0, 1024, 968]);
+      this.map.setView(view);
+      this.map.addLayer(layer);
+    } else {
+      this.map.getLayers().clear();
     }
-    this.map = createMap('map');
-    const view = createView([0, 0, 1024, 968]);
-    const layer = createLayer('./online_communities.png', [0, 0, 1024, 968]);
-    this.map.setView(view);
-    this.map.addLayer(layer);
   }
 
   render() {
