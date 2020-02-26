@@ -256,6 +256,18 @@ export default [
         ],
       },
       {
+        path: '/station',
+        name: 'station',
+        icon: 'dashboard',
+        routes: [
+          {
+            path: '/station/stationlist',
+            name: 'stationlist',
+            component: './Station/StationList',
+          },
+        ],
+      },
+      {
         path: '/map',
         name: 'map',
         icon: 'dashboard',

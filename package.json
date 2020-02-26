@@ -41,6 +41,7 @@
     "dva": "^2.4.0",
     "echarts": "^4.6.0",
     "echarts-for-react": "^2.0.15-beta.1",
+    "egg": "^2.26.0",
     "enquire-js": "^0.2.1",
     "hash.js": "^1.1.5",
     "lodash": "^4.17.10",
