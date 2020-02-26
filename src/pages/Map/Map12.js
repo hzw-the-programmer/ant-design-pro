@@ -9,7 +9,15 @@ import { getCenter } from 'ol/extent';
 
 import styles from './Map12.less';
 
-function createMap(target, url, extent) {
+function createMap(target) {
+  const map = new Map({
+    target,
+  });
+
+  return map;
+}
+
+function createView(extent) {
   const projection = new Projection({
     code: 'hzw',
     extent,
@@ -21,6 +29,10 @@ function createMap(target, url, extent) {
     projection,
   });
 
+  return view;
+}
+
+function createLayer(url, extent) {
   const layer = new ImageLayer({
     source: new ImageStatic({
       url,
@@ -28,13 +40,7 @@ function createMap(target, url, extent) {
     }),
   });
 
-  const map = new Map({
-    target,
-    view,
-    layers: [layer],
-  });
-
-  return map;
+  return layer;
 }
 
 class Map12 extends Component {
@@ -44,7 +50,11 @@ class Map12 extends Component {
     if (this.map) {
       this.map.setTarget(undefined);
     }
-    this.map = createMap('map', './online_communities.png', [0, 0, 1024, 968]);
+    this.map = createMap('map');
+    const view = createView([0, 0, 1024, 968]);
+    const layer = createLayer('./online_communities.png', [0, 0, 1024, 968]);
+    this.map.setView(view);
+    this.map.addLayer(layer);
   }
 
   render() {
