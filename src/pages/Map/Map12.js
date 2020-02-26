@@ -37,18 +37,21 @@ function createMap(target, url, extent) {
   return map;
 }
 
-function onClick() {
-  createMap('map', './online_communities.png', [0, 0, 1024, 968]);
-}
-
 class Map12 extends Component {
   componentDidMount() {}
+
+  onClick() {
+    if (this.map) {
+      this.map.setTarget(undefined);
+    }
+    this.map = createMap('map', './online_communities.png', [0, 0, 1024, 968]);
+  }
 
   render() {
     return (
       <div>
         <div id="map" className={styles.map} />
-        <button onClick={onClick} type="button">
+        <button onClick={this.onClick.bind(this)} type="button">
           Create Map
         </button>
       </div>
