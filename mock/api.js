@@ -400,12 +400,12 @@ function getPlaces(req, res) {
 function getMap(req, res) {
   let map = { url: '', extent: [] };
   const { l1, l2 } = req.query;
-  if (l1 === 1 && l2 === 2) {
+  if (l1 === '1' && l2 === '2') {
     map = {
       url: './hospitalMap2.png',
       extent: [0, 0, 668, 550],
     };
-  } else if (l1 === 1 && l2 === 3) {
+  } else if (l1 === '1' && l2 === '3') {
     map = {
       url: './PRMC-2nd-floor-map-8-2013.png',
       extent: [0, 0, 1650, 1275],
