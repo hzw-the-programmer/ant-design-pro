@@ -1,4 +1,4 @@
-import { queryRTI, queryPlaces } from '@/services/api';
+import { queryRTI, queryPlaces, queryMap } from '@/services/api';
 
 export default {
   namespace: 'map',
@@ -6,6 +6,7 @@ export default {
   state: {
     rti: { regions: [], people: [] },
     places: [],
+    map: { url: '', extent: [] },
   },
 
   effects: {
@@ -19,11 +20,22 @@ export default {
 
     *fetchPlaces(_, { call, put }) {
       const response = yield call(queryPlaces);
-      console.log(response);
       yield put({
         type: 'savePlaces',
         payload: response,
       });
+    },
+
+    *fetchMap(action, { call, put }) {
+      const response = yield call(queryMap, action.payload);
+      yield put({
+        type: 'saveMap',
+        payload: response,
+      });
+    },
+
+    *changePlace(action, { put }) {
+      yield put({ type: 'fetchMap', payload: action.payload });
     },
   },
 
@@ -39,6 +51,13 @@ export default {
       return {
         ...state,
         places: action.payload,
+      };
+    },
+
+    saveMap(state, action) {
+      return {
+        ...state,
+        map: action.payload,
       };
     },
   },

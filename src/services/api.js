@@ -132,3 +132,7 @@ export async function queryRTI() {
 export async function queryPlaces() {
   return request('/api/places');
 }
+
+export async function queryMap(value) {
+  return request(`/api/map?l1=${value[0]}&l2=${value[1]}`);
+}
