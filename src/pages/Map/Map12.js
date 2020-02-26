@@ -6,12 +6,27 @@ import ImageLayer from 'ol/layer/Image';
 import ImageStatic from 'ol/source/ImageStatic';
 import Projection from 'ol/proj/Projection';
 import { getCenter } from 'ol/extent';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
 
 import styles from './Map12.less';
 
 function createMap(target) {
+  const mapLayer = new ImageLayer({
+    visible: false,
+  });
+  const regionLayer = new VectorLayer({
+    source: new VectorSource(),
+  });
+  const peopleLayer = new VectorLayer({
+    source: new VectorSource(),
+  });
+  const heatmapLayer = new VectorLayer({
+    source: new VectorSource(),
+  });
   const map = new Map({
     target,
+    layers: [mapLayer, regionLayer, peopleLayer, heatmapLayer],
   });
 
   return map;
@@ -50,7 +65,7 @@ class Map12 extends Component {
   }
 
   onClick() {
-    this.map.getLayers().clear();
+    this.map.getLayers().removeAt(0);
     if (this.count % 2 === 0) {
       const extent = [0, 0, 668, 550];
       const view = createView(extent);
