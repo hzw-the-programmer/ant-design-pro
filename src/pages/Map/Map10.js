@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import { connect } from 'dva';
-import { Switch, Card } from 'antd';
+import { Switch, Card, Cascader } from 'antd';
 
 import Map from 'ol/Map';
 import View from 'ol/View';
@@ -21,46 +21,58 @@ import HeatmapLayer from 'ol/layer/Heatmap';
 
 import ReactEcharts from 'echarts-for-react';
 
+import styles from './Map10.less';
+
+function createView(extent) {
+  const projection = new Projection({
+    code: 'hzw',
+    extent,
+  });
+
+  const view = new View({
+    center: getCenter(extent),
+    zoom: 2,
+    projection,
+  });
+
+  return view;
+}
+
+function createLayer(url, extent) {
+  const layer = new ImageLayer({
+    source: new ImageStatic({
+      url,
+      imageExtent: extent,
+    }),
+  });
+
+  return layer;
+}
+
 @connect(({ map }) => ({
   map,
 }))
 class Map10 extends Component {
   constructor(props) {
     super(props);
-    this.mapRef = React.createRef();
     this.state = {
       showHeatmap: false,
     };
     this.toggleHeatmap = this.toggleHeatmap.bind(this);
+    this.changePlace = this.changePlace.bind(this);
   }
 
   componentDidMount() {
     const { dispatch } = this.props;
     const { showHeatmap } = this.state;
 
-    this.timerId = setInterval(() => {
-      dispatch({
-        type: 'map/fetchRTI',
-      });
-    }, 1000);
-
-    const extent = [0, 0, 1024, 968];
-    const center = getCenter(extent);
-    const projection = new Projection({
-      code: 'hzw',
-      extent,
-    });
-
-    const view = new View({
-      center,
-      zoom: 2,
-      projection,
+    dispatch({
+      type: 'map/fetchPlaces',
     });
 
     const mapLayer = new ImageLayer({
       source: new ImageStatic({
-        url: './online_communities.png',
-        imageExtent: extent,
+        visible: false,
       }),
     });
 
@@ -93,6 +105,7 @@ class Map10 extends Component {
     });
 
     this.peopleSource = new VectorSource();
+
     this.peopleLayer = new VectorLayer({
       source: this.peopleSource,
     });
@@ -107,8 +120,7 @@ class Map10 extends Component {
     const mousePositionControl = new MousePosition();
 
     this.map = new Map({
-      target: this.mapRef.current,
-      view,
+      target: 'map',
       layers,
       controls: defaultControls().extend([mousePositionControl]),
     });
@@ -117,7 +129,7 @@ class Map10 extends Component {
   // componentDidUpdate(prevProps, prevState, snapshot) {
   componentDidUpdate() {
     const {
-      map: { rti },
+      map: { rti, map },
     } = this.props;
 
     this.regionLayer.getSource().clear();
@@ -144,11 +156,18 @@ class Map10 extends Component {
       });
       this.peopleSource.addFeature(pointFeature);
     });
+
+    if (map.url !== '') {
+      const view = createView(map.extent);
+      this.map.setView(view);
+      const layer = createLayer(map.url, map.extent);
+      this.map.getLayers().removeAt(0);
+      this.map.getLayers().insertAt(0, layer);
+    }
   }
 
   componentWillUnmount() {
     this.map.setTarget(undefined);
-    clearInterval(this.timerId);
   }
 
   getOption() {
@@ -210,15 +229,25 @@ class Map10 extends Component {
     this.heatmapLayer.setVisible(!showHeatmap);
   }
 
+  changePlace(value) {
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'map/changePlace',
+      payload: value,
+    });
+  }
+
   render() {
     const { showHeatmap } = this.state;
     const {
-      map: { rti },
+      map: { rti, places },
     } = this.props;
 
     return (
       <div>
-        <div ref={this.mapRef} style={{ width: '100%', height: '400px' }} />
+        <Cascader options={places} onChange={this.changePlace} placeholder="请选择地址" />
+        <div id="map" className={styles.map} />
         <Switch checked={showHeatmap} onChange={this.toggleHeatmap} />
         <Card>
           <div style={{ textAlign: 'center' }}>总人数</div>

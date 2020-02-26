@@ -339,6 +339,11 @@ export default [
             name: 'map11',
             component: './Map/Map11',
           },
+          {
+            path: '/map/map12',
+            name: 'map12',
+            component: './Map/Map12',
+          },
         ],
       },
       {

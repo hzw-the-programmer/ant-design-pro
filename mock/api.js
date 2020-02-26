@@ -374,6 +374,46 @@ const getRTI = {
   ],
 };
 
+function getPlaces(req, res) {
+  const places = [];
+  const buildings = ['门诊楼', '住院楼'];
+  let count = 1;
+  for (let i = 0; i < buildings.length; i += 1) {
+    const building = {
+      value: count,
+      label: buildings[i],
+      children: [],
+    };
+    count += 1;
+    for (let j = 0; j < 10; j += 1) {
+      building.children.push({
+        value: count,
+        label: `${j + 1}层`,
+      });
+      count += 1;
+    }
+    places.push(building);
+  }
+  res.json(places);
+}
+
+function getMap(req, res) {
+  let map = { url: '', extent: [] };
+  const { l1, l2 } = req.query;
+  if (l1 === '1' && l2 === '2') {
+    map = {
+      url: './hospitalMap2.png',
+      extent: [0, 0, 668, 550],
+    };
+  } else if (l1 === '1' && l2 === '3') {
+    map = {
+      url: './PRMC-2nd-floor-map-8-2013.png',
+      extent: [0, 0, 1650, 1275],
+    };
+  }
+  res.json(map);
+}
+
 function getFakeCaptcha(req, res) {
   return res.json('captcha-xxx');
 }
@@ -391,4 +431,6 @@ export default {
   'POST /api/fake_list': postFakeList,
   'GET /api/captcha': getFakeCaptcha,
   'GET /api/rti': getRTI,
+  'GET /api/places': getPlaces,
+  'GET /api/map': getMap,
 };
