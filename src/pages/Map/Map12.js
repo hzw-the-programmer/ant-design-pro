@@ -47,15 +47,30 @@ function createView(extent) {
   return view;
 }
 
-function createLayer(url, extent) {
-  const layer = new ImageLayer({
-    source: new ImageStatic({
-      url,
-      imageExtent: extent,
-    }),
+// function createLayer(url, extent) {
+//   const layer = new ImageLayer({
+//     source: new ImageStatic({
+//       url,
+//       imageExtent: extent,
+//     }),
+//   });
+
+//   return layer;
+// }
+
+function createSource(url, extent) {
+  // const projection = new Projection({
+  //   code: 'hzw',
+  //   extent,
+  // });
+
+  const source = new ImageStatic({
+    url,
+    imageExtent: extent,
+    // projection,
   });
 
-  return layer;
+  return source;
 }
 
 class Map12 extends Component {
@@ -65,19 +80,32 @@ class Map12 extends Component {
   }
 
   onClick() {
-    this.map.getLayers().removeAt(0);
     if (this.count % 2 === 0) {
       const extent = [0, 0, 668, 550];
       const view = createView(extent);
-      const layer = createLayer('./hospitalMap2.png', extent);
       this.map.setView(view);
-      this.map.getLayers().insertAt(0, layer);
+      const source = createSource('./hospitalMap2.png', extent);
+      this.map
+        .getLayers()
+        .item(0)
+        .setSource(source);
+      this.map
+        .getLayers()
+        .item(0)
+        .setVisible(true);
     } else {
       const extent = [0, 0, 1650, 1275];
       const view = createView(extent);
-      const layer = createLayer('./PRMC-2nd-floor-map-8-2013.png', extent);
       this.map.setView(view);
-      this.map.getLayers().insertAt(0, layer);
+      const source = createSource('./PRMC-2nd-floor-map-8-2013.png', extent);
+      this.map
+        .getLayers()
+        .item(0)
+        .setSource(source);
+      this.map
+        .getLayers()
+        .item(0)
+        .setVisible(true);
     }
     this.count += 1;
   }
