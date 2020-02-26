@@ -268,6 +268,18 @@ export default [
         ],
       },
       {
+        path: '/beacon',
+        name: 'beacon',
+        icon: 'dashboard',
+        routes: [
+          {
+            path: '/beacon/beaconlist',
+            name: 'beaconlist',
+            component: './Beacon/BeaconList',
+          },
+        ],
+      },
+      {
         path: '/map',
         name: 'map',
         icon: 'dashboard',

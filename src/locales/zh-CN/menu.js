@@ -49,4 +49,6 @@ export default {
   'menu.map.map11': 'Map11',
   'menu.station': '基站管理',
   'menu.station.stationlist': '基站列表',
+  'menu.beacon': '信标管理',
+  'menu.beacon.beaconlist': '信标列表',
 };
