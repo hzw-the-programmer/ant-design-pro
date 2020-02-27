@@ -134,6 +134,26 @@ class Map10 extends Component {
     } = this.props;
 
     this.regionLayer.getSource().clear();
+    this.peopleSource.clear();
+
+    if (map.url === '') {
+      this.url = map.url;
+      this.map
+        .getLayers()
+        .item(0)
+        .setVisible(false);
+      return;
+    }
+
+    if (map.url !== this.url) {
+      this.url = map.url;
+      const view = createView(map.extent);
+      this.map.setView(view);
+      const layer = createLayer(map.url, map.extent);
+      this.map.getLayers().removeAt(0);
+      this.map.getLayers().insertAt(0, layer);
+    }
+
     rti.regions.forEach(region => {
       const l = region.rect.x;
       const b = region.rect.y - region.rect.h;
@@ -149,7 +169,6 @@ class Map10 extends Component {
       this.regionLayer.getSource().addFeature(pointFeature);
     });
 
-    this.peopleSource.clear();
     rti.people.forEach(person => {
       const pointFeature = new Feature({
         geometry: new Point([person.pos.x, person.pos.y]),
@@ -157,18 +176,14 @@ class Map10 extends Component {
       });
       this.peopleSource.addFeature(pointFeature);
     });
-
-    if (map.url !== '' && map.url !== this.url) {
-      this.url = map.url;
-      const view = createView(map.extent);
-      this.map.setView(view);
-      const layer = createLayer(map.url, map.extent);
-      this.map.getLayers().removeAt(0);
-      this.map.getLayers().insertAt(0, layer);
-    }
   }
 
   componentWillUnmount() {
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'stopRTI',
+    });
     this.map.setTarget(undefined);
   }
 

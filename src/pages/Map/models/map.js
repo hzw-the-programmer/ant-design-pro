@@ -56,6 +56,7 @@ export default {
                 type: 'saveRTI',
                 payload: response,
               });
+              console.log('rtiTask');
             }
           } finally {
             console.log('rtiTask canceled');
