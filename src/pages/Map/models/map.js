@@ -6,31 +6,39 @@ export default {
   namespace: 'map',
 
   state: {
-    rti: { regions: [], people: [] },
     places: [],
+    place: [],
     map: { url: '', extent: [] },
+    rti: { regions: [], people: [] },
   },
 
   effects: {
-    *fetchPlaces(_, { call, put }) {
-      const response = yield call(queryPlaces);
-      yield put({
-        type: 'savePlaces',
-        payload: response,
-      });
-    },
-
-    *fetchMap(action, { call, put }) {
-      const response = yield call(queryMap, action.payload);
-      yield put({
-        type: 'saveMap',
-        payload: response,
-      });
-    },
+    placesWatcher: [
+      function*({ call, put }) {
+        console.log('placesWatcher');
+        const response = yield call(queryPlaces);
+        yield put({
+          type: 'savePlaces',
+          payload: response,
+        });
+      },
+      { type: 'watcher' },
+    ],
 
     *changePlace({ payload }, { call, put }) {
       yield put({
-        type: 'stopRTI',
+        type: 'savePlace',
+        payload,
+      });
+
+      yield put({
+        type: 'saveMap',
+        payload: { url: '', extent: [] },
+      });
+
+      yield put({
+        type: 'saveRTI',
+        payload: { regions: [], people: [] },
       });
 
       const response = yield call(queryMap, payload);
@@ -38,34 +46,37 @@ export default {
         type: 'saveMap',
         payload: response,
       });
-
-      yield put({
-        type: 'startRTI',
-        payload,
-      });
     },
 
     rtiWatcher: [
-      function*({ take, fork, call, cancel, put }) {
-        function* rtiTask(place) {
+      function*({ take, fork, call, cancel, put, select }) {
+        function* rtiTask() {
           try {
             while (true) {
               yield call(delay, 1000);
-              const response = yield call(queryRTI, place);
-              yield put({
-                type: 'saveRTI',
-                payload: response,
-              });
-              console.log('rtiTask');
+
+              const map = yield select(state => state.map.map);
+              if (map.url === '') {
+                console.log('rtiTask map.url is empty, continue.');
+              } else {
+                const place = yield select(state => state.map.place);
+                const response = yield call(queryRTI, place);
+                yield put({
+                  type: 'saveRTI',
+                  payload: response,
+                });
+
+                console.log('rtiTask');
+              }
             }
           } finally {
-            console.log('rtiTask canceled');
+            console.log('rtiTask cancelled');
           }
         }
 
         while (true) {
-          const { payload } = yield take('startRTI');
-          const task = yield fork(rtiTask, payload);
+          yield take('startRTI');
+          const task = yield fork(rtiTask);
           yield take('stopRTI');
           yield cancel(task);
           console.log('after cancel');
@@ -76,13 +87,6 @@ export default {
   },
 
   reducers: {
-    saveRTI(state, action) {
-      return {
-        ...state,
-        rti: action.payload,
-      };
-    },
-
     savePlaces(state, action) {
       return {
         ...state,
@@ -90,10 +94,24 @@ export default {
       };
     },
 
+    savePlace(state, action) {
+      return {
+        ...state,
+        place: action.payload,
+      };
+    },
+
     saveMap(state, action) {
       return {
         ...state,
         map: action.payload,
+      };
+    },
+
+    saveRTI(state, action) {
+      return {
+        ...state,
+        rti: action.payload,
       };
     },
   },

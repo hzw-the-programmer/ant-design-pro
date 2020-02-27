@@ -67,7 +67,7 @@ class Map10 extends Component {
     const { showHeatmap } = this.state;
 
     dispatch({
-      type: 'map/fetchPlaces',
+      type: 'startRTI',
     });
 
     const mapLayer = new ImageLayer({
@@ -184,6 +184,7 @@ class Map10 extends Component {
     dispatch({
       type: 'stopRTI',
     });
+
     this.map.setTarget(undefined);
   }
 
@@ -246,24 +247,29 @@ class Map10 extends Component {
     this.heatmapLayer.setVisible(!showHeatmap);
   }
 
-  changePlace(value) {
+  changePlace(place) {
     const { dispatch } = this.props;
 
     dispatch({
       type: 'map/changePlace',
-      payload: value,
+      payload: place,
     });
   }
 
   render() {
     const { showHeatmap } = this.state;
     const {
-      map: { rti, places },
+      map: { places, place, rti },
     } = this.props;
 
     return (
       <div>
-        <Cascader options={places} onChange={this.changePlace} placeholder="请选择地址" />
+        <Cascader
+          options={places}
+          value={place}
+          onChange={this.changePlace}
+          placeholder="请选择地址"
+        />
         <div id="map" className={styles.map} />
         <Switch checked={showHeatmap} onChange={this.toggleHeatmap} />
         <Card>
