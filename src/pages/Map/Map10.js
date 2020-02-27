@@ -128,6 +128,7 @@ class Map10 extends Component {
 
   // componentDidUpdate(prevProps, prevState, snapshot) {
   componentDidUpdate() {
+    console.log('componentDidUpdate');
     const {
       map: { rti, map },
     } = this.props;
@@ -157,7 +158,8 @@ class Map10 extends Component {
       this.peopleSource.addFeature(pointFeature);
     });
 
-    if (map.url !== '') {
+    if (map.url !== '' && map.url !== this.url) {
+      this.url = map.url;
       const view = createView(map.extent);
       this.map.setView(view);
       const layer = createLayer(map.url, map.extent);
