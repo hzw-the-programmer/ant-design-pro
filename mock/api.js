@@ -407,6 +407,17 @@ function getRTI(req, res) {
   res.json(rti);
 }
 
+function getPeople(req, res) {
+  const people = [];
+  for (let i = 0; i < 10; i += 1) {
+    people.push({
+      id: i,
+      name: `人员${i}`,
+    });
+  }
+  res.json(people);
+}
+
 function getFakeCaptcha(req, res) {
   return res.json('captcha-xxx');
 }
@@ -427,4 +438,5 @@ export default {
   'GET /api/places': getPlaces,
   'GET /api/map': getMap,
   'GET /api/rti': getRTI,
+  'GET /api/people': getPeople,
 };

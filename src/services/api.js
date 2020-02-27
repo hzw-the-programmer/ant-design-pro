@@ -136,3 +136,7 @@ export async function queryMap(place) {
 export async function queryRTI(place) {
   return request(`/api/rti?l1=${place[0]}&l2=${place[1]}`);
 }
+
+export async function queryPeople() {
+  return request('/api/people');
+}

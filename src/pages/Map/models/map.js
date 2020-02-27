@@ -1,4 +1,4 @@
-import { queryRTI, queryPlaces, queryMap } from '@/services/api';
+import { queryRTI, queryPlaces, queryMap, queryPeople } from '@/services/api';
 
 const delay = timeout => new Promise(resolve => setTimeout(resolve, timeout));
 
@@ -10,6 +10,8 @@ export default {
     place: [],
     map: { url: '', extent: [] },
     rti: { regions: [], people: [] },
+    people: [],
+    person: undefined,
   },
 
   effects: {
@@ -19,6 +21,19 @@ export default {
         const response = yield call(queryPlaces);
         yield put({
           type: 'savePlaces',
+          payload: response,
+        });
+      },
+      { type: 'watcher' },
+    ],
+
+    peopleWatcher: [
+      function*({ call, put }) {
+        console.log('peopleWatcher');
+        const response = yield call(queryPeople);
+        console.log(response);
+        yield put({
+          type: 'savePeople',
           payload: response,
         });
       },
@@ -45,6 +60,13 @@ export default {
       yield put({
         type: 'saveMap',
         payload: response,
+      });
+    },
+
+    *changePerson({ payload }, { put }) {
+      yield put({
+        type: 'savePerson',
+        payload,
       });
     },
 
@@ -112,6 +134,20 @@ export default {
       return {
         ...state,
         rti: action.payload,
+      };
+    },
+
+    savePeople(state, action) {
+      return {
+        ...state,
+        people: action.payload,
+      };
+    },
+
+    savePerson(state, action) {
+      return {
+        ...state,
+        person: action.payload,
       };
     },
   },

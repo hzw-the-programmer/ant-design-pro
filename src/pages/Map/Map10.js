@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import { connect } from 'dva';
-import { Switch, Card, Cascader } from 'antd';
+import { Switch, Card, Cascader, Select } from 'antd';
 
 import Map from 'ol/Map';
 import View from 'ol/View';
@@ -60,6 +60,7 @@ class Map10 extends Component {
     };
     this.toggleHeatmap = this.toggleHeatmap.bind(this);
     this.changePlace = this.changePlace.bind(this);
+    this.changePerson = this.changePerson.bind(this);
   }
 
   componentDidMount() {
@@ -256,10 +257,19 @@ class Map10 extends Component {
     });
   }
 
+  changePerson(person) {
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'map/changePerson',
+      payload: person,
+    });
+  }
+
   render() {
     const { showHeatmap } = this.state;
     const {
-      map: { places, place, rti },
+      map: { places, place, rti, people, person },
     } = this.props;
 
     return (
@@ -270,6 +280,20 @@ class Map10 extends Component {
           onChange={this.changePlace}
           placeholder="请选择地址"
         />
+        <br />
+        <Select
+          style={{ width: '178px' }}
+          placeholder="找人"
+          allowClear
+          onChange={this.changePerson}
+          value={person}
+        >
+          {people.map(p => (
+            <Select.Option key={p.id} value={p.id}>
+              {p.name}
+            </Select.Option>
+          ))}
+        </Select>
         <div id="map" className={styles.map} />
         <Switch checked={showHeatmap} onChange={this.toggleHeatmap} />
         <Card>
