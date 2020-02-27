@@ -317,63 +317,6 @@ const getActivities = [
   },
 ];
 
-const getRTI = {
-  regions: [
-    {
-      name: '防疫隔离区',
-      rect: { x: 400, y: 630, w: 200, h: 100 },
-      total: 3,
-    },
-    {
-      name: '病房101',
-      rect: { x: 400, y: 430, w: 200, h: 100 },
-      total: 2,
-    },
-  ],
-  people: [
-    {
-      pos: { x: 450, y: 600 },
-      type: 0,
-    },
-    {
-      pos: { x: 500, y: 600 },
-      type: 1,
-    },
-    {
-      pos: { x: 550, y: 600 },
-      type: 2,
-    },
-    {
-      pos: { x: 500, y: 400 },
-      type: 1,
-    },
-    {
-      pos: { x: 550, y: 400 },
-      type: 2,
-    },
-    {
-      pos: { x: 600, y: 500 },
-      type: 2,
-    },
-    {
-      pos: { x: 550, y: 450 },
-      type: 2,
-    },
-    {
-      pos: { x: 550, y: 500 },
-      type: 2,
-    },
-    {
-      pos: { x: 573, y: 480 },
-      type: 2,
-    },
-    {
-      pos: { x: 571, y: 505 },
-      type: 2,
-    },
-  ],
-};
-
 function getPlaces(req, res) {
   const places = [];
   const buildings = ['门诊楼', '住院楼'];
@@ -414,6 +357,56 @@ function getMap(req, res) {
   res.json(map);
 }
 
+function getRTI(req, res) {
+  const rti = { regions: [], people: [] };
+  const { l1, l2 } = req.query;
+  if (l1 === '1' && l2 === '2') {
+    rti.regions.push({
+      name: '防疫隔离区',
+      rect: { x: 396, y: 315, w: 90, h: 90 },
+      total: 3,
+    });
+    rti.regions.push({
+      name: '病房101',
+      rect: { x: 102, y: 312, w: 131, h: 150 },
+      total: 20,
+    });
+  } else if (l1 === '1' && l2 === '3') {
+    rti.regions.push({
+      name: '手术区',
+      rect: { x: 754, y: 593, w: 330, h: 160 },
+      total: 7,
+    });
+    rti.regions.push({
+      name: '急诊室',
+      rect: { x: 310, y: 937, w: 100, h: 150 },
+      total: 11,
+    });
+  }
+
+  function getRandomInt(min, max) {
+    const mint = Math.ceil(min);
+    const maxt = Math.floor(max);
+    return Math.floor(Math.random() * (maxt - mint)) + mint;
+  }
+
+  rti.regions.forEach(region => {
+    const {
+      rect: { x, y, w, h },
+    } = region;
+    for (let i = 0; i < region.total; i += 1) {
+      rti.people.push({
+        pos: {
+          x: getRandomInt(x, x + w),
+          y: getRandomInt(y, y - h),
+        },
+      });
+    }
+  });
+
+  res.json(rti);
+}
+
 function getFakeCaptcha(req, res) {
   return res.json('captcha-xxx');
 }
@@ -430,7 +423,8 @@ export default {
   'GET /api/fake_list': getFakeList,
   'POST /api/fake_list': postFakeList,
   'GET /api/captcha': getFakeCaptcha,
-  'GET /api/rti': getRTI,
+
   'GET /api/places': getPlaces,
   'GET /api/map': getMap,
+  'GET /api/rti': getRTI,
 };
