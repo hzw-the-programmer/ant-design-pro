@@ -306,9 +306,9 @@ export default [
             component: './Map/Map9',
           },
           {
-            path: '/map/map10',
-            name: 'map10',
-            component: './Map/Map10',
+            path: '/map/monitor',
+            name: 'monitor',
+            component: './Map/Monitor',
           },
           {
             path: '/map/map11',

@@ -21,7 +21,7 @@ import HeatmapLayer from 'ol/layer/Heatmap';
 
 import ReactEcharts from 'echarts-for-react';
 
-import styles from './Map10.less';
+import styles from './Monitor.less';
 
 function createView(extent) {
   const projection = new Projection({
@@ -49,10 +49,10 @@ function createLayer(url, extent) {
   return layer;
 }
 
-@connect(({ map }) => ({
-  map,
+@connect(({ monitor }) => ({
+  monitor,
 }))
-class Map10 extends Component {
+class Monitor extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -68,7 +68,7 @@ class Map10 extends Component {
     const { showHeatmap } = this.state;
 
     dispatch({
-      type: 'startRTI',
+      type: 'monitor/startRTI',
     });
 
     const mapLayer = new ImageLayer({
@@ -131,7 +131,7 @@ class Map10 extends Component {
   componentDidUpdate() {
     console.log('componentDidUpdate');
     const {
-      map: { rti, map },
+      monitor: { rti, map },
     } = this.props;
 
     this.regionLayer.getSource().clear();
@@ -184,7 +184,7 @@ class Map10 extends Component {
     const { dispatch } = this.props;
 
     dispatch({
-      type: 'stopRTI',
+      type: 'monitor/stopRTI',
     });
 
     this.map.setTarget(undefined);
@@ -192,7 +192,7 @@ class Map10 extends Component {
 
   getOption() {
     const {
-      map: { rti },
+      monitor: { rti },
     } = this.props;
 
     const options = {
@@ -253,7 +253,7 @@ class Map10 extends Component {
     const { dispatch } = this.props;
 
     dispatch({
-      type: 'map/changePlace',
+      type: 'monitor/changePlace',
       payload: place,
     });
   }
@@ -262,7 +262,7 @@ class Map10 extends Component {
     const { dispatch } = this.props;
 
     dispatch({
-      type: 'map/changePerson',
+      type: 'monitor/changePerson',
       payload: person,
     });
   }
@@ -270,7 +270,7 @@ class Map10 extends Component {
   render() {
     const { showHeatmap } = this.state;
     const {
-      map: { places, place, rti, people, person },
+      monitor: { places, place, rti, people, person },
     } = this.props;
 
     return (
@@ -309,4 +309,4 @@ class Map10 extends Component {
   }
 }
 
-export default Map10;
+export default Monitor;

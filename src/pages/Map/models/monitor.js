@@ -3,7 +3,7 @@ import { queryRTI, queryPlaces, queryMap, queryPeople, queryPlace } from '@/serv
 const delay = timeout => new Promise(resolve => setTimeout(resolve, timeout));
 
 export default {
-  namespace: 'map',
+  namespace: 'monitor',
 
   state: {
     places: [],
@@ -74,8 +74,8 @@ export default {
             while (true) {
               yield call(delay, 1000);
 
-              const place = yield select(state => state.map.place);
-              const person = yield select(state => state.map.person);
+              const place = yield select(state => state.monitor.place);
+              const person = yield select(state => state.monitor.person);
 
               let placeChanged = false;
               if (person !== undefined) {
@@ -90,7 +90,7 @@ export default {
               }
 
               if (!placeChanged) {
-                const map = yield select(state => state.map.map);
+                const map = yield select(state => state.monitor.map);
                 if (map.url === '') {
                   console.log('rtiTask map.url is empty, continue.');
                 } else {
@@ -110,9 +110,9 @@ export default {
         }
 
         while (true) {
-          yield take('startRTI');
+          yield take('monitor/startRTI');
           const task = yield fork(rtiTask);
-          yield take('stopRTI');
+          yield take('monitor/stopRTI');
           yield cancel(task);
           console.log('after cancel');
         }
