@@ -48,4 +48,5 @@ export default {
   'menu.map.monitor': '监控',
   'menu.map.map11': 'Map11',
   'menu.map.map12': 'Map12',
+  'menu.map.route': '轨迹',
 };

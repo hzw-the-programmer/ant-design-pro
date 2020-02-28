@@ -320,6 +320,11 @@ export default [
             name: 'map12',
             component: './Map/Map12',
           },
+          {
+            path: '/map/route',
+            name: 'route',
+            component: './Map/Route',
+          },
         ],
       },
       {
