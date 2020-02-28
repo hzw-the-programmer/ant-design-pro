@@ -12,6 +12,7 @@ export default {
     rti: { regions: [], people: [] },
     people: [],
     person: undefined,
+    heatmap: false,
   },
 
   effects: {
@@ -63,6 +64,13 @@ export default {
     *changePerson({ payload }, { put }) {
       yield put({
         type: 'savePerson',
+        payload,
+      });
+    },
+
+    *changeHeatmap({ payload }, { put }) {
+      yield put({
+        type: 'saveHeatmap',
         payload,
       });
     },
@@ -161,6 +169,13 @@ export default {
       return {
         ...state,
         person: action.payload,
+      };
+    },
+
+    saveHeatmap(state, action) {
+      return {
+        ...state,
+        heatmap: action.payload,
       };
     },
   },

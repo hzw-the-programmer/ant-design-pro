@@ -55,17 +55,16 @@ function createLayer(url, extent) {
 class Monitor extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      showHeatmap: false,
-    };
     this.toggleHeatmap = this.toggleHeatmap.bind(this);
     this.changePlace = this.changePlace.bind(this);
     this.changePerson = this.changePerson.bind(this);
   }
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    const { showHeatmap } = this.state;
+    const {
+      monitor: { heatmap },
+      dispatch,
+    } = this.props;
 
     dispatch({
       type: 'monitor/startRTI',
@@ -113,7 +112,7 @@ class Monitor extends Component {
 
     this.heatmapLayer = new HeatmapLayer({
       source: this.peopleSource,
-      visible: showHeatmap,
+      visible: heatmap,
     });
 
     const layers = [mapLayer, this.regionLayer, this.peopleLayer, this.heatmapLayer];
@@ -131,11 +130,12 @@ class Monitor extends Component {
   componentDidUpdate() {
     console.log('componentDidUpdate');
     const {
-      monitor: { rti, map },
+      monitor: { rti, map, heatmap },
     } = this.props;
 
     this.regionLayer.getSource().clear();
     this.peopleSource.clear();
+    this.heatmapLayer.setVisible(heatmap);
 
     if (map.url === '') {
       this.url = map.url;
@@ -242,11 +242,15 @@ class Monitor extends Component {
   }
 
   toggleHeatmap() {
-    const { showHeatmap } = this.state;
-    this.setState({
-      showHeatmap: !showHeatmap,
+    const {
+      monitor: { heatmap },
+      dispatch,
+    } = this.props;
+
+    dispatch({
+      type: 'monitor/changeHeatmap',
+      payload: !heatmap,
     });
-    this.heatmapLayer.setVisible(!showHeatmap);
   }
 
   changePlace(place) {
@@ -268,9 +272,8 @@ class Monitor extends Component {
   }
 
   render() {
-    const { showHeatmap } = this.state;
     const {
-      monitor: { places, place, rti, people, person },
+      monitor: { places, place, rti, people, person, heatmap },
     } = this.props;
 
     return (
@@ -296,7 +299,7 @@ class Monitor extends Component {
           ))}
         </Select>
         <div id="map" className={styles.map} />
-        <Switch checked={showHeatmap} onChange={this.toggleHeatmap} />
+        <Switch checked={heatmap} onChange={this.toggleHeatmap} />
         <Card>
           <div style={{ textAlign: 'center' }}>总人数</div>
           <div style={{ textAlign: 'center', fontSize: 50 }}>{rti.people && rti.people.length}</div>
