@@ -49,4 +49,5 @@ export default {
   'menu.map.map11': 'Map11',
   'menu.map.map12': 'Map12',
   'menu.map.route': '轨迹',
+  'menu.map.table': '表格',
 };

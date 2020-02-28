@@ -325,6 +325,11 @@ export default [
             name: 'route',
             component: './Map/Route',
           },
+          {
+            path: '/map/table',
+            name: 'table',
+            component: './Map/Table',
+          },
         ],
       },
       {
