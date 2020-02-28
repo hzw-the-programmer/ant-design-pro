@@ -363,7 +363,7 @@ function getMap(req, res) {
 
 function getRTI(req, res) {
   const rti = { regions: [], people: [] };
-  const { l1, l2 } = req.query;
+  const { l1, l2, p } = req.query;
   if (l1 === '1' && l2 === '2') {
     rti.regions.push({
       name: '防疫隔离区',
@@ -398,6 +398,19 @@ function getRTI(req, res) {
     const {
       rect: { x, y, w, h },
     } = region;
+
+    if (p !== 'undefined') {
+      if (rti.people.length === 0) {
+        rti.people.push({
+          pos: {
+            x: getRandomInt(x, x + w),
+            y: getRandomInt(y, y - h),
+          },
+        });
+      }
+      return;
+    }
+
     for (let i = 0; i < region.total; i += 1) {
       rti.people.push({
         pos: {
