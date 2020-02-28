@@ -171,6 +171,7 @@ class Map10 extends Component {
     });
 
     rti.people.forEach(person => {
+      if (!person.visible) return;
       const pointFeature = new Feature({
         geometry: new Point([person.pos.x, person.pos.y]),
         type: person.type,

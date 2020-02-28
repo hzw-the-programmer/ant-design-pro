@@ -399,24 +399,17 @@ function getRTI(req, res) {
       rect: { x, y, w, h },
     } = region;
 
-    if (p !== 'undefined') {
-      if (rti.people.length === 0) {
-        rti.people.push({
-          pos: {
-            x: getRandomInt(x, x + w),
-            y: getRandomInt(y, y - h),
-          },
-        });
-      }
-      return;
-    }
-
     for (let i = 0; i < region.total; i += 1) {
+      let visible = true;
+      if (p !== 'undefined') {
+        visible = rti.people.length === 0;
+      }
       rti.people.push({
         pos: {
           x: getRandomInt(x, x + w),
           y: getRandomInt(y, y - h),
         },
+        visible,
       });
     }
   });
