@@ -1,4 +1,4 @@
-import { queryRTI, queryPlaces, queryMap, queryPeople } from '@/services/api';
+import { queryRTI, queryPlaces, queryMap, queryPeople, queryPlace } from '@/services/api';
 
 const delay = timeout => new Promise(resolve => setTimeout(resolve, timeout));
 
@@ -17,7 +17,6 @@ export default {
   effects: {
     placesWatcher: [
       function*({ call, put }) {
-        console.log('placesWatcher');
         const response = yield call(queryPlaces);
         yield put({
           type: 'savePlaces',
@@ -29,9 +28,7 @@ export default {
 
     peopleWatcher: [
       function*({ call, put }) {
-        console.log('peopleWatcher');
         const response = yield call(queryPeople);
-        console.log(response);
         yield put({
           type: 'savePeople',
           payload: response,
@@ -77,18 +74,34 @@ export default {
             while (true) {
               yield call(delay, 1000);
 
-              const map = yield select(state => state.map.map);
-              if (map.url === '') {
-                console.log('rtiTask map.url is empty, continue.');
-              } else {
-                const place = yield select(state => state.map.place);
-                const response = yield call(queryRTI, place);
-                yield put({
-                  type: 'saveRTI',
-                  payload: response,
-                });
+              const place = yield select(state => state.map.place);
+              const person = yield select(state => state.map.person);
 
-                console.log('rtiTask');
+              let placeChanged = false;
+              if (person !== undefined) {
+                const p = yield call(queryPlace, person);
+                if (place[0] !== p[0] || place[1] !== p[1]) {
+                  yield put({
+                    type: 'changePlace',
+                    payload: p,
+                  });
+                  placeChanged = true;
+                }
+              }
+
+              if (!placeChanged) {
+                const map = yield select(state => state.map.map);
+                if (map.url === '') {
+                  console.log('rtiTask map.url is empty, continue.');
+                } else {
+                  const response = yield call(queryRTI, place, person);
+                  yield put({
+                    type: 'saveRTI',
+                    payload: response,
+                  });
+
+                  console.log('rtiTask');
+                }
               }
             }
           } finally {

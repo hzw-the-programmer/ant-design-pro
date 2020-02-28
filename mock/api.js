@@ -317,6 +317,10 @@ const getActivities = [
   },
 ];
 
+function getFakeCaptcha(req, res) {
+  return res.json('captcha-xxx');
+}
+
 function getPlaces(req, res) {
   const places = [];
   const buildings = ['门诊楼', '住院楼'];
@@ -418,8 +422,15 @@ function getPeople(req, res) {
   res.json(people);
 }
 
-function getFakeCaptcha(req, res) {
-  return res.json('captcha-xxx');
+function getPlace(req, res) {
+  let place = [];
+  const { p } = req.query;
+  if (p === '0') {
+    place = [1, 2];
+  } else if (p === '1') {
+    place = [1, 3];
+  }
+  res.json(place);
 }
 
 export default {
@@ -439,4 +450,5 @@ export default {
   'GET /api/map': getMap,
   'GET /api/rti': getRTI,
   'GET /api/people': getPeople,
+  'GET /api/place': getPlace,
 };

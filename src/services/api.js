@@ -140,3 +140,7 @@ export async function queryRTI(place) {
 export async function queryPeople() {
   return request('/api/people');
 }
+
+export async function queryPlace(person) {
+  return request(`/api/place?p=${person}`);
+}
