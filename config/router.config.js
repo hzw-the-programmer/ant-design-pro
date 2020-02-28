@@ -330,9 +330,9 @@ export default [
             component: './Map/Map9',
           },
           {
-            path: '/map/map10',
-            name: 'map10',
-            component: './Map/Map10',
+            path: '/map/monitor',
+            name: 'monitor',
+            component: './Map/Monitor',
           },
           {
             path: '/map/map11',
@@ -343,6 +343,16 @@ export default [
             path: '/map/map12',
             name: 'map12',
             component: './Map/Map12',
+          },
+          {
+            path: '/map/route',
+            name: 'route',
+            component: './Map/Route',
+          },
+          {
+            path: '/map/table',
+            name: 'table',
+            component: './Map/Table',
           },
         ],
       },

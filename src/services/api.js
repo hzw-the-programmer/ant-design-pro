@@ -125,14 +125,22 @@ export async function getFakeCaptcha(mobile) {
   return request(`/api/captcha?mobile=${mobile}`);
 }
 
-export async function queryRTI() {
-  return request('/api/rti');
-}
-
 export async function queryPlaces() {
   return request('/api/places');
 }
 
-export async function queryMap(value) {
-  return request(`/api/map?l1=${value[0]}&l2=${value[1]}`);
+export async function queryMap(place) {
+  return request(`/api/map?l1=${place[0]}&l2=${place[1]}`);
+}
+
+export async function queryRTI(place, person) {
+  return request(`/api/rti?l1=${place[0]}&l2=${place[1]}&p=${person}`);
+}
+
+export async function queryPeople() {
+  return request('/api/people');
+}
+
+export async function queryPlace(person) {
+  return request(`/api/place?p=${person}`);
 }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import { connect } from 'dva';
-import { Switch, Card, Cascader } from 'antd';
+import { Switch, Card, Cascader, Select } from 'antd';
 
 import Map from 'ol/Map';
 import View from 'ol/View';
@@ -21,7 +21,7 @@ import HeatmapLayer from 'ol/layer/Heatmap';
 
 import ReactEcharts from 'echarts-for-react';
 
-import styles from './Map10.less';
+import styles from './Monitor.less';
 
 function createView(extent) {
   const projection = new Projection({
@@ -49,25 +49,25 @@ function createLayer(url, extent) {
   return layer;
 }
 
-@connect(({ map }) => ({
-  map,
+@connect(({ monitor }) => ({
+  monitor,
 }))
-class Map10 extends Component {
+class Monitor extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      showHeatmap: false,
-    };
     this.toggleHeatmap = this.toggleHeatmap.bind(this);
     this.changePlace = this.changePlace.bind(this);
+    this.changePerson = this.changePerson.bind(this);
   }
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    const { showHeatmap } = this.state;
+    const {
+      monitor: { heatmap },
+      dispatch,
+    } = this.props;
 
     dispatch({
-      type: 'map/fetchPlaces',
+      type: 'monitor/startRTI',
     });
 
     const mapLayer = new ImageLayer({
@@ -112,7 +112,7 @@ class Map10 extends Component {
 
     this.heatmapLayer = new HeatmapLayer({
       source: this.peopleSource,
-      visible: showHeatmap,
+      visible: heatmap,
     });
 
     const layers = [mapLayer, this.regionLayer, this.peopleLayer, this.heatmapLayer];
@@ -128,11 +128,33 @@ class Map10 extends Component {
 
   // componentDidUpdate(prevProps, prevState, snapshot) {
   componentDidUpdate() {
+    console.log('componentDidUpdate');
     const {
-      map: { rti, map },
+      monitor: { rti, map, heatmap },
     } = this.props;
 
     this.regionLayer.getSource().clear();
+    this.peopleSource.clear();
+    this.heatmapLayer.setVisible(heatmap);
+
+    if (map.url === '') {
+      this.url = map.url;
+      this.map
+        .getLayers()
+        .item(0)
+        .setVisible(false);
+      return;
+    }
+
+    if (map.url !== this.url) {
+      this.url = map.url;
+      const view = createView(map.extent);
+      this.map.setView(view);
+      const layer = createLayer(map.url, map.extent);
+      this.map.getLayers().removeAt(0);
+      this.map.getLayers().insertAt(0, layer);
+    }
+
     rti.regions.forEach(region => {
       const l = region.rect.x;
       const b = region.rect.y - region.rect.h;
@@ -148,31 +170,29 @@ class Map10 extends Component {
       this.regionLayer.getSource().addFeature(pointFeature);
     });
 
-    this.peopleSource.clear();
     rti.people.forEach(person => {
+      if (!person.visible) return;
       const pointFeature = new Feature({
         geometry: new Point([person.pos.x, person.pos.y]),
         type: person.type,
       });
       this.peopleSource.addFeature(pointFeature);
     });
-
-    if (map.url !== '') {
-      const view = createView(map.extent);
-      this.map.setView(view);
-      const layer = createLayer(map.url, map.extent);
-      this.map.getLayers().removeAt(0);
-      this.map.getLayers().insertAt(0, layer);
-    }
   }
 
   componentWillUnmount() {
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'monitor/stopRTI',
+    });
+
     this.map.setTarget(undefined);
   }
 
   getOption() {
     const {
-      map: { rti },
+      monitor: { rti },
     } = this.props;
 
     const options = {
@@ -222,33 +242,64 @@ class Map10 extends Component {
   }
 
   toggleHeatmap() {
-    const { showHeatmap } = this.state;
-    this.setState({
-      showHeatmap: !showHeatmap,
+    const {
+      monitor: { heatmap },
+      dispatch,
+    } = this.props;
+
+    dispatch({
+      type: 'monitor/changeHeatmap',
+      payload: !heatmap,
     });
-    this.heatmapLayer.setVisible(!showHeatmap);
   }
 
-  changePlace(value) {
+  changePlace(place) {
     const { dispatch } = this.props;
 
     dispatch({
-      type: 'map/changePlace',
-      payload: value,
+      type: 'monitor/changePlace',
+      payload: place,
+    });
+  }
+
+  changePerson(person) {
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'monitor/changePerson',
+      payload: person,
     });
   }
 
   render() {
-    const { showHeatmap } = this.state;
     const {
-      map: { rti, places },
+      monitor: { places, place, rti, people, person, heatmap },
     } = this.props;
 
     return (
       <div>
-        <Cascader options={places} onChange={this.changePlace} placeholder="请选择地址" />
+        <Cascader
+          options={places}
+          value={place}
+          onChange={this.changePlace}
+          placeholder="请选择地址"
+        />
+        <br />
+        <Select
+          style={{ width: '178px' }}
+          placeholder="找人"
+          allowClear
+          onChange={this.changePerson}
+          value={person}
+        >
+          {people.map(p => (
+            <Select.Option key={p.id} value={p.id}>
+              {p.name}
+            </Select.Option>
+          ))}
+        </Select>
         <div id="map" className={styles.map} />
-        <Switch checked={showHeatmap} onChange={this.toggleHeatmap} />
+        <Switch checked={heatmap} onChange={this.toggleHeatmap} />
         <Card>
           <div style={{ textAlign: 'center' }}>总人数</div>
           <div style={{ textAlign: 'center', fontSize: 50 }}>{rti.people && rti.people.length}</div>
@@ -261,4 +312,4 @@ class Map10 extends Component {
   }
 }
 
-export default Map10;
+export default Monitor;
