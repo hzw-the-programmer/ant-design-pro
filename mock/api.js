@@ -419,7 +419,7 @@ function getRTI(req, res) {
 
 function getPeople(req, res) {
   const people = [];
-  for (let i = 0; i < 10; i += 1) {
+  for (let i = 0; i < 12; i += 1) {
     people.push({
       id: i,
       name: `人员${i}`,
@@ -439,6 +439,26 @@ function getPlace(req, res) {
   res.json(place);
 }
 
+
+//cm代码开始
+function getStationList(req, res) {
+  const stationlist = [];
+  for (let i = 0; i < 12; i += 1) {
+    stationlist.push({
+      id: i,
+      sn: `设备${i}`,
+      place:`车间${i}`,
+      region:`区域${i}`,
+      single: '100',
+      battery: '50%',
+      last_active_time:'hh',
+      status:'ok',
+    });
+  }
+  res.json(stationlist);
+}
+////cm代码截止
+
 export default {
   'GET /api/project/notice': getNotice,
   'GET /api/activities': getActivities,
@@ -457,4 +477,7 @@ export default {
   'GET /api/rti': getRTI,
   'GET /api/people': getPeople,
   'GET /api/place': getPlace,
+
+  //cm代码开始
+  'GET /api/station': getStationList,
 };
