@@ -27,9 +27,33 @@ function handleMoveEvent(evt) {
   }
 }
 
+function handleDownEvent(evt) {
+  const { map } = evt;
+  const feature = map.forEachFeatureAtPixel(evt.pixel, f => f);
+
+  if (feature) {
+    this.feature = feature;
+    this.coordinate = evt.coordinate;
+  }
+
+  return !!feature;
+}
+
+function handleDragEvent(evt) {
+  const deltaX = evt.coordinate[0] - this.coordinate[0];
+  const deltaY = evt.coordinate[1] - this.coordinate[1];
+
+  const geometry = this.feature.getGeometry();
+  geometry.translate(deltaX, deltaY);
+
+  [this.coordinate[0], this.coordinate[1]] = evt.coordinate;
+}
+
 function Drag() {
   PointerInteraction.call(this, {
     handleMoveEvent,
+    handleDownEvent,
+    handleDragEvent,
   });
 
   this.cursor = 'pointer';
