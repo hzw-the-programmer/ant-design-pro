@@ -24,8 +24,10 @@ export default class Map14 extends PureComponent {
     super(props);
     this.state = {
       shallSmoothen: false,
+      iterations: 5,
     };
     this.changeShallSmoothen = this.changeShallSmoothen.bind(this);
+    this.changeIterations = this.changeIterations.bind(this);
   }
 
   componentDidMount() {
@@ -53,13 +55,13 @@ export default class Map14 extends PureComponent {
       type: 'LineString',
     });
     draw.on('drawend', event => {
-      const { shallSmoothen } = this.state;
+      const { shallSmoothen, iterations } = this.state;
       if (!shallSmoothen) return;
 
       const { feature } = event;
       const geometry = feature.getGeometry();
       const coordinates = geometry.getCoordinates();
-      const smoothened = makeSmooth(coordinates, 5);
+      const smoothened = makeSmooth(coordinates, iterations);
       geometry.setCoordinates(smoothened);
     });
 
@@ -73,8 +75,17 @@ export default class Map14 extends PureComponent {
     });
   }
 
+  changeIterations(event) {
+    const {
+      target: { value },
+    } = event;
+    this.setState({
+      iterations: value,
+    });
+  }
+
   render() {
-    const { shallSmoothen } = this.state;
+    const { shallSmoothen, iterations } = this.state;
 
     return (
       <div>
@@ -86,6 +97,19 @@ export default class Map14 extends PureComponent {
             type="checkbox"
             checked={shallSmoothen}
             onChange={this.changeShallSmoothen}
+          />
+        </label>
+        <br />
+        <label htmlFor="iterations">
+          Number of smoothings
+          <input
+            id="iterations"
+            type="range"
+            min="2"
+            max="10"
+            step="1"
+            value={iterations}
+            onChange={this.changeIterations}
           />
         </label>
       </div>
