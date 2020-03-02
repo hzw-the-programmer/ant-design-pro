@@ -7,8 +7,39 @@ import { TileJSON, Vector as VectorSource } from 'ol/source';
 import Feature from 'ol/Feature';
 import { Point, LineString, Polygon } from 'ol/geom';
 import { Style, Icon, Stroke, Fill } from 'ol/style';
+import { defaults as defaultInteractions, Pointer as PointerInteraction } from 'ol/interaction';
 
 import styles from './Map13.less';
+
+function handleMoveEvent(evt) {
+  const { map } = evt;
+  const element = map.getTargetElement();
+  const feature = map.forEachFeatureAtPixel(evt.pixel, f => f);
+
+  if (feature) {
+    if (element.style.cursor !== this.cursor) {
+      this.previousCursor = element.style.cursor;
+      element.style.cursor = this.cursor;
+    }
+  } else if (this.previousCursor !== undefined) {
+    element.style.cursor = this.previousCursor;
+    this.previousCursor = undefined;
+  }
+}
+
+function Drag() {
+  PointerInteraction.call(this, {
+    handleMoveEvent,
+  });
+
+  this.cursor = 'pointer';
+  this.previousCursor = undefined;
+
+  this.coordinate = null;
+  this.feature = null;
+}
+
+Drag.prototype = Object.create(PointerInteraction.prototype);
 
 export default class Map13 extends PureComponent {
   componentDidMount() {
@@ -59,6 +90,7 @@ export default class Map13 extends PureComponent {
           }),
         }),
       ],
+      interactions: defaultInteractions().extend([new Drag()]),
     });
   }
 
