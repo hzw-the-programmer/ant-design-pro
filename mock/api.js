@@ -472,6 +472,19 @@ function getBeaconList(req, res) {
   }
   res.json(beaconlist);
 }
+
+function getStaffList(req, res) {
+  const stafflist = [];
+  for (let i = 0; i < 12; i += 1) {
+    stafflist.push({
+      id: i,
+      name:`姓名${i}`,
+      number:`工号${i}`,
+      team:`班组${i}`,
+    });
+  }
+  res.json(stafflist);
+}
 ////cm代码截止
 
 export default {
@@ -496,4 +509,6 @@ export default {
   //cm代码开始
   'GET /api/station': getStationList,
   'GET /api/beacon': getBeaconList,
+  'GET /api/station': getStationList,
+  'GET /api/staff': getStaffList,
 };

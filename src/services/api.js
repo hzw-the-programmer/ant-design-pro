@@ -145,7 +145,6 @@ export async function queryPlace(person) {
   return request(`/api/place?p=${person}`);
 }
 
-
 //cm代码开始
 export async function queryStation() {
   return request('/api/station');
@@ -154,3 +153,8 @@ export async function queryStation() {
 export async function queryBeacon() {
   return request('/api/beacon');
 }
+
+export async function queryStaff() {
+  return request('/api/staff');
+}
+

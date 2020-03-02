@@ -280,6 +280,23 @@ export default [
         ],
       },
       {
+        path: '/staff',
+        name: 'staff',
+        icon: 'dashboard',
+        routes: [
+          {
+            path: '/staff/stafflist',
+            name: 'stafflist',
+            component: './Staff/StaffList',
+          },
+          {
+            path: '/staff/teamlist',
+            name: 'teamlist',
+            component: './Staff/TeamList',
+          },
+        ],
+      },
+      {
         path: '/map',
         name: 'map',
         icon: 'dashboard',

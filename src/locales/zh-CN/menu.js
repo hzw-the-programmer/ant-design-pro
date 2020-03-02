@@ -52,6 +52,9 @@ export default {
   'menu.station.stationlist': '基站列表',
   'menu.beacon': '信标管理',
   'menu.beacon.beaconlist': '信标列表',
+  'menu.staff': '人员管理',
+  'menu.staff.stafflist': '人员列表',
+  'menu.staff.teamlist': '组织列表',
   'menu.map.route': '轨迹',
   'menu.map.table': '表格',
 };
