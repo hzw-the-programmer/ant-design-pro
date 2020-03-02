@@ -457,6 +457,21 @@ function getStationList(req, res) {
   }
   res.json(stationlist);
 }
+
+function getBeaconList(req, res) {
+  const beaconlist = [];
+  for (let i = 0; i < 12; i += 1) {
+    beaconlist.push({
+      id: i,
+      mac: `信标${i}`,
+      name:`人员${i}`,
+      number:`工号${i}`,
+      battery: '50%',
+      rssi:'-75',
+    });
+  }
+  res.json(beaconlist);
+}
 ////cm代码截止
 
 export default {
@@ -480,4 +495,5 @@ export default {
 
   //cm代码开始
   'GET /api/station': getStationList,
+  'GET /api/beacon': getBeaconList,
 };

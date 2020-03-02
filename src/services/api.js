@@ -150,3 +150,7 @@ export async function queryPlace(person) {
 export async function queryStation() {
   return request('/api/station');
 }
+
+export async function queryBeacon() {
+  return request('/api/beacon');
+}
