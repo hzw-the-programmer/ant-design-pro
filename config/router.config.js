@@ -330,6 +330,11 @@ export default [
             name: 'table',
             component: './Map/Table',
           },
+          {
+            path: '/map/map13',
+            name: 'map13',
+            component: './Map/Map13',
+          },
         ],
       },
       {
