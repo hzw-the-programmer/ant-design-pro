@@ -12,6 +12,8 @@ import { Image as ImageLayer, Vector as VectorLayer } from 'ol/layer';
 import { Vector as VectorSource, ImageStatic } from 'ol/source';
 import Projection from 'ol/proj/Projection';
 import { getCenter } from 'ol/extent';
+import Feature from 'ol/Feature';
+import { Point, LineString } from 'ol/geom';
 
 import styles from './Route.less';
 
@@ -54,47 +56,57 @@ class Route extends Component {
     const fr = routes.filter(r => isEqual(r.place, place));
     const [route] = fr;
 
+    const routeSource = this.map
+      .getLayers()
+      .item(1)
+      .getSource();
     if (!route) {
       this.url = undefined;
       this.map
         .getLayers()
         .item(0)
         .setVisible(false);
-      this.map
-        .getLayers()
-        .item(1)
-        .getSource()
-        .clear();
+      routeSource.clear();
       return;
     }
 
     const {
       map: { url, extent },
+      locations,
     } = route;
 
-    if (this.url === url) return;
-    this.url = url;
+    if (this.url !== url) {
+      this.url = url;
 
-    const projection = new Projection({
-      code: 'hzw',
-      extent,
-    });
+      const projection = new Projection({
+        code: 'hzw',
+        extent,
+      });
 
-    const view = new View({
-      center: getCenter(extent),
-      zoom: 2,
-      projection,
-    });
-    this.map.setView(view);
+      const view = new View({
+        center: getCenter(extent),
+        zoom: 2,
+        projection,
+      });
+      this.map.setView(view);
 
-    const mapLayer = new ImageLayer({
-      source: new ImageStatic({
-        url,
-        imageExtent: extent,
-      }),
+      const mapLayer = new ImageLayer({
+        source: new ImageStatic({
+          url,
+          imageExtent: extent,
+        }),
+      });
+      this.map.getLayers().removeAt(0);
+      this.map.getLayers().insertAt(0, mapLayer);
+    }
+
+    routeSource.clear();
+    const coords = [];
+    locations.forEach(location => {
+      routeSource.addFeature(new Feature(new Point(location.coord)));
+      coords.push(location.coord);
     });
-    this.map.getLayers().removeAt(0);
-    this.map.getLayers().insertAt(0, mapLayer);
+    routeSource.addFeature(new Feature(new LineString(coords)));
   }
 
   componentWillUnmount() {

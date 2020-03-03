@@ -440,6 +440,7 @@ function getPlace(req, res) {
 }
 
 function getRoutes(req, res) {
+  const { st, et } = req.query;
   const routes = [
     {
       place: [1, 2],
@@ -447,6 +448,7 @@ function getRoutes(req, res) {
         url: './hospitalMap2.png',
         extent: [0, 0, 668, 550],
       },
+      locations: [],
     },
     {
       place: [1, 3],
@@ -454,8 +456,26 @@ function getRoutes(req, res) {
         url: './PRMC-2nd-floor-map-8-2013.png',
         extent: [0, 0, 1650, 1275],
       },
+      locations: [],
     },
   ];
+
+  const duration = (et - st) / 6;
+  let ct = st;
+  let x = 450;
+  let y = 250;
+  routes.forEach(route => {
+    for (let i = 0; i < 3; i += 1) {
+      route.locations.push({
+        datetime: ct,
+        duration,
+        coord: [x, y],
+      });
+      ct += duration;
+      x += 50;
+      y += 50;
+    }
+  });
 
   res.json(routes);
 }
