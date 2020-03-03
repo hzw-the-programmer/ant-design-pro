@@ -439,6 +439,27 @@ function getPlace(req, res) {
   res.json(place);
 }
 
+function getRoutes(req, res) {
+  const routes = [
+    {
+      place: [1, 2],
+      map: {
+        url: './hospitalMap2.png',
+        extent: [0, 0, 668, 550],
+      },
+    },
+    {
+      place: [1, 3],
+      map: {
+        url: './PRMC-2nd-floor-map-8-2013.png',
+        extent: [0, 0, 1650, 1275],
+      },
+    },
+  ];
+
+  res.json(routes);
+}
+
 export default {
   'GET /api/project/notice': getNotice,
   'GET /api/activities': getActivities,
@@ -457,4 +478,5 @@ export default {
   'GET /api/rti': getRTI,
   'GET /api/people': getPeople,
   'GET /api/place': getPlace,
+  'GET /api/routes': getRoutes,
 };

@@ -144,3 +144,7 @@ export async function queryPeople() {
 export async function queryPlace(person) {
   return request(`/api/place?p=${person}`);
 }
+
+export async function queryRoutes(person, datetime) {
+  return request(`/api/routes?p=${person}&st=${datetime[0].unix()}&et=${datetime[1].unix()}`);
+}

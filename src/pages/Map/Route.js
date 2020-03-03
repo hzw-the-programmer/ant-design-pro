@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import { connect } from 'dva';
 
-import { Select, DatePicker, Button } from 'antd';
+import { Select, DatePicker, Button, Cascader } from 'antd';
 
 @connect(({ monitor, route }) => ({
   monitor,
@@ -13,6 +13,8 @@ class Route extends Component {
     super(props);
     this.changePerson = this.changePerson.bind(this);
     this.changeDatetime = this.changeDatetime.bind(this);
+    this.handleSearch = this.handleSearch.bind(this);
+    this.changePlace = this.changePlace.bind(this);
   }
 
   changePerson(person) {
@@ -31,11 +33,35 @@ class Route extends Component {
     });
   }
 
+  handleSearch() {
+    const {
+      dispatch,
+      route: { person, datetime },
+    } = this.props;
+
+    dispatch({
+      type: 'route/fetchRoutes',
+      payload: {
+        person,
+        datetime,
+      },
+    });
+  }
+
+  changePlace(place) {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'route/changePlace',
+      payload: place,
+    });
+  }
+
   render() {
     const {
       monitor: { people },
-      route: { person, datetime },
+      route: { person, datetime, places, place },
     } = this.props;
+
     return (
       <div>
         <Select
@@ -58,7 +84,16 @@ class Route extends Component {
           value={datetime}
         />
         <br />
-        <Button type="primary">查询</Button>
+        <Button type="primary" onClick={this.handleSearch}>
+          查询
+        </Button>
+        <br />
+        <Cascader
+          options={places}
+          value={place}
+          onChange={this.changePlace}
+          placeholder="请选择地址"
+        />
       </div>
     );
   }
