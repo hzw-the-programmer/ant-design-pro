@@ -461,7 +461,7 @@ function getRoutes(req, res) {
   ];
 
   const duration = (et - st) / 6;
-  let ct = st;
+  let ct = parseInt(st, 10);
   let x = 450;
   let y = 250;
   routes.forEach(route => {

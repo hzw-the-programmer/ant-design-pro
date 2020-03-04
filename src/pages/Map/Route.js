@@ -6,6 +6,8 @@ import { Select, DatePicker, Button, Cascader } from 'antd';
 
 import { isEqual } from 'lodash';
 
+import moment from 'moment';
+
 import Map from 'ol/Map';
 import View from 'ol/View';
 import { Image as ImageLayer, Vector as VectorLayer } from 'ol/layer';
@@ -14,7 +16,7 @@ import Projection from 'ol/proj/Projection';
 import { getCenter } from 'ol/extent';
 import Feature from 'ol/Feature';
 import { Point, LineString } from 'ol/geom';
-import { Style, Stroke, Icon, Circle, Fill } from 'ol/style';
+import { Style, Stroke, Icon, Circle, Fill, Text } from 'ol/style';
 
 import styles from './Route.less';
 
@@ -29,6 +31,14 @@ function styleFunction(feature) {
           color: 'white',
           width: 2,
         }),
+      }),
+      text: new Text({
+        text: feature.get('text'),
+        stroke: new Stroke({
+          color: [255, 255, 255, 0.5],
+          width: 4,
+        }),
+        textBaseline: 'bottom',
       }),
     });
   }
@@ -159,7 +169,12 @@ class Route extends Component {
     routeSource.clear();
     const coords = [];
     locations.forEach(location => {
-      routeSource.addFeature(new Feature(new Point(location.coord)));
+      routeSource.addFeature(
+        new Feature({
+          geometry: new Point(location.coord),
+          text: `${moment.unix(location.datetime).format()} ${location.duration}`,
+        })
+      );
       coords.push(location.coord);
     });
     routeSource.addFeature(new Feature(new LineString(coords)));
