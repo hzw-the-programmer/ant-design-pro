@@ -5,7 +5,7 @@ import View from 'ol/View';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { OSM, Vector as VectorSource } from 'ol/source';
 import { GeoJSON } from 'ol/format';
-import { Select, Translate, defaults as defaultInteractions } from 'ol/interaction';
+import { Select, Translate, Modify, defaults as defaultInteractions } from 'ol/interaction';
 
 import styles from './Map16.less';
 
@@ -19,6 +19,7 @@ export default class Map16 extends PureComponent {
       source: new VectorSource({
         url: './countries.geojson',
         format: new GeoJSON(),
+        wrapX: false,
       }),
     });
 
@@ -33,12 +34,15 @@ export default class Map16 extends PureComponent {
     const translate = new Translate({
       features: select.getFeatures(),
     });
+    const modify = new Modify({
+      features: select.getFeatures(),
+    });
 
     this.map = new Map({
       target: 'map',
       layers,
       view,
-      interactions: defaultInteractions().extend([select, translate]),
+      interactions: defaultInteractions().extend([select, translate, modify]),
     });
   }
 
