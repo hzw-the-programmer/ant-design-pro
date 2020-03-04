@@ -19,6 +19,20 @@ import { Style, Stroke, Icon, Circle, Fill } from 'ol/style';
 import styles from './Route.less';
 
 function styleFunction(feature) {
+  const geometry = feature.getGeometry();
+  if (geometry.getType() === 'Point') {
+    return new Style({
+      image: new Circle({
+        radius: 7,
+        fill: new Fill({ color: '#ffcc33' }),
+        stroke: new Stroke({
+          color: 'white',
+          width: 2,
+        }),
+      }),
+    });
+  }
+
   const fstyles = [
     new Style({
       stroke: new Stroke({
@@ -28,7 +42,6 @@ function styleFunction(feature) {
     }),
   ];
 
-  const geometry = feature.getGeometry();
   geometry.forEachSegment((start, end) => {
     const dx = end[0] - start[0];
     const dy = end[1] - start[1];
@@ -41,32 +54,6 @@ function styleFunction(feature) {
           rotation: -rotation,
           rotateWithView: true,
           anchor: [0.5, 0.5],
-        }),
-      })
-    );
-    fstyles.push(
-      new Style({
-        geometry: new Point(start),
-        image: new Circle({
-          radius: 7,
-          fill: new Fill({ color: '#ffcc33' }),
-          stroke: new Stroke({
-            color: 'white',
-            width: 2,
-          }),
-        }),
-      })
-    );
-    fstyles.push(
-      new Style({
-        geometry: new Point(end),
-        image: new Circle({
-          radius: 7,
-          fill: new Fill({ color: '#ffcc33' }),
-          stroke: new Stroke({
-            color: 'white',
-            width: 2,
-          }),
         }),
       })
     );
@@ -106,9 +93,19 @@ class Route extends Component {
       target: 'map',
       layers,
     });
+
+    this.updateMap();
   }
 
   componentDidUpdate() {
+    this.updateMap();
+  }
+
+  componentWillUnmount() {
+    this.map.setTarget(undefined);
+  }
+
+  updateMap() {
     const {
       route: { place, routes },
     } = this.props;
@@ -162,14 +159,10 @@ class Route extends Component {
     routeSource.clear();
     const coords = [];
     locations.forEach(location => {
-      // routeSource.addFeature(new Feature(new Point(location.coord)));
+      routeSource.addFeature(new Feature(new Point(location.coord)));
       coords.push(location.coord);
     });
     routeSource.addFeature(new Feature(new LineString(coords)));
-  }
-
-  componentWillUnmount() {
-    this.map.setTarget(undefined);
   }
 
   changePerson(person) {
