@@ -52,4 +52,5 @@ export default {
   'menu.map.table': '表格',
   'menu.map.map13': 'Map13',
   'menu.map.map14': 'Map14',
+  'menu.map.map15': 'Map15',
 };
