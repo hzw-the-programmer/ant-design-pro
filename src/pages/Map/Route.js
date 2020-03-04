@@ -14,8 +14,66 @@ import Projection from 'ol/proj/Projection';
 import { getCenter } from 'ol/extent';
 import Feature from 'ol/Feature';
 import { Point, LineString } from 'ol/geom';
+import { Style, Stroke, Icon, Circle, Fill } from 'ol/style';
 
 import styles from './Route.less';
+
+function styleFunction(feature) {
+  const fstyles = [
+    new Style({
+      stroke: new Stroke({
+        width: 2,
+        color: '#ffcc33',
+      }),
+    }),
+  ];
+
+  const geometry = feature.getGeometry();
+  geometry.forEachSegment((start, end) => {
+    const dx = end[0] - start[0];
+    const dy = end[1] - start[1];
+    const rotation = Math.atan2(dy, dx);
+    fstyles.push(
+      new Style({
+        geometry: new Point([start[0] + dx / 2, start[1] + dy / 2]),
+        image: new Icon({
+          src: './arrow.png',
+          rotation: -rotation,
+          rotateWithView: true,
+          anchor: [0.5, 0.5],
+        }),
+      })
+    );
+    fstyles.push(
+      new Style({
+        geometry: new Point(start),
+        image: new Circle({
+          radius: 7,
+          fill: new Fill({ color: '#ffcc33' }),
+          stroke: new Stroke({
+            color: 'white',
+            width: 2,
+          }),
+        }),
+      })
+    );
+    fstyles.push(
+      new Style({
+        geometry: new Point(end),
+        image: new Circle({
+          radius: 7,
+          fill: new Fill({ color: '#ffcc33' }),
+          stroke: new Stroke({
+            color: 'white',
+            width: 2,
+          }),
+        }),
+      })
+    );
+  });
+
+  return fstyles;
+}
 
 @connect(({ monitor, route }) => ({
   monitor,
@@ -39,6 +97,7 @@ class Route extends Component {
 
     const routeLayer = new VectorLayer({
       source: this.routeSource,
+      style: styleFunction,
     });
 
     const layers = [mapLayer, routeLayer];
@@ -103,7 +162,7 @@ class Route extends Component {
     routeSource.clear();
     const coords = [];
     locations.forEach(location => {
-      routeSource.addFeature(new Feature(new Point(location.coord)));
+      // routeSource.addFeature(new Feature(new Point(location.coord)));
       coords.push(location.coord);
     });
     routeSource.addFeature(new Feature(new LineString(coords)));
