@@ -6,6 +6,7 @@ import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { OSM, Vector as VectorSource } from 'ol/source';
 import { GeoJSON } from 'ol/format';
 import { Select, Translate, Modify, defaults as defaultInteractions } from 'ol/interaction';
+import Draw, { createBox } from 'ol/interaction/Draw';
 
 import styles from './Map16.less';
 
@@ -15,12 +16,13 @@ export default class Map16 extends PureComponent {
       source: new OSM(),
     });
 
+    const source = new VectorSource({
+      url: './countries.geojson',
+      format: new GeoJSON(),
+      wrapX: false,
+    });
     const vector = new VectorLayer({
-      source: new VectorSource({
-        url: './countries.geojson',
-        format: new GeoJSON(),
-        wrapX: false,
-      }),
+      source,
     });
 
     const layers = [raster, vector];
@@ -44,6 +46,14 @@ export default class Map16 extends PureComponent {
       view,
       interactions: defaultInteractions().extend([select, translate, modify]),
     });
+
+    this.map.addInteraction(
+      new Draw({
+        source,
+        type: 'Circle',
+        geometryFunction: createBox(),
+      })
+    );
   }
 
   componentWillUnmount() {
