@@ -1,5 +1,7 @@
 import React, { PureComponent } from 'react';
 
+import { connect } from 'dva';
+
 import Map from 'ol/Map';
 import View from 'ol/View';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
@@ -10,7 +12,18 @@ import Draw, { createBox } from 'ol/interaction/Draw';
 
 import styles from './Map16.less';
 
-export default class Map16 extends PureComponent {
+export const CREATE_REGION = 0;
+export const MODIFY_REGION = 1;
+
+@connect(({ map16 }) => ({
+  map16,
+}))
+class Map16 extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.changeOperation = this.changeOperation.bind(this);
+  }
+
   componentDidMount() {
     const raster = new TileLayer({
       source: new OSM(),
@@ -47,20 +60,59 @@ export default class Map16 extends PureComponent {
       interactions: defaultInteractions().extend([select, translate, modify]),
     });
 
-    this.map.addInteraction(
-      new Draw({
-        source,
-        type: 'Circle',
-        geometryFunction: createBox(),
-      })
-    );
+    this.draw = new Draw({
+      source,
+      type: 'Circle',
+      geometryFunction: createBox(),
+    });
+
+    this.update();
+  }
+
+  componentDidUpdate() {
+    this.update();
   }
 
   componentWillUnmount() {
     this.map.setTarget(undefined);
   }
 
+  update() {
+    const {
+      map16: { operation },
+    } = this.props;
+    if (operation === CREATE_REGION) {
+      this.map.addInteraction(this.draw);
+    } else {
+      this.map.removeInteraction(this.draw);
+    }
+  }
+
+  changeOperation(event) {
+    const { dispatch } = this.props;
+    const {
+      target: { value },
+    } = event;
+    dispatch({
+      type: 'map16/changeOperation',
+      payload: parseInt(value, 10),
+    });
+  }
+
   render() {
-    return <div id="map" className={styles.map} />;
+    const {
+      map16: { operation },
+    } = this.props;
+    return (
+      <div>
+        <select value={operation} onChange={this.changeOperation}>
+          <option value={CREATE_REGION}>创建区域</option>
+          <option value={MODIFY_REGION}>编辑区域</option>
+        </select>
+        <div id="map" className={styles.map} />
+      </div>
+    );
   }
 }
+
+export default Map16;
