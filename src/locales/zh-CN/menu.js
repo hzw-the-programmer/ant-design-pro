@@ -54,4 +54,5 @@ export default {
   'menu.map.map14': 'Map14',
   'menu.map.map15': 'Map15',
   'menu.map.map16': 'Map16',
+  'menu.map.map17': 'Map17',
 };
