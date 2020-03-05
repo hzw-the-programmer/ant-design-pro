@@ -8,7 +8,8 @@ import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { OSM, Vector as VectorSource } from 'ol/source';
 import { GeoJSON } from 'ol/format';
 import { Select, Translate, Modify, defaults as defaultInteractions } from 'ol/interaction';
-import Draw, { createBox } from 'ol/interaction/Draw';
+// import Draw, { createBox } from 'ol/interaction/Draw';
+import Extent from 'ol/interaction/Extent';
 
 import styles from './Map16.less';
 
@@ -60,11 +61,12 @@ class Map16 extends PureComponent {
       interactions: defaultInteractions().extend([select, translate, modify]),
     });
 
-    this.draw = new Draw({
-      source,
-      type: 'Circle',
-      geometryFunction: createBox(),
-    });
+    // this.draw = new Draw({
+    //   source,
+    //   type: 'Circle',
+    //   geometryFunction: createBox(),
+    // });
+    this.draw = new Extent();
 
     this.update();
   }
