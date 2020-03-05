@@ -1,4 +1,4 @@
-import { queryBeacon } from '@/services/api';
+import { queryBeacon,addBeacon } from '@/services/api';
 
 export default {
   namespace: 'table',
@@ -6,6 +6,7 @@ export default {
   state: {
     beaconlist: [],
   },
+
 
   effects: {
     peopleWatcher: [
