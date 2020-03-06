@@ -1,52 +1,10 @@
-
-// class StationList extends PureComponent {
-//   state = {};
-//   render() {
-//     return (
-//       <div>
-//         <Form onSubmit={this.handleSearch} layout="inline">
-//           <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-//             <Col md={8} sm={24}>
-//               <FormItem label="设备sn">
-//                 <input id="device_sn" className="input" />
-//                 {/* {getFieldDecorator('name')(<Input placeholder="请输入" />)} */}
-//               </FormItem>
-//             </Col>
-
-//             <Col md={8} sm={24}>
-//               <FormItem label="车间">
-//                 <input id="place" className="input" />
-//                 {/* {getFieldDecorator('name')(<Input placeholder="请输入" />)} */}
-//               </FormItem>
-//             </Col>
-
-//             <Col md={8} sm={24}>
-//               <span className={styles.submitButtons}>
-//                 <Button type="primary" htmlType="submit">
-//                   查询
-//                 </Button>
-//                 <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-//                   重置
-//                 </Button>
-//               </span>
-//             </Col>
-//           </Row>
-//         </Form>
-//         <Table
-//           //   dataSource={dataSource}
-//           columns={columns}
-//         />
-//       </div>
-//     );
-//   }
-// }
-
-
 import React, { Component } from 'react';
-
 import { connect } from 'dva';
-
 import { Table } from 'antd';
+
+
+import { formRequest} from '../../utils'
+import { HTTP_API_ROOT } from '../../services/httpUrls'
 
 const columns = [
   {
@@ -80,16 +38,39 @@ const columns = [
 ];
 
 
-@connect(({ table }) => ({
-  table,
-}))
 class StationList extends Component {
-  render() {
-    const {
-      table: { stationlist },
-    } = this.props;
-    return <Table dataSource={stationlist} columns={columns} rowKey="id" />;
+
+
+  handleSearch = conditions => {
+    this.setState({conditions})
+    this.props.loadAdReport(conditions)
   }
+  
+  render() {
+    const dataSources = this.props.result
+    console.log(dataSources)
+
+    return (
+      <div>
+       
+        {/* <ReportForm
+          onSearch={this.handleSearch}
+          onDownload={conditions => formRequest(`${HTTP_API_ROOT}/basestation/station_list`, 'post', conditions)}
+          loading={this.props.loading} /> */}
+        <Table
+          columns={columns}
+          dataSource={this.props.result}
+          rowKey="id"
+          // pagination={{
+          //   total: this.props.total,
+          //   onChange: this.handlePageChange
+          // }}
+          loading={this.props.loading}
+        />
+      </div>
+ 
+    )};
+  
 }
 
 export default StationList;

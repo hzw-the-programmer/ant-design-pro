@@ -1,20 +1,19 @@
-import { queryBeacon,addBeacon } from '@/services/api';
+import { queryBeacons } from '@/services/api';
 
 export default {
-  namespace: 'table',
+  namespace: 'beacon',
 
   state: {
-    beaconlist: [],
+    beacons: [],
   },
 
-
   effects: {
-    peopleWatcher: [
+    beaconsWatcher: [
       function*({ call, put }) {
-        const response = yield call(queryBeacon);
+        const response = yield call(queryBeacons, { page: 1, rows: 10 });
         yield put({
-          type: 'saveBeacon',
-          payload: response,
+          type: 'saveBeacons',
+          payload: response.result.rows,
         });
       },
       { type: 'watcher' },
@@ -22,10 +21,10 @@ export default {
   },
 
   reducers: {
-    saveBeacon(state, { payload }) {
+    saveBeacons(state, { payload }) {
       return {
         ...state,
-        beaconlist: payload,
+        beacons: payload,
       };
     },
   },
