@@ -59,11 +59,12 @@ class BeaconList extends Component {
   }
 
   handleSearch() {
-    const { page, rows, mac, name } = this.state
+    const { rows, mac, name } = this.state
     this.setState({
       loading: true,
+      page: 1,
     })
-    queryBeacons({ page, rows, mac, name }).then(response => {
+    queryBeacons({ page:1 , rows, mac, name }).then(response => {
       // setTimeout(() => {
         this.setState({
           beacons: response.result.rows,
