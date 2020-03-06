@@ -48,8 +48,10 @@ class BeaconList extends Component {
       rows: 10,
       beacons: [],
       loading: false,
+      total: 0,
     }
     this.handleSearch = this.handleSearch.bind(this)
+    this.handlePaginationChange = this.handlePaginationChange.bind(this)
   }
 
   handleSearch() {
@@ -62,13 +64,31 @@ class BeaconList extends Component {
         this.setState({
           beacons: response.result.rows,
           loading: false,
+          total: parseInt(response.result.total, 10),
+        })
+      // }, 3000)
+    })
+  }
+
+  handlePaginationChange(page, pageSize) {
+    this.setState({
+      loading: true,
+      page,
+      rows: pageSize,
+    })
+    queryBeacons({ page, pageSize }).then(response => {
+      // setTimeout(() => {
+        this.setState({
+          beacons: response.result.rows,
+          loading: false,
+          total: parseInt(response.result.total, 10),
         })
       // }, 3000)
     })
   }
 
   render() {
-    const { page, rows, beacons, loading } = this.state
+    const { page, rows, beacons, loading, total } = this.state
 
     return (
       <PageHeaderWrapper>
@@ -79,6 +99,7 @@ class BeaconList extends Component {
             columns={columns}
             rowKey="id"
             loading={loading}
+            pagination={{current: page, pageSize: rows, total, onChange: this.handlePaginationChange}}
           />
         </div>
      </PageHeaderWrapper>
