@@ -49,17 +49,21 @@ class BeaconList extends Component {
       beacons: [],
       loading: false,
       total: 0,
+      mac: '',
+      name: '',
     }
     this.handleSearch = this.handleSearch.bind(this)
     this.handlePaginationChange = this.handlePaginationChange.bind(this)
+    this.handleMacChange = this.handleMacChange.bind(this)
+    this.handleNameChange = this.handleNameChange.bind(this)
   }
 
   handleSearch() {
-    const { page, rows } = this.state
+    const { page, rows, mac, name } = this.state
     this.setState({
       loading: true,
     })
-    queryBeacons({ page, rows }).then(response => {
+    queryBeacons({ page, rows, mac, name }).then(response => {
       // setTimeout(() => {
         this.setState({
           beacons: response.result.rows,
@@ -87,12 +91,26 @@ class BeaconList extends Component {
     })
   }
 
+  handleMacChange(event) {
+    this.setState({
+      mac: event.target.value,
+    })
+  }
+
+  handleNameChange(event) {
+    this.setState({
+      name: event.target.value,
+    })
+  }
+
   render() {
-    const { page, rows, beacons, loading, total } = this.state
+    const { page, rows, beacons, loading, total, mac, name } = this.state
 
     return (
       <PageHeaderWrapper>
         <div className={styles.standardList}>
+          <Input addonBefore="MAC" placeholder="请输入" value={mac} onChange={this.handleMacChange}  />
+          <Input addonBefore="姓名" placeholder="请输入" value={name} onChange={this.handleNameChange}  />
           <Button onClick={this.handleSearch} loading={loading}>查询</Button>
           <Table 
             dataSource={beacons}
