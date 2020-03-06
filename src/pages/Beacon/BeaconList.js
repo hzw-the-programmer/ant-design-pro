@@ -7,37 +7,41 @@ import styles from './BeaconList.less';
 
 import { queryBeacons } from '@/services/api';
 
-const columns = [
-  {
-    title: '信标Sn',
-    dataIndex: 'mac',
-  },
-  {
-    title: '姓名',
-    dataIndex: 'name',
-  },
-  {
-    title: '工号',
-    dataIndex: 'number',
-  },
-  {
-    title: '电量',
-    dataIndex: 'battery',
-  },
-  {
-    title: '强度',
-    dataIndex: 'rssi',
-  },
-  
-  {
-    title: '操作',
-    dataIndex: 'operation',
-    render: (text, record) =>     
-        <Popconfirm title="确定删除?" onConfirm={() => this.handleDelete(record.key)}>
-          <a>删除</a>
-        </Popconfirm>     
-  },
-];
+function getColumns(operations) {
+  const columns = [
+    {
+      title: '信标Sn',
+      dataIndex: 'mac',
+    },
+    {
+      title: '姓名',
+      dataIndex: 'name',
+    },
+    {
+      title: '工号',
+      dataIndex: 'number',
+    },
+    {
+      title: '电量',
+      dataIndex: 'battery',
+    },
+    {
+      title: '强度',
+      dataIndex: 'rssi',
+    },
+    
+    {
+      title: '操作',
+      dataIndex: 'operation',
+      render: (text, record) =>     
+          <Popconfirm title="确定删除?" onConfirm={() => operations.delete(record.id)}>
+            <a>删除</a>
+          </Popconfirm>     
+    },
+  ];
+
+  return columns
+}
 
 class BeaconList extends Component {
 
@@ -56,6 +60,7 @@ class BeaconList extends Component {
     this.handlePaginationChange = this.handlePaginationChange.bind(this)
     this.handleMacChange = this.handleMacChange.bind(this)
     this.handleNameChange = this.handleNameChange.bind(this)
+    this.handleDelete = this.handleDelete.bind(this)
   }
 
   handleSearch() {
@@ -104,6 +109,10 @@ class BeaconList extends Component {
     })
   }
 
+  handleDelete(id) {
+    console.log(id)
+  }
+
   render() {
     const { page, rows, beacons, loading, total, mac, name } = this.state
 
@@ -115,7 +124,7 @@ class BeaconList extends Component {
           <Button onClick={this.handleSearch} loading={loading}>查询</Button>
           <Table 
             dataSource={beacons}
-            columns={columns}
+            columns={getColumns({delete: this.handleDelete})}
             rowKey="id"
             loading={loading}
             pagination={{current: page, pageSize: rows, total, onChange: this.handlePaginationChange}}
