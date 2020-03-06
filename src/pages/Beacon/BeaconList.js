@@ -5,6 +5,7 @@ import { Table,Button,Card , Modal,Form,Input,Popconfirm,Dropdown,Menu} from 'an
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './BeaconList.less';
 
+import { queryBeacons } from '@/services/api';
 
 const columns = [
   {
@@ -38,28 +39,46 @@ const columns = [
   },
 ];
 
-
-@connect(({ beacon }) => ({
-  beacon,
-}))
 class BeaconList extends Component {
 
   constructor(props){
-    super(props) 
+    super(props)
+    this.state = {
+      page: 1,
+      rows: 10,
+      beacons: [],
+      loading: false,
+    }
+    this.handleSearch = this.handleSearch.bind(this)
+  }
+
+  handleSearch() {
+    const { page, rows } = this.state
+    this.setState({
+      loading: true,
+    })
+    queryBeacons({ page, rows }).then(response => {
+      // setTimeout(() => {
+        this.setState({
+          beacons: response.result.rows,
+          loading: false,
+        })
+      // }, 3000)
+    })
   }
 
   render() {
-    const {
-      beacon: { beacons },
-    } = this.props;
+    const { page, rows, beacons, loading } = this.state
 
     return (
       <PageHeaderWrapper>
         <div className={styles.standardList}>
+          <Button onClick={this.handleSearch} loading={loading}>查询</Button>
           <Table 
             dataSource={beacons}
             columns={columns}
             rowKey="id"
+            loading={loading}
           />
         </div>
      </PageHeaderWrapper>
