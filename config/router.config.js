@@ -355,6 +355,11 @@ export default [
             name: 'map17',
             component: './Map/Map17',
           },
+          {
+            path: '/map/table2',
+            name: 'table2',
+            component: './Map/Table2',
+          },
         ],
       },
       {
