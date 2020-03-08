@@ -1,6 +1,19 @@
 import React, { PureComponent } from 'react';
 
-import { Row, Col, Card, Form, Input, Select, Icon, Button, InputNumber, DatePicker } from 'antd';
+import {
+  Row,
+  Col,
+  Card,
+  Form,
+  Input,
+  Select,
+  Icon,
+  Button,
+  Dropdown,
+  InputNumber,
+  DatePicker,
+  Menu,
+} from 'antd';
 
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
@@ -13,6 +26,7 @@ const { Option } = Select;
 class Table2 extends PureComponent {
   state = {
     expandForm: false,
+    selectedRows: [],
   };
 
   toggleForm = () => {
@@ -142,10 +156,36 @@ class Table2 extends PureComponent {
   }
 
   render() {
+    const { selectedRows } = this.state;
+
+    const menu = (
+      <Menu>
+        <Menu.Item key="remove">删除</Menu.Item>
+        <Menu.Item key="approval">批量审批</Menu.Item>
+      </Menu>
+    );
+
     return (
       <PageHeaderWrapper>
         <Card>
-          <div className={styles.tableListForm}>{this.renderForm()}</div>
+          <div className={styles.tableList}>
+            <div className={styles.tableListForm}>{this.renderForm()}</div>
+            <div className={styles.tableListOperator}>
+              <Button icon="plus" type="primary">
+                新建
+              </Button>
+              {selectedRows.length > 0 && (
+                <span>
+                  <Button>批量操作</Button>
+                  <Dropdown overlay={menu}>
+                    <Button>
+                      更多操作 <Icon type="down" />
+                    </Button>
+                  </Dropdown>
+                </span>
+              )}
+            </div>
+          </div>
         </Card>
       </PageHeaderWrapper>
     );
