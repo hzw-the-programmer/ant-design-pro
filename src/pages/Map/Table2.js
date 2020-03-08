@@ -13,6 +13,7 @@ import {
   InputNumber,
   DatePicker,
   Menu,
+  Modal,
 } from 'antd';
 
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -22,17 +23,56 @@ import styles from './Table2.less';
 const FormItem = Form.Item;
 const { Option } = Select;
 
+const CreateForm = Form.create()(props => {
+  const { modalVisible, form, handleModalVisible, handleAdd } = props;
+  const okHandle = () => {
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+      form.resetFields();
+      handleAdd(fieldsValue);
+    });
+  };
+
+  return (
+    <Modal
+      destroyOnClose
+      title="新建规则"
+      visible={modalVisible}
+      onCancel={() => handleModalVisible()}
+      onOk={okHandle}
+    >
+      <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="描述">
+        {form.getFieldDecorator('desc', {
+          rules: [{ required: true, message: '请输入至少五个字符的规则描述！', min: 5 }],
+        })(<Input placeholder="请输入" />)}
+      </FormItem>
+    </Modal>
+  );
+});
+
 @Form.create()
 class Table2 extends PureComponent {
   state = {
     expandForm: false,
     selectedRows: [],
+    modalVisible: false,
   };
 
   toggleForm = () => {
     const { expandForm } = this.state;
     this.setState({
       expandForm: !expandForm,
+    });
+  };
+
+  handleAdd = fields => {
+    console.log(fields);
+    this.handleModalVisible();
+  };
+
+  handleModalVisible = flag => {
+    this.setState({
+      modalVisible: !!flag,
     });
   };
 
@@ -156,7 +196,7 @@ class Table2 extends PureComponent {
   }
 
   render() {
-    const { selectedRows } = this.state;
+    const { selectedRows, modalVisible } = this.state;
 
     const menu = (
       <Menu>
@@ -165,13 +205,18 @@ class Table2 extends PureComponent {
       </Menu>
     );
 
+    const parentMethods = {
+      handleModalVisible: this.handleModalVisible,
+      handleAdd: this.handleAdd,
+    };
+
     return (
       <PageHeaderWrapper>
         <Card>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary">
+              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
                 新建
               </Button>
               {selectedRows.length > 0 && (
@@ -187,6 +232,7 @@ class Table2 extends PureComponent {
             </div>
           </div>
         </Card>
+        <CreateForm {...parentMethods} modalVisible={modalVisible} />
       </PageHeaderWrapper>
     );
   }
