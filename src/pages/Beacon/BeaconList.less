@@ -1,28 +1,18 @@
-@import '~antd/lib/style/themes/default.less';
-@import '~@/utils/utils.less';
-
-@media screen and (max-width: @screen-xs) {
-  .standardList {
-    :global {
-      .ant-list-item-content {
-        display: block;
-        flex: none;
-        width: 100%;
+.tableListForm {
+  :global {
+    .ant-form-item {
+      display: flex;
+      margin-right: 0;
+      margin-bottom: 24px;
+      .ant-form-item-label {
+        width: 68px;
+        line-height: 32px;
+        padding-right: 8px;
       }
-      .ant-list-item-action {
-        margin-left: 0;
-      }
-    }
-    .listContent {
-      margin-left: 0;
-      & > div {
-        margin-left: 0;
-      }
-    }
-    .listCard {
-      :global {
-        .ant-card-head-title {
-          overflow: visible;
+      .ant-form-item-control-wrapper {
+        flex: 1;
+        .ant-form-item-control {
+          line-height: 32px;
         }
       }
     }
