@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Form, Row, Col, Card, Button, Table, Modal,Input,Popconfirm,Dropdown,Menu} from 'antd';
+import { Form, Row, Col, Card, Button, Table, Modal, Input, Popconfirm, message } from 'antd';
 
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './BeaconList.less';
 
-import { queryBeacons, deleteBeacon } from '@/services/sh';
+import { queryBeacons, deleteBeacon, createBeacon } from '@/services/sh';
 
 function getColumns(operations) {
   const columns = [
@@ -42,6 +42,34 @@ function getColumns(operations) {
 
   return columns
 }
+
+const CreateForm = Form.create()(props => {
+  const { modalVisible, form, handleAdd, handleModalVisible } = props;
+
+  const okHandle = () => {
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+      form.resetFields();
+      handleAdd(fieldsValue);
+    });
+  };
+
+  return (
+    <Modal
+      destroyOnClose
+      title="Add Beacon"
+      visible={modalVisible}
+      onOk={okHandle}
+      onCancel={() => handleModalVisible()}
+    >
+      <Form.Item labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="Mac">
+        {form.getFieldDecorator('mac', {
+          rules: [{ required: true, message: 'Please input 4 hex digit', min: 4, max: 4 }],
+        })(<Input placeholder="Please input" />)}
+      </Form.Item>
+    </Modal>
+  );
+});
 @Form.create()
 class BeaconList extends Component {
   state = {
@@ -53,6 +81,7 @@ class BeaconList extends Component {
     params: {},
     beacons: [],
     total: 0,
+    modalVisible: false,
   }
 
   searchBeacons = (pagination, params) => {
@@ -61,14 +90,14 @@ class BeaconList extends Component {
     })
 
     queryBeacons(pagination, params).then(response => {
-      setTimeout(() => {
+      // setTimeout(() => {
         this.setState({
           loading: false,
           beacons: response.result.rows,
           total: parseInt(response.result.total, 10),
           pagination,
         })
-      }, 3000)
+      // }, 3000)
     })
   }
 
@@ -123,6 +152,26 @@ class BeaconList extends Component {
     })
   }
 
+  handleModalVisible = flag => {
+    this.setState({
+      modalVisible: !!flag,
+    });
+  };
+
+  handleAdd = fields => {
+    const { pagination, params } = this.state
+
+    this.setState({
+      loading: true,
+    })
+
+    createBeacon(fields).then(response => {
+      message.success('添加成功');
+      this.handleModalVisible();
+      this.searchBeacons(pagination, params)
+    })
+  };
+
   renderForm = loading => {
     const { form: { getFieldDecorator } } = this.props
     
@@ -167,22 +216,35 @@ class BeaconList extends Component {
   }
 
   render() {
-    const { loading, pagination: { page, pageSize }, beacons, total } = this.state
+    const { loading, pagination: { page, pageSize }, beacons, total, modalVisible } = this.state
+
+    const parentMethods = {
+      handleAdd: this.handleAdd,
+      handleModalVisible: this.handleModalVisible,
+    };
 
     return (
       <PageHeaderWrapper>
         <Card>
-          <div className={styles.tableListForm}>
-            {this.renderForm(loading)}
+          <div className={styles.tableList}>
+            <div className={styles.tableListForm}>
+              {this.renderForm(loading)}
+            </div>
+            <div className={styles.tableListOperator}>
+              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+                Add
+              </Button>
+            </div>
+            <Table 
+              dataSource={beacons}
+              columns={getColumns({delete: this.handleDelete})}
+              rowKey="id"
+              loading={loading}
+              pagination={{current: page, pageSize, total, onChange: this.handlePaginationChange}}
+            />
           </div>
-          <Table 
-            dataSource={beacons}
-            columns={getColumns({delete: this.handleDelete})}
-            rowKey="id"
-            loading={loading}
-            pagination={{current: page, pageSize, total, onChange: this.handlePaginationChange}}
-          />
         </Card>
+        <CreateForm {...parentMethods} modalVisible={modalVisible} />
      </PageHeaderWrapper>
     );
   }

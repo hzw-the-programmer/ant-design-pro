@@ -21,3 +21,11 @@ export async function deleteBeacon(params) {
         credentials: 'omit',
     });
 }
+
+export async function createBeacon(params) {
+    return request(`${HTTP_API_ROOT}/config/beacon_single_add`, {
+        method: 'POST',
+        body: params,
+        credentials: 'omit',
+    });
+}
