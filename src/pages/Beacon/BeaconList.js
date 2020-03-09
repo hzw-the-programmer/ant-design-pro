@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import { Form, Row, Col, Card, Button, Table, Modal, Input, Popconfirm, message } from 'antd';
 
+import { formatMessage, FormattedMessage } from 'umi/locale';
+
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './BeaconList.less';
 
@@ -10,32 +12,35 @@ import { queryBeacons, deleteBeacon, createBeacon } from '@/services/sh';
 function getColumns(operations) {
   const columns = [
     {
-      title: '信标Sn',
+      title: formatMessage({ id: 'sh.mac', defaultMessage: 'Mac' }),
       dataIndex: 'mac',
     },
     {
-      title: '姓名',
+      title: formatMessage({ id: 'sh.name', defaultMessage: 'Name' }),
       dataIndex: 'name',
     },
     {
-      title: '工号',
+      title: formatMessage({ id: 'sh.work-number', defaultMessage: 'Number' }),
       dataIndex: 'number',
     },
     {
-      title: '电量',
+      title: formatMessage({ id: 'sh.battery', defaultMessage: 'Battery' }),
       dataIndex: 'battery',
     },
     {
-      title: '强度',
+      title: formatMessage({ id: 'sh.rssi', defaultMessage: 'Rssi' }),
       dataIndex: 'rssi',
     },
     
     {
-      title: '操作',
+      title: formatMessage({ id: 'sh.operation', defaultMessage: 'Operation' }),
       dataIndex: 'operation',
       render: (text, record) =>     
-          <Popconfirm title="确定删除?" onConfirm={() => operations.delete(record.id)}>
-            <a>删除</a>
+          <Popconfirm
+            title={formatMessage({ id: 'sh.delete-confirm', defaultMessage: 'Delete?' })}
+            onConfirm={() => operations.delete(record.id)}
+          >
+            <a>{formatMessage({ id: 'sh.delete', defaultMessage: 'Delete' })}</a>
           </Popconfirm>     
     },
   ];
@@ -57,15 +62,23 @@ const CreateForm = Form.create()(props => {
   return (
     <Modal
       destroyOnClose
-      title="Add Beacon"
+      title={formatMessage({ id: 'sh.add', defaultMessage: 'Add' })}
       visible={modalVisible}
       onOk={okHandle}
       onCancel={() => handleModalVisible()}
     >
-      <Form.Item labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="Mac">
+      <Form.Item
+        labelCol={{ span: 5 }}
+        wrapperCol={{ span: 15 }}
+        label={formatMessage({ id: 'sh.mac', defaultMessage: 'Mac' })}>
         {form.getFieldDecorator('mac', {
-          rules: [{ required: true, message: 'Please input 4 hex digit', min: 4, max: 4 }],
-        })(<Input placeholder="Please input" />)}
+          rules: [{
+            required: true,
+            message: formatMessage({ id: 'sh.four-hex-digits', defaultMessage: 'Please input 4 hex digits'}),
+            min: 4,
+            max: 4
+          }],
+        })(<Input placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })} />)}
       </Form.Item>
     </Modal>
   );
@@ -166,7 +179,7 @@ class BeaconList extends Component {
     })
 
     createBeacon(fields).then(response => {
-      message.success('添加成功');
+      message.success(formatMessage({ id: 'sh.add-success', defaultMessage: 'Add success!' }));
       this.handleModalVisible();
       this.searchBeacons(pagination, params)
     })
@@ -179,35 +192,35 @@ class BeaconList extends Component {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ lg: 24, xl: 48 }}>
           <Col md={8}>
-            <Form.Item label="Mac">
-              {getFieldDecorator('mac')(<Input placeholder="请输入" />)}
+            <Form.Item label={formatMessage({ id: 'sh.mac', defaultMessage: 'Mac' })}>
+              {getFieldDecorator('mac')(<Input placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })} />)}
             </Form.Item>      
           </Col>
           <Col md={8}>
-            <Form.Item label="Name">
-              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
+            <Form.Item label={formatMessage({ id: 'sh.name', defaultMessage: 'Name' })}>
+              {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })} />)}
             </Form.Item>
           </Col>
           <Col md={8}>
-            <Form.Item label="Number">
-              {getFieldDecorator('number')(<Input placeholder="请输入" />)}
+            <Form.Item label={formatMessage({ id: 'sh.work-number', defaultMessage: 'Number' })}>
+              {getFieldDecorator('number')(<Input placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })} />)}
             </Form.Item>
           </Col>
         </Row>
         <Row gutter={{ lg: 24, xl: 48 }}>
           <Col md={8}>
-            <Form.Item label="Type">
-              {getFieldDecorator('type')(<Input placeholder="请输入" />)}
+            <Form.Item label={formatMessage({ id: 'sh.type', defaultMessage: 'Type' })}>
+              {getFieldDecorator('type')(<Input placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })} />)}
             </Form.Item>      
           </Col>
         </Row>
         <div style={{ overflow: 'hidden' }}>
           <div style={{ float: 'right', marginBottom: 24 }}>
             <Button type="primary" htmlType="submit" loading={loading}>
-              查询
+              {formatMessage({ id: 'sh.search', defaultMessage: 'Search' })}
             </Button>
             <Button style={{ marginLeft: 8 }} loading={loading}  onClick={this.handleFormReset}>
-              重置
+              {formatMessage({ id: 'sh.reset', defaultMessage: 'Reset' })}
             </Button>
           </div>
         </div>
@@ -232,7 +245,7 @@ class BeaconList extends Component {
             </div>
             <div className={styles.tableListOperator}>
               <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
-                Add
+                {formatMessage({ id: 'sh.add', defaultMessage: 'Add' })}
               </Button>
             </div>
             <Table 
