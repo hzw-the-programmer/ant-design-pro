@@ -44,26 +44,17 @@ function getColumns(operations) {
 }
 
 class BeaconList extends Component {
-
-  constructor(props){
-    super(props)
-    this.state = {
-      page: 1,
-      rows: 10,
-      beacons: [],
-      loading: false,
-      total: 0,
-      mac: '',
-      name: '',
-    }
-    this.handleSearch = this.handleSearch.bind(this)
-    this.handlePaginationChange = this.handlePaginationChange.bind(this)
-    this.handleMacChange = this.handleMacChange.bind(this)
-    this.handleNameChange = this.handleNameChange.bind(this)
-    this.handleDelete = this.handleDelete.bind(this)
+  state = {
+    page: 1,
+    rows: 10,
+    beacons: [],
+    loading: false,
+    total: 0,
+    mac: '',
+    name: '',
   }
 
-  handleSearch() {
+  handleSearch = () => {
     const { rows, mac, name } = this.state
     this.setState({
       loading: true,
@@ -80,7 +71,7 @@ class BeaconList extends Component {
     })
   }
 
-  handlePaginationChange(page, pageSize) {
+  handlePaginationChange = (page, pageSize) => {
     this.setState({
       loading: true,
       page,
@@ -97,19 +88,19 @@ class BeaconList extends Component {
     })
   }
 
-  handleMacChange(event) {
+  handleMacChange = (event) => {
     this.setState({
       mac: event.target.value,
     })
   }
 
-  handleNameChange(event) {
+  handleNameChange = (event) => {
     this.setState({
       name: event.target.value,
     })
   }
 
-  handleDelete(id) {
+  handleDelete = (id) => {
     const { page, rows, mac, name } = this.state
 
     this.setState({
