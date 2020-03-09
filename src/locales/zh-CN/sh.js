@@ -18,5 +18,13 @@ export default {
     'sh.debind': '解绑',
     'sh.bind-confirm': '确定绑定？',
     'sh.bind': '绑定',
+    'sh.Station-sn': 'Sn',
+    'sh.placeId': '车间Id',
+    'sh.stSn': '基站Sn',
+    'sh.region': '所处区域',
+    'sh.single': '当前信号强度',
+    'sh.battery': '当前电量',
+    'sh.last_active_time': '最后活跃时间',
+    'sh.sync_status': '同步状态',
 };
   

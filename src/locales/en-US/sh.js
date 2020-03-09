@@ -18,5 +18,13 @@ export default {
     'sh.debind': 'Debind',
     'sh.bind-confirm': 'Bind?',
     'sh.bind': 'Bind',
+    'sh.Station-sn': 'Sn',
+    'sh.placeId': 'PlaceId',
+    'sh.stSn': 'Station Sn',
+    'sh.region': 'Region',
+    'sh.single': 'Single',
+    'sh.battery': 'Battery',
+    'sh.last_active_time': 'Last active time',
+    'sh.sync_status': 'Sync status',
 };
   

@@ -1,75 +1,178 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Table } from 'antd';
 
+import { Form, Row, Col, Card, Button, Table, Input, Popconfirm, message } from 'antd';
+import { formatMessage, FormattedMessage } from 'umi/locale';
 
-import { formRequest} from '../../utils'
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import styles from './StationList.less';
 
-const columns = [
-  {
-    title: '设备SN',
-    dataIndex: 'sn',
-  },
-  {
-    title: '所处车间',
-    dataIndex: 'place',
-  },
-  {
-    title: '所处区域',
-    dataIndex: 'region',
-  },
-  {
-    title: '当前信号强度',
-    dataIndex: 'single',
-  },
-  {
-    title: '当前电量',
-    dataIndex: 'battery',
-  },
-  {
-    title: '最后活跃时间',
-    dataIndex: 'last_active_time',
-  },
-  {
-    title: '同步状态',
-    dataIndex: 'status',
-  },
-];
+import { queryStations } from '@/services/sh';
 
+function getColumns(operations) {
 
+  const columns = [
+    {
+      title: formatMessage({ id: 'sh.stSn', defaultMessage: 'Sn' }),
+      dataIndex: 'sn',
+    },
+    {
+      title: formatMessage({id: 'sh.placeId', defaultMessage: 'PlaceId'}),
+      dataIndex: 'placeId',
+    },
+    {
+      title: formatMessage({id: 'sh.region', defaultMessage: 'Region'}),
+      dataIndex: 'rName',
+    },
+    {
+      title: formatMessage({id: 'sh.single', defaultMessage: 'Single'}),
+      dataIndex: 'rssi',
+    },
+    {
+      title: formatMessage({id: 'sh.battery', defaultMessage: 'Battery'}),
+      dataIndex: 'battery',
+    },
+    {
+      title:  formatMessage({id: 'sh.last_active_time', defaultMessage: 'Last active time'}),
+      dataIndex: 'activeTime',
+    },
+    {
+      title: formatMessage({id: 'sh.sync_status', defaultMessage: 'Sync status'}),
+      dataIndex: 'sync',
+    },
+  ];
+  return columns
+}
+
+@Form.create()
 class StationList extends Component {
 
-
-  handleSearch = conditions => {
-    this.setState({conditions})
-    this.props.loadAdReport(conditions)
+  state = {
+    loading: false,
+    pagination: {
+      page: 1,
+      pageSize: 10,
+    },
+    params: {},
+    stations: [],
+    total: 0,
   }
-  
+
+  searchStations = (pagination, params) => {
+    this.setState({
+      loading: true,
+    })
+
+    queryStations(pagination, params).then(response => {
+      // setTimeout(() => {
+        this.setState({
+          loading: false,
+          stations: response.result,
+          total: parseInt(response.result.total, 10),
+          pagination,
+        })
+      // }, 3000)
+    })
+  }
+
+  handleSearch = e => {
+    e.preventDefault();
+
+    const { form } = this.props;
+
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+
+      const params = fieldsValue
+
+      this.setState({
+        params,
+      })
+
+      const pagination = { ...this.state.pagination }
+      pagination.page = 1
+      this.searchStations(pagination, params)
+    });
+  }
+
+  handleFormReset = () => {
+    const { form } = this.props;
+    
+    form.resetFields();
+    this.setState({
+      params: {},
+    })
+
+    const pagination = { ...this.state.pagination }
+    pagination.page = 1
+    this.searchStations(pagination, {})
+  };
+
+  handlePaginationChange = (page, pageSize) => {
+    const { params } = this.state
+    const pagination = { page, pageSize }
+    this.searchStations(pagination, params)
+  }
+
+  renderForm = loading => {
+    const { form: { getFieldDecorator } } = this.props
+    
+    return (
+      <Form onSubmit={this.handleSearch} layout="inline">
+        <Row gutter={{ lg: 24, xl: 48 }}>
+          <Col md={8}>
+            <Form.Item label={formatMessage({ id: 'sh.Station-sn', defaultMessage: 'Sn' })}>
+              {getFieldDecorator('sn')(<Input placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })} />)}
+            </Form.Item>      
+          </Col>
+          <Col md={8}>
+            <Form.Item label={formatMessage({ id: 'sh.placeId', defaultMessage: 'PlaceId' })}>
+              {getFieldDecorator('place_id')(<Input placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })} />)}
+            </Form.Item>
+          </Col>
+          {/* <Col md={8}>
+            <Form.Item label={formatMessage({ id: 'sh.work-number', defaultMessage: 'Number' })}>
+              {getFieldDecorator('number')(<Input placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })} />)}
+            </Form.Item>
+          </Col> */}
+        </Row>
+
+        <div style={{ overflow: 'hidden' }}>
+          <div style={{ float: 'right', marginBottom: 24 }}>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              {formatMessage({ id: 'sh.search', defaultMessage: 'Search' })}
+            </Button>
+            <Button style={{ marginLeft: 8 }} loading={loading}  onClick={this.handleFormReset}>
+              {formatMessage({ id: 'sh.reset', defaultMessage: 'Reset' })}
+            </Button>
+          </div>
+        </div>
+      </Form>
+    )
+  }
   render() {
-    const dataSources = this.props.result
-    console.log(dataSources)
+    const { loading, pagination: { page, pageSize }, stations, total} = this.state
 
     return (
-      <div>
-       
-        {/* <ReportForm
-          onSearch={this.handleSearch}
-          onDownload={conditions => formRequest(`${HTTP_API_ROOT}/basestation/station_list`, 'post', conditions)}
-          loading={this.props.loading} /> */}
-        <Table
-          columns={columns}
-          dataSource={this.props.result}
-          rowKey="id"
-          // pagination={{
-          //   total: this.props.total,
-          //   onChange: this.handlePageChange
-          // }}
-          loading={this.props.loading}
-        />
-      </div>
- 
-    )};
-  
+      <PageHeaderWrapper>
+        <Card>
+          <div className={styles.tableList}>
+            <div className={styles.tableListForm}>
+              {this.renderForm(loading)}
+            </div>
+
+            <Table 
+              dataSource={stations}
+              columns={getColumns()}
+              rowKey="id"
+              loading={loading}
+              pagination={{current: page, pageSize, total, onChange: this.handlePaginationChange}}
+            />
+          </div>
+        </Card>     
+     </PageHeaderWrapper>
+    );
+  }
 }
 
 export default StationList;
