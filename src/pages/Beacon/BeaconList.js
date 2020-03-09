@@ -5,7 +5,7 @@ import { Table,Button,Card , Modal,Form,Input,Popconfirm,Dropdown,Menu} from 'an
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './BeaconList.less';
 
-import { queryBeacons } from '@/services/api';
+import { queryBeacons,deleteBeacons } from '@/services/sh';
 
 function getColumns(operations) {
   const columns = [
@@ -110,7 +110,23 @@ class BeaconList extends Component {
   }
 
   handleDelete(id) {
-    console.log(id)
+    const { page, rows, mac, name } = this.state
+
+    this.setState({
+      loading: true,
+    })
+
+    deleteBeacons({ id }).then(response => {   
+      queryBeacons({ page , rows, mac, name }).then(response => {
+        // setTimeout(() => {
+          this.setState({
+            beacons: response.result.rows,
+            loading: false,
+            total: parseInt(response.result.total, 10),
+          })
+        // }, 3000)
+      })
+    })
   }
 
   render() {

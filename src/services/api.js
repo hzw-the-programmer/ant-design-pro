@@ -150,14 +150,6 @@ export async function queryStation() {
   return request('/api/station');
 }
 
-export async function queryBeacons(params) {
-  return request('http://10.0.37.135:8087/config/beacon_list', {
-    method: 'POST',
-    body: params,
-    credentials: 'omit',
-  });
-}
-
 export async function queryStaff() {
   return request('/api/staff');
 }

@@ -4,7 +4,6 @@ import { Table } from 'antd';
 
 
 import { formRequest} from '../../utils'
-import { HTTP_API_ROOT } from '../../services/httpUrls'
 
 const columns = [
   {
