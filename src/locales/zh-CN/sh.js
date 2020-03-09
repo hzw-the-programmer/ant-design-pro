@@ -14,5 +14,9 @@ export default {
     'sh.search': '查询',
     'sh.reset': '重置',
     'sh.add-success': '添加成功！',
+    'sh.debind-confirm': '确定解绑？',
+    'sh.debind': '解绑',
+    'sh.bind-confirm': '确定绑定？',
+    'sh.bind': '绑定',
 };
   

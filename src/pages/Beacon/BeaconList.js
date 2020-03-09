@@ -7,7 +7,7 @@ import { formatMessage, FormattedMessage } from 'umi/locale';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './BeaconList.less';
 
-import { queryBeacons, deleteBeacon, createBeacon } from '@/services/sh';
+import { queryBeacons, deleteBeacon, createBeacon, debindBeacon, bindBeacon } from '@/services/sh';
 
 function getColumns(operations) {
   const columns = [
@@ -35,13 +35,29 @@ function getColumns(operations) {
     {
       title: formatMessage({ id: 'sh.operation', defaultMessage: 'Operation' }),
       dataIndex: 'operation',
-      render: (text, record) =>     
-          <Popconfirm
-            title={formatMessage({ id: 'sh.delete-confirm', defaultMessage: 'Delete?' })}
-            onConfirm={() => operations.delete(record.id)}
-          >
-            <a>{formatMessage({ id: 'sh.delete', defaultMessage: 'Delete' })}</a>
-          </Popconfirm>     
+      render: (text, record) =>
+          <span>
+            <Popconfirm
+              title={formatMessage({ id: 'sh.delete-confirm', defaultMessage: 'Delete?' })}
+              onConfirm={() => operations.delete(record.id)}
+            >
+              <a>{formatMessage({ id: 'sh.delete', defaultMessage: 'Delete' })}</a>
+            </Popconfirm>
+            &nbsp;
+            <Popconfirm
+              title={formatMessage({ id: 'sh.debind-confirm', defaultMessage: 'Debind?' })}
+              onConfirm={() => operations.debind(record.id)}
+            >
+              <a>{formatMessage({ id: 'sh.debind', defaultMessage: 'Debind' })}</a>
+            </Popconfirm>
+            &nbsp;
+            <Popconfirm
+              title={formatMessage({ id: 'sh.bind-confirm', defaultMessage: 'Bind?' })}
+              onConfirm={() => operations.bind(record.id)}
+            >
+              <a>{formatMessage({ id: 'sh.bind', defaultMessage: 'Bind' })}</a>
+            </Popconfirm>
+          </span> 
     },
   ];
 
@@ -185,6 +201,30 @@ class BeaconList extends Component {
     })
   };
 
+  handleDebind = id => {
+    const { pagination, params } = this.state
+
+    this.setState({
+      loading: true,
+    })
+
+    debindBeacon({ id }).then(response => {   
+      this.searchBeacons(pagination, params)
+    })
+  }
+
+  handleBind = id => {
+    const { pagination, params } = this.state
+
+    this.setState({
+      loading: true,
+    })
+
+    bindBeacon({ id }).then(response => {   
+      this.searchBeacons(pagination, params)
+    })
+  }
+
   renderForm = loading => {
     const { form: { getFieldDecorator } } = this.props
     
@@ -250,7 +290,11 @@ class BeaconList extends Component {
             </div>
             <Table 
               dataSource={beacons}
-              columns={getColumns({delete: this.handleDelete})}
+              columns={getColumns({
+                delete: this.handleDelete,
+                debind: this.handleDebind,
+                bind: this.handleBind,
+              })}
               rowKey="id"
               loading={loading}
               pagination={{current: page, pageSize, total, onChange: this.handlePaginationChange}}

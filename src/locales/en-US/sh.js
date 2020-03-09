@@ -14,5 +14,9 @@ export default {
     'sh.search': 'Search',
     'sh.reset': 'Reset',
     'sh.add-success': 'Add success!',
+    'sh.debind-confirm': 'Debind?',
+    'sh.debind': 'Debind',
+    'sh.bind-confirm': 'Bind?',
+    'sh.bind': 'Bind',
 };
   

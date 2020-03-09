@@ -29,3 +29,19 @@ export async function createBeacon(params) {
         credentials: 'omit',
     });
 }
+
+export async function debindBeacon(params) {
+    return request(`${HTTP_API_ROOT}/config/beacon_unbind`, {
+        method: 'POST',
+        body: params,
+        credentials: 'omit',
+    });
+}
+
+export async function bindBeacon(params) {
+    return request(`${HTTP_API_ROOT}/config/beacon_bind`, {
+        method: 'POST',
+        body: params,
+        credentials: 'omit',
+    });
+}
