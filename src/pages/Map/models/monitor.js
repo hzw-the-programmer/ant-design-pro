@@ -1,5 +1,5 @@
-import { queryRTI, queryPeople, queryPlace } from '@/services/api';
-import { queryPlaces, queryMap } from '@/services/sh';
+import { queryRTI, queryPlace } from '@/services/api';
+import { queryPlaces, queryMap, queryPeople } from '@/services/sh';
 import { IDAS_HTTP_API_ROOT } from '@/services/constants';
 
 const delay = timeout => new Promise(resolve => setTimeout(resolve, timeout));
@@ -25,6 +25,15 @@ function convertMap(map) {
   };
 
   return newMap;
+}
+
+function convertPerson(person) {
+  const newPerson = {
+    id: person.id,
+    name: person.name,
+  };
+
+  return newPerson;
 }
 
 export default {
@@ -55,11 +64,19 @@ export default {
 
     peopleWatcher: [
       function*({ call, put }) {
-        const response = yield call(queryPeople);
-        yield put({
-          type: 'savePeople',
-          payload: response,
-        });
+        try {
+          const response = yield call(queryPeople);
+          const people = [];
+          response.result.forEach(person => {
+            people.push(convertPerson(person));
+          });
+          yield put({
+            type: 'savePeople',
+            payload: people,
+          });
+        } catch (e) {
+          console.log(e);
+        }
       },
       { type: 'watcher' },
     ],

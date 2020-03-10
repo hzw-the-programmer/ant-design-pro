@@ -1,6 +1,6 @@
 import request from '@/utils/request';
 
-import { IDAS_HTTP_API_ROOT } from './constants';
+import { IDAS_HTTP_API_ROOT, LOCATION_HTTP_API_ROOT } from './constants';
 
 export async function queryPlaces() {
   return request(`${IDAS_HTTP_API_ROOT}/api/config/get_place_now_nodes`, {
@@ -14,6 +14,12 @@ export async function queryMap(params) {
   return request(`${IDAS_HTTP_API_ROOT}/api/image/place/query`, {
     method: 'POST',
     body,
+    credentials: 'omit',
+  });
+}
+
+export async function queryPeople() {
+  return request(`${LOCATION_HTTP_API_ROOT}/staff_id/list`, {
     credentials: 'omit',
   });
 }
