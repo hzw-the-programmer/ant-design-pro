@@ -8,8 +8,12 @@ export async function queryPlaces() {
   });
 }
 
-export async function queryMap() {
-  return request(`${IDAS_HTTP_API_ROOT}/api/config/get_place_now_nodes`, {
+export async function queryMap(params) {
+  const body = { place_id: params[1] };
+
+  return request(`${IDAS_HTTP_API_ROOT}/api/image/place/query`, {
+    method: 'POST',
+    body,
     credentials: 'omit',
   });
 }

@@ -1,5 +1,6 @@
-import { queryRTI, queryMap, queryPeople, queryPlace } from '@/services/api';
-import { queryPlaces } from '@/services/sh';
+import { queryRTI, queryPeople, queryPlace } from '@/services/api';
+import { queryPlaces, queryMap } from '@/services/sh';
+import { IDAS_HTTP_API_ROOT } from '@/services/constants';
 
 const delay = timeout => new Promise(resolve => setTimeout(resolve, timeout));
 
@@ -17,13 +18,22 @@ function convertPlace(place) {
   return newPlace;
 }
 
+function convertMap(map) {
+  const newMap = {
+    url: IDAS_HTTP_API_ROOT + map.image,
+    ratio: map.ratio,
+  };
+
+  return newMap;
+}
+
 export default {
   namespace: 'monitor',
 
   state: {
     places: [],
     place: [],
-    map: { url: '', extent: [] },
+    map: { url: '', ration: 0.0 },
     rti: { regions: [], people: [] },
     people: [],
     person: undefined,
@@ -71,9 +81,10 @@ export default {
       });
 
       const response = yield call(queryMap, payload);
+      const map = convertMap(response.result[0]);
       yield put({
         type: 'saveMap',
-        payload: response,
+        payload: map,
       });
     },
 

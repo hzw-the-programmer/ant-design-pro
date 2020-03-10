@@ -53,13 +53,6 @@ function createLayer(url, extent) {
   monitor,
 }))
 class Monitor extends Component {
-  constructor(props) {
-    super(props);
-    this.toggleHeatmap = this.toggleHeatmap.bind(this);
-    this.changePlace = this.changePlace.bind(this);
-    this.changePerson = this.changePerson.bind(this);
-  }
-
   componentDidMount() {
     const {
       monitor: { heatmap },
@@ -148,11 +141,16 @@ class Monitor extends Component {
 
     if (map.url !== this.url) {
       this.url = map.url;
-      const view = createView(map.extent);
-      this.map.setView(view);
-      const layer = createLayer(map.url, map.extent);
-      this.map.getLayers().removeAt(0);
-      this.map.getLayers().insertAt(0, layer);
+      const image = new Image();
+      image.src = map.url;
+      image.onload = () => {
+        const extent = [0, 0, image.width, image.height];
+        const view = createView(extent);
+        this.map.setView(view);
+        const layer = createLayer(map.url, extent);
+        this.map.getLayers().removeAt(0);
+        this.map.getLayers().insertAt(0, layer);
+      };
     }
 
     rti.regions.forEach(region => {
@@ -241,7 +239,7 @@ class Monitor extends Component {
     return options;
   }
 
-  toggleHeatmap() {
+  toggleHeatmap = () => {
     const {
       monitor: { heatmap },
       dispatch,
@@ -251,25 +249,25 @@ class Monitor extends Component {
       type: 'monitor/changeHeatmap',
       payload: !heatmap,
     });
-  }
+  };
 
-  changePlace(place) {
+  changePlace = place => {
     const { dispatch } = this.props;
 
     dispatch({
       type: 'monitor/changePlace',
       payload: place,
     });
-  }
+  };
 
-  changePerson(person) {
+  changePerson = person => {
     const { dispatch } = this.props;
 
     dispatch({
       type: 'monitor/changePerson',
       payload: person,
     });
-  }
+  };
 
   render() {
     const {
