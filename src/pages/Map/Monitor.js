@@ -21,6 +21,8 @@ import HeatmapLayer from 'ol/layer/Heatmap';
 
 import ReactEcharts from 'echarts-for-react';
 
+// import { rtlWS } from '@/services/sh';
+
 import styles from './Monitor.less';
 
 function createView(extent) {
@@ -56,12 +58,7 @@ class Monitor extends Component {
   componentDidMount() {
     const {
       monitor: { heatmap },
-      dispatch,
     } = this.props;
-
-    dispatch({
-      type: 'monitor/startRTI',
-    });
 
     const mapLayer = new ImageLayer({
       source: new ImageStatic({
@@ -123,7 +120,7 @@ class Monitor extends Component {
   componentDidUpdate() {
     console.log('componentDidUpdate');
     const {
-      monitor: { rti, map, heatmap },
+      monitor: { rtl, map, heatmap },
     } = this.props;
 
     this.regionLayer.getSource().clear();
@@ -153,7 +150,7 @@ class Monitor extends Component {
       };
     }
 
-    rti.regions.forEach(region => {
+    rtl.regions.forEach(region => {
       const l = region.rect.x;
       const b = region.rect.y - region.rect.h;
       const r = region.rect.x + region.rect.w;
@@ -168,7 +165,7 @@ class Monitor extends Component {
       this.regionLayer.getSource().addFeature(pointFeature);
     });
 
-    rti.people.forEach(person => {
+    rtl.people.forEach(person => {
       if (!person.visible) return;
       const pointFeature = new Feature({
         geometry: new Point([person.pos.x, person.pos.y]),
@@ -179,18 +176,12 @@ class Monitor extends Component {
   }
 
   componentWillUnmount() {
-    const { dispatch } = this.props;
-
-    dispatch({
-      type: 'monitor/stopRTI',
-    });
-
     this.map.setTarget(undefined);
   }
 
   getOption() {
     const {
-      monitor: { rti },
+      monitor: { rtl },
     } = this.props;
 
     const options = {
@@ -224,10 +215,10 @@ class Monitor extends Component {
         },
       ],
     };
-    if (!rti.regions) return options;
+    if (!rtl.regions) return options;
 
-    rti.regions.forEach(region => {
-      if (options.legend.data.length !== rti.regions.length) {
+    rtl.regions.forEach(region => {
+      if (options.legend.data.length !== rtl.regions.length) {
         options.legend.data.push(region.name);
       }
       options.series[0].data.push({
@@ -271,7 +262,7 @@ class Monitor extends Component {
 
   render() {
     const {
-      monitor: { places, place, rti, people, person, heatmap },
+      monitor: { places, place, rtl, people, person, heatmap },
     } = this.props;
 
     return (
@@ -300,7 +291,7 @@ class Monitor extends Component {
         <Switch checked={heatmap} onChange={this.toggleHeatmap} />
         <Card>
           <div style={{ textAlign: 'center' }}>总人数</div>
-          <div style={{ textAlign: 'center', fontSize: 50 }}>{rti.people && rti.people.length}</div>
+          <div style={{ textAlign: 'center', fontSize: 50 }}>{rtl.people && rtl.people.length}</div>
         </Card>
         <Card>
           <ReactEcharts option={this.getOption()} />

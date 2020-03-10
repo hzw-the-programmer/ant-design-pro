@@ -1,8 +1,5 @@
-import { queryRTI, queryPlace } from '@/services/api';
-import { queryPlaces, queryMap, queryPeople } from '@/services/sh';
-import { IDAS_HTTP_API_ROOT } from '@/services/constants';
-
-const delay = timeout => new Promise(resolve => setTimeout(resolve, timeout));
+import { queryPlaces, queryMap, queryPeople, rtlWS } from '@/services/sh';
+import { IDAS_HTTP_API_ROOT, LOCATION_WEBSOCKET_API_ROOT } from '@/services/constants';
 
 function convertPlace(place) {
   const newPlace = {
@@ -36,16 +33,19 @@ function convertPerson(person) {
   return newPerson;
 }
 
+const DEFAULT_MAP = { url: '', ratio: 0.0 };
+const DEFAULT_RTL = { regions: [], people: [] };
+
 export default {
   namespace: 'monitor',
 
   state: {
     places: [],
-    place: [],
-    map: { url: '', ration: 0.0 },
-    rti: { regions: [], people: [] },
     people: [],
-    person: undefined,
+    place: [],
+    person: null,
+    map: DEFAULT_MAP,
+    rtl: DEFAULT_RTL,
     heatmap: false,
   },
 
@@ -88,13 +88,11 @@ export default {
       });
 
       yield put({
-        type: 'saveMap',
-        payload: { url: '', extent: [] },
+        type: 'clearMap',
       });
 
       yield put({
-        type: 'saveRTI',
-        payload: { regions: [], people: [] },
+        type: 'clearRtl',
       });
 
       const response = yield call(queryMap, payload);
@@ -102,6 +100,12 @@ export default {
       yield put({
         type: 'saveMap',
         payload: map,
+      });
+
+      rtlWS.send({
+        type: 'record',
+        place_id: payload[1],
+        action: 1,
       });
     },
 
@@ -119,58 +123,40 @@ export default {
       });
     },
 
-    rtiWatcher: [
-      function*({ take, fork, call, cancel, put, select }) {
-        function* rtiTask() {
-          try {
-            while (true) {
-              yield call(delay, 1000);
+    *rtlMsg({ payload }, { put, select }) {
+      try {
+        const ratio = yield select(state => state.monitor.map.ratio);
 
-              const place = yield select(state => state.monitor.place);
-              const person = yield select(state => state.monitor.person);
+        const convertP = person => {
+          const newPerson = {
+            pos: {
+              x: person.x * ratio,
+              y: person.y * ratio,
+            },
+            visible: true,
+          };
 
-              let placeChanged = false;
-              if (person !== undefined) {
-                const p = yield call(queryPlace, person);
-                if (place[0] !== p[0] || place[1] !== p[1]) {
-                  yield put({
-                    type: 'changePlace',
-                    payload: p,
-                  });
-                  placeChanged = true;
-                }
-              }
+          return newPerson;
+        };
 
-              if (!placeChanged) {
-                const map = yield select(state => state.monitor.map);
-                if (map.url === '') {
-                  console.log('rtiTask map.url is empty, continue.');
-                } else {
-                  const response = yield call(queryRTI, place, person);
-                  yield put({
-                    type: 'saveRTI',
-                    payload: response,
-                  });
+        const regions = [];
 
-                  console.log('rtiTask');
-                }
-              }
-            }
-          } finally {
-            console.log('rtiTask cancelled');
-          }
-        }
+        const people = [];
+        payload.data.forEach(person => {
+          people.push(convertP(person));
+        });
 
-        while (true) {
-          yield take('monitor/startRTI');
-          const task = yield fork(rtiTask);
-          yield take('monitor/stopRTI');
-          yield cancel(task);
-          console.log('after cancel');
-        }
-      },
-      { type: 'watcher' },
-    ],
+        yield put({
+          type: 'saveRtl',
+          payload: {
+            regions,
+            people,
+          },
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    },
   },
 
   reducers: {
@@ -195,10 +181,24 @@ export default {
       };
     },
 
-    saveRTI(state, action) {
+    clearMap(state) {
       return {
         ...state,
-        rti: action.payload,
+        map: DEFAULT_MAP,
+      };
+    },
+
+    saveRtl(state, action) {
+      return {
+        ...state,
+        rtl: action.payload,
+      };
+    },
+
+    clearRtl(state) {
+      return {
+        ...state,
+        rtl: DEFAULT_RTL,
       };
     },
 
@@ -221,6 +221,12 @@ export default {
         ...state,
         heatmap: action.payload,
       };
+    },
+  },
+
+  subscriptions: {
+    setup({ dispatch }) {
+      rtlWS.open(LOCATION_WEBSOCKET_API_ROOT, dispatch);
     },
   },
 };

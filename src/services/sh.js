@@ -23,3 +23,55 @@ export async function queryPeople() {
     credentials: 'omit',
   });
 }
+
+function createRtlWS() {
+  console.log('createRtlWS');
+  let ws = null;
+
+  function open(url, dispatch) {
+    if (ws && ws.url === url && ws.readyState === WebSocket.OPEN) {
+      return;
+    }
+
+    ws = new WebSocket(url);
+
+    ws.onopen = () => {
+      console.log('onopen');
+    };
+
+    ws.onmessage = ev => {
+      const response = JSON.parse(ev.data);
+
+      dispatch({
+        type: 'rtlMsg',
+        payload: response,
+      });
+    };
+
+    ws.onerror = () => {
+      console.log('onerror');
+    };
+
+    ws.onclose = () => {
+      console.log('onclose');
+      ws = null;
+    };
+  }
+
+  function close() {
+    if (ws) ws.close();
+  }
+
+  function send(msg) {
+    if (!ws) return;
+    ws.send(JSON.stringify(msg));
+  }
+
+  return {
+    open,
+    close,
+    send,
+  };
+}
+
+export const rtlWS = createRtlWS();
