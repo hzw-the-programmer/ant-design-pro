@@ -9,6 +9,9 @@ import styles from './StationList.less';
 
 import { queryStations } from '@/services/sh';
 
+import { formatDate } from '@/utils/sh';
+
+
 function getColumns(operations) {
 
   const columns = [
@@ -35,9 +38,9 @@ function getColumns(operations) {
     {
       title:  formatMessage({id: 'sh.last_active_time', defaultMessage: 'Last active time'}),
       dataIndex: 'activeTime',
-      // render: activeTime => {
-        
-      // }
+      render: activeTime => {
+        return formatDate(activeTime)
+      }
     },
     {
       title: formatMessage({id: 'sh.sync_status', defaultMessage: 'Sync status'}),
@@ -78,7 +81,7 @@ class StationList extends Component {
         this.setState({
           loading: false,
           stations: response.result,
-          total: parseInt(response.result.length, 10),
+          total: parseInt(response.total, 10),
           pagination,
         })
 
