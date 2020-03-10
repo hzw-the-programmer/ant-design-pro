@@ -26,5 +26,7 @@ export default {
     'sh.battery': 'Battery',
     'sh.last_active_time': 'Last active time',
     'sh.sync_status': 'Sync status',
+    'sh.sync_yes': 'Synchronized',
+    'sh.sync_no': 'Unsynchronized',
 };
   

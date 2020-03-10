@@ -35,10 +35,20 @@ function getColumns(operations) {
     {
       title:  formatMessage({id: 'sh.last_active_time', defaultMessage: 'Last active time'}),
       dataIndex: 'activeTime',
+      // render: activeTime => {
+        
+      // }
     },
     {
       title: formatMessage({id: 'sh.sync_status', defaultMessage: 'Sync status'}),
       dataIndex: 'sync',
+      render: sync => {
+        if (sync === '1') {
+          return formatMessage({id: 'sh.sync_yes', defaultMessage: 'Synchronized'})
+        }else {
+          return formatMessage({id: 'sh.sync_no', defaultMessage: 'Unsynchronized'})
+        }
+      }
     },
   ];
   return columns
@@ -68,9 +78,11 @@ class StationList extends Component {
         this.setState({
           loading: false,
           stations: response.result,
-          total: parseInt(response.result.total, 10),
+          total: parseInt(response.result.length, 10),
           pagination,
         })
+
+        // console.log(response.result.length)
       // }, 3000)
     })
   }

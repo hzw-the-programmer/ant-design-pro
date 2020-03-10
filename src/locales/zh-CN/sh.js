@@ -26,5 +26,8 @@ export default {
     'sh.battery': '当前电量',
     'sh.last_active_time': '最后活跃时间',
     'sh.sync_status': '同步状态',
+    'sh.sync_yes': '已同步',
+    'sh.sync_no': '未同步',
+
 };
   
