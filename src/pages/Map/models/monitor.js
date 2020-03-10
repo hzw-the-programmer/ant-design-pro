@@ -1,6 +1,21 @@
-import { queryRTI, queryPlaces, queryMap, queryPeople, queryPlace } from '@/services/api';
+import { queryRTI, queryMap, queryPeople, queryPlace } from '@/services/api';
+import { queryPlaces } from '@/services/sh';
 
 const delay = timeout => new Promise(resolve => setTimeout(resolve, timeout));
+
+function convertPlace(place) {
+  const newPlace = {
+    label: place.name,
+    value: place.id,
+    children: [],
+  };
+
+  place.children.forEach(child => {
+    newPlace.children.push(convertPlace(child));
+  });
+
+  return newPlace;
+}
 
 export default {
   namespace: 'monitor',
@@ -19,9 +34,10 @@ export default {
     placesWatcher: [
       function*({ call, put }) {
         const response = yield call(queryPlaces);
+        const places = convertPlace(response).children;
         yield put({
           type: 'savePlaces',
-          payload: response,
+          payload: places,
         });
       },
       { type: 'watcher' },
