@@ -1,4 +1,5 @@
-import { queryRoutes } from '@/services/api';
+import { queryRoutes } from '@/services/sh';
+import { findAncestors, getPlace, getFirstPlace } from '@/utils/sh';
 
 export default {
   namespace: 'route',
@@ -32,49 +33,48 @@ export default {
       },
       { call, select, put }
     ) {
-      const routes = yield call(queryRoutes, person, datetime);
-      yield put({
-        type: 'saveRoutes',
-        payload: routes,
-      });
+      try {
+        const places = yield select(state => state.monitor.places);
 
-      const mPlaces = yield select(state => state.monitor.places);
-      const rPlaces = [];
-      let rPlace = [];
-      routes.forEach(route => {
-        const r1 = mPlaces.filter(p => p.value === route.place[0]);
-        if (r1.length === 0) return;
+        const pls = [];
+        const routes = yield call(queryRoutes, person, datetime);
+        routes.result.forEach(r => {
+          const pid = r.place_id;
+          const pids = [];
+          findAncestors({ value: 0, children: places }, pid, pids);
+          pids.push(pid);
+          pids.shift();
+          pls.push(pids);
+        });
 
-        let place;
-        const r2 = rPlaces.filter(p => p.value === route.place[0]);
-        if (r2.length === 0) {
-          place = { ...r1[0], children: [] };
-          rPlaces.push(place);
-        } else {
-          [place] = r2;
-        }
+        const rPlaces = [];
+        pls.forEach(pl => {
+          places.forEach(p => {
+            const tp = getPlace(p, pl, 0);
+            if (tp) {
+              rPlaces.push(tp);
+            }
+          });
+        });
+        console.log(rPlaces);
 
-        const cr1 = r1[0].children.filter(p => p.value === route.place[1]);
-        if (cr1.length === 0) return;
+        yield put({
+          type: 'savePlaces',
+          payload: rPlaces,
+        });
 
-        const cr2 = place.children.filter(p => p.value === route.place[1]);
-        if (cr2.length === 0) {
-          place.children.push({ ...cr1[0] });
-          if (rPlace.length === 0) {
-            rPlace = [...route.place];
-          }
-        }
-      });
+        const rPlace = [];
+        getFirstPlace({ value: 0, children: rPlaces }, rPlace);
+        rPlace.shift();
+        console.log(rPlace);
 
-      yield put({
-        type: 'savePlaces',
-        payload: rPlaces,
-      });
-
-      yield put({
-        type: 'changePlace',
-        payload: rPlace,
-      });
+        yield put({
+          type: 'changePlace',
+          payload: rPlace,
+        });
+      } catch (e) {
+        console.log(e);
+      }
     },
 
     *changePlace({ payload }, { put }) {

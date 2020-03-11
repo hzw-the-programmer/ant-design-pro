@@ -75,3 +75,16 @@ function createRtlWS() {
 }
 
 export const rtlWS = createRtlWS();
+
+export async function queryRoutes(person, datetime) {
+  const body = {
+    staff_id: person,
+    starttime: datetime[0].unix(),
+    endtime: datetime[1].unix(),
+  };
+  return request(`${LOCATION_HTTP_API_ROOT}/track/list`, {
+    method: 'POST',
+    body,
+    credentials: 'omit',
+  });
+}
