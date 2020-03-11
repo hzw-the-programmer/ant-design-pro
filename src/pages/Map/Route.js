@@ -172,15 +172,15 @@ class Route extends Component {
         routeSource.clear();
         const coords = [];
         locations.forEach(location => {
-          routeSource.addFeature(
-            new Feature({
-              geometry: new Point(location.coord),
-              text: `${moment.unix(location.datetime).format()} ${location.duration}`,
-            })
-          );
           let [x, y] = location.coord;
           x *= ratio;
           y = extent[3] - y * ratio;
+          routeSource.addFeature(
+            new Feature({
+              geometry: new Point([x, y]),
+              text: `${moment.unix(location.datetime).format()} ${location.duration}`,
+            })
+          );
           coords.push([x, y]);
         });
         routeSource.addFeature(new Feature(new LineString(coords)));

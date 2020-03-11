@@ -123,10 +123,14 @@ export default {
           payload,
         });
 
+        if (payload.length === 0) {
+          return;
+        }
+
         const response = yield call(queryMap, payload);
-        // if (response.result.length === 0) {
-        //   return;
-        // }
+        if (response.result.length === 0) {
+          return;
+        }
         const map = convertMap(response.result[0]);
 
         yield put({
