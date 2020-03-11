@@ -74,3 +74,11 @@ export async function queryStaffs(pagination, params) {
     });
 }
 
+//组织列表输出
+export async function queryTeams() {
+      
+    return request(`${HTTP_API_ROOT}/config/group_list`, {
+        method: 'POST',       
+        credentials: 'omit',
+    });
+}

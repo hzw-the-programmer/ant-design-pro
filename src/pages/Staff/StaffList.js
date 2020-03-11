@@ -13,15 +13,15 @@ function getColumns(operations) {
 
     const columns = [
       {
-        title: '姓名',
+        title: formatMessage({id: 'sh.name', defaultMessage: 'Name'}),
         dataIndex: 'name',
       },
       {
-        title: '工号',
+        title: formatMessage({id: 'sh.work-number', defaultMessage: 'Number'}),
         dataIndex: 'number',
       },
       {
-        title: '班组',
+        title: formatMessage({id: 'sh.team', defaultMessage: 'Team'}),
         dataIndex: 'team',
       },
 

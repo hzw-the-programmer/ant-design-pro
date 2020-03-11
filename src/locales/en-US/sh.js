@@ -29,5 +29,9 @@ export default {
     'sh.sync_status': 'Sync status',
     'sh.sync_yes': 'Synchronized',
     'sh.sync_no': 'Unsynchronized',
+
+    'sh.team_name': 'Organization name',
+    'sh.higher level organization': 'Higher level organization',
+    'sh.team_level': 'Organization level',
 };
   

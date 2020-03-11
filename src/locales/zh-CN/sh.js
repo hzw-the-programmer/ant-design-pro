@@ -29,5 +29,10 @@ export default {
     'sh.sync_status': '同步状态',
     'sh.sync_yes': '已同步',
     'sh.sync_no': '未同步',
+
+    'sh.team_name': '组织名称',
+    'sh.higher level organization': '上级组织',
+    'sh.team_level': '组织级别',
+
 };
   
