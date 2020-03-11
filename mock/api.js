@@ -439,54 +439,6 @@ function getPlace(req, res) {
   res.json(place);
 }
 
-
-//cm代码开始
-function getStationList(req, res) {
-  const stationlist = [];
-  for (let i = 0; i < 12; i += 1) {
-    stationlist.push({
-      id: i,
-      sn: `设备${i}`,
-      place:`车间${i}`,
-      region:`区域${i}`,
-      single: '100',
-      battery: '50%',
-      last_active_time:'hh',
-      status:'ok',
-    });
-  }
-  res.json(stationlist);
-}
-
-function getBeaconList(req, res) {
-  const beaconlist = [];
-  for (let i = 0; i < 12; i += 1) {
-    beaconlist.push({
-      id: i,
-      mac: `信标${i}`,
-      name:`人员${i}`,
-      number:`工号${i}`,
-      battery: '50%',
-      rssi:'-75',
-    });
-  }
-  res.json(beaconlist);
-}
-
-function getStaffList(req, res) {
-  const stafflist = [];
-  for (let i = 0; i < 12; i += 1) {
-    stafflist.push({
-      id: i,
-      name:`姓名${i}`,
-      number:`工号${i}`,
-      team:`班组${i}`,
-    });
-  }
-  res.json(stafflist);
-}
-////cm代码截止
-
 export default {
   'GET /api/project/notice': getNotice,
   'GET /api/activities': getActivities,
@@ -505,10 +457,4 @@ export default {
   'GET /api/rti': getRTI,
   'GET /api/people': getPeople,
   'GET /api/place': getPlace,
-
-  //cm代码开始
-  'GET /api/station': getStationList,
-  'GET /api/beacon': getBeaconList,
-  'GET /api/station': getStationList,
-  'GET /api/staff': getStaffList,
 };

@@ -2,6 +2,7 @@ export default {
     'sh.mac': 'Mac',
     'sh.name': 'Name',
     'sh.work-number': 'Number',
+    'sh.team': 'Team',
     'sh.battery': 'Battery',
     'sh.rssi': 'Rssi',
     'sh.operation': 'Operation',

@@ -2,6 +2,7 @@ export default {
     'sh.mac': 'Mac',
     'sh.name': '姓名',
     'sh.work-number': '工号',
+    'sh.team': '班组',
     'sh.battery': '电量',
     'sh.rssi': '强度',
     'sh.operation': '操作',
@@ -28,6 +29,5 @@ export default {
     'sh.sync_status': '同步状态',
     'sh.sync_yes': '已同步',
     'sh.sync_no': '未同步',
-
 };
   

@@ -60,3 +60,17 @@ export async function queryStations(pagination, params) {
         credentials: 'omit',
     });
 }
+
+//人员列表查询
+export async function queryStaffs(pagination, params) {
+    const body = { ...pagination, ...params }
+    body.rows = body.pageSize
+    delete body.pageSize    
+    
+    return request(`${HTTP_API_ROOT}/staff/img_list`, {
+        method: 'POST',
+        body,
+        credentials: 'omit',
+    });
+}
+
