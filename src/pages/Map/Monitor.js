@@ -258,12 +258,7 @@ class Monitor extends Component {
 
     dispatch({
       type: 'monitor/changePlace',
-      payload: place,
-    });
-
-    dispatch({
-      type: 'monitor/rtlSub',
-      payload: place,
+      payload: { place, force: false },
     });
   };
 
@@ -288,6 +283,7 @@ class Monitor extends Component {
           value={place}
           onChange={this.changePlace}
           placeholder="请选择地址"
+          allowClear={false}
         />
         <br />
         <Select

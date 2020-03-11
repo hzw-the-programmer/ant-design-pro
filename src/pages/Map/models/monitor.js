@@ -1,3 +1,5 @@
+import { isEqual } from 'lodash';
+
 import { queryPlaces, queryMap, queryPeople, rtlWS } from '@/services/sh';
 import { IDAS_HTTP_API_ROOT, LOCATION_WEBSOCKET_API_ROOT } from '@/services/constants';
 
@@ -26,11 +28,36 @@ function convertMap(map) {
 
 function convertPerson(person) {
   const newPerson = {
-    id: person.id,
+    id: parseInt(person.id, 10),
     name: person.name,
   };
 
   return newPerson;
+}
+
+function getFirstPlace(place, ids) {
+  ids.push(place.value);
+  if (place.children.length !== 0) {
+    getFirstPlace(place.children[0], ids);
+  }
+}
+
+function findAncestors(place, id, ids) {
+  const r = place.children.filter(c => c.value === id);
+
+  if (r.length !== 0) {
+    ids.push(place.value);
+    return true;
+  }
+
+  for (let i = 0; i < place.children.length; i += 1) {
+    if (findAncestors(place.children[i], id, ids)) {
+      ids.unshift(place.value);
+      return true;
+    }
+  }
+
+  return false;
 }
 
 const DEFAULT_MAP = { url: '', ratio: 0.0 };
@@ -58,6 +85,14 @@ export default {
           type: 'savePlaces',
           payload: places,
         });
+
+        const ids = [];
+        getFirstPlace({ value: 0, children: places }, ids);
+        ids.shift();
+        yield put({
+          type: 'changePlace',
+          payload: { place: ids, force: false },
+        });
       },
       { type: 'watcher' },
     ],
@@ -81,11 +116,16 @@ export default {
       { type: 'watcher' },
     ],
 
-    *changePlace({ payload }, { call, put }) {
+    *changePlace({ payload }, { call, put, select }) {
       try {
+        const { place, force } = payload;
+
+        const person = yield select(state => state.monitor.person);
+        if (person && !force) return;
+
         yield put({
           type: 'savePlace',
-          payload,
+          payload: place,
         });
 
         yield put({
@@ -96,11 +136,15 @@ export default {
           type: 'clearRtl',
         });
 
-        if (payload.length === 0) {
+        if (place.length === 0) {
+          yield put({
+            type: 'rtlSub',
+            payload: [],
+          });
           return;
         }
 
-        const response = yield call(queryMap, payload);
+        const response = yield call(queryMap, place);
         if (response.result.length === 0) {
           return;
         }
@@ -108,6 +152,11 @@ export default {
         yield put({
           type: 'saveMap',
           payload: map,
+        });
+
+        yield put({
+          type: 'rtlSub',
+          payload: place,
         });
       } catch (e) {
         console.log(e);
@@ -132,25 +181,51 @@ export default {
       console.log('rtlMsg');
       try {
         const ratio = yield select(state => state.monitor.map.ratio);
+        const person = yield select(state => state.monitor.person);
+        const place = yield select(state => state.monitor.place);
+        const places = yield select(state => state.monitor.places);
 
-        const convertP = person => {
-          const newPerson = {
+        const convertP = p => {
+          const newP = {
             pos: {
-              x: person.x * ratio,
-              y: person.y * ratio,
+              x: p.x * ratio,
+              y: p.y * ratio,
             },
             visible: true,
           };
 
-          return newPerson;
+          return newP;
         };
 
         const regions = [];
 
         const people = [];
-        payload.data.forEach(person => {
-          people.push(convertP(person));
-        });
+        if (person) {
+          for (let i = 0; i < payload.data1.length; i += 1) {
+            if (person === parseInt(payload.data1[i].staff_id, 10)) {
+              const pid = parseInt(payload.data1[i].place_id, 10);
+              const pids = [];
+              findAncestors({ value: 0, children: places }, pid, pids);
+              pids.push(pid);
+              pids.shift();
+              console.log(pids, place);
+
+              if (!isEqual(pids, place)) {
+                yield put({
+                  type: 'changePlace',
+                  payload: { place: pids, force: true },
+                });
+                return;
+              }
+
+              people.push(convertP(payload.data1[i]));
+            }
+          }
+        } else {
+          payload.data.forEach(p => {
+            people.push(convertP(p));
+          });
+        }
 
         yield put({
           type: 'saveRtl',
