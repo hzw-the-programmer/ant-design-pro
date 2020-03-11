@@ -187,6 +187,7 @@ export default {
 
         const convertP = p => {
           const newP = {
+            id: parseInt(p.staff_id, 10),
             pos: {
               x: p.x * ratio,
               y: p.y * ratio,
@@ -217,15 +218,17 @@ export default {
                 });
                 return;
               }
-
-              people.push(convertP(payload.data1[i]));
             }
           }
-        } else {
-          payload.data.forEach(p => {
-            people.push(convertP(p));
-          });
         }
+
+        payload.data.forEach(p => {
+          const tp = convertP(p);
+          if (person && tp.id !== person) {
+            tp.visible = false;
+          }
+          people.push(tp);
+        });
 
         yield put({
           type: 'saveRtl',
