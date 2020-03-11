@@ -82,31 +82,36 @@ export default {
     ],
 
     *changePlace({ payload }, { call, put }) {
-      yield put({
-        type: 'savePlace',
-        payload,
-      });
+      try {
+        yield put({
+          type: 'savePlace',
+          payload,
+        });
 
-      yield put({
-        type: 'clearMap',
-      });
+        yield put({
+          type: 'clearMap',
+        });
 
-      yield put({
-        type: 'clearRtl',
-      });
+        yield put({
+          type: 'clearRtl',
+        });
 
-      const response = yield call(queryMap, payload);
-      const map = convertMap(response.result[0]);
-      yield put({
-        type: 'saveMap',
-        payload: map,
-      });
+        if (payload.length === 0) {
+          return;
+        }
 
-      rtlWS.send({
-        type: 'record',
-        place_id: payload[1],
-        action: 1,
-      });
+        const response = yield call(queryMap, payload);
+        if (response.result.length === 0) {
+          return;
+        }
+        const map = convertMap(response.result[0]);
+        yield put({
+          type: 'saveMap',
+          payload: map,
+        });
+      } catch (e) {
+        console.log(e);
+      }
     },
 
     *changePerson({ payload }, { put }) {
@@ -124,6 +129,7 @@ export default {
     },
 
     *rtlMsg({ payload }, { put, select }) {
+      console.log('rtlMsg');
       try {
         const ratio = yield select(state => state.monitor.map.ratio);
 
@@ -155,6 +161,22 @@ export default {
         });
       } catch (e) {
         console.log(e);
+      }
+    },
+
+    rtlSub({ payload }) {
+      if (payload.length === 0) {
+        rtlWS.send({
+          type: 'record',
+          place_id: 0,
+          action: 0,
+        });
+      } else {
+        rtlWS.send({
+          type: 'record',
+          place_id: payload[payload.length - 1],
+          action: 1,
+        });
       }
     },
   },

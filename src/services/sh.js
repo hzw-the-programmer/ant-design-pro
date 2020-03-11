@@ -9,7 +9,7 @@ export async function queryPlaces() {
 }
 
 export async function queryMap(params) {
-  const body = { place_id: params[1] };
+  const body = { place_id: params[params.length - 1] };
 
   return request(`${IDAS_HTTP_API_ROOT}/api/image/place/query`, {
     method: 'POST',

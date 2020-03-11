@@ -21,8 +21,6 @@ import HeatmapLayer from 'ol/layer/Heatmap';
 
 import ReactEcharts from 'echarts-for-react';
 
-// import { rtlWS } from '@/services/sh';
-
 import styles from './Monitor.less';
 
 function createView(extent) {
@@ -57,8 +55,14 @@ function createLayer(url, extent) {
 class Monitor extends Component {
   componentDidMount() {
     const {
-      monitor: { heatmap },
+      monitor: { heatmap, place },
+      dispatch,
     } = this.props;
+
+    dispatch({
+      type: 'monitor/rtlSub',
+      payload: place,
+    });
 
     const mapLayer = new ImageLayer({
       source: new ImageStatic({
@@ -176,6 +180,13 @@ class Monitor extends Component {
   }
 
   componentWillUnmount() {
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'monitor/rtlSub',
+      payload: [],
+    });
+
     this.map.setTarget(undefined);
   }
 
@@ -247,6 +258,11 @@ class Monitor extends Component {
 
     dispatch({
       type: 'monitor/changePlace',
+      payload: place,
+    });
+
+    dispatch({
+      type: 'monitor/rtlSub',
       payload: place,
     });
   };
