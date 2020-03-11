@@ -60,7 +60,7 @@ function findAncestors(place, id, ids) {
   return false;
 }
 
-const DEFAULT_MAP = { url: '', ratio: 0.0 };
+const DEFAULT_MAP = { url: '', ratio: 0.0, extent: [] };
 const DEFAULT_RTL = { regions: [], people: [] };
 
 export default {
@@ -178,27 +178,45 @@ export default {
     },
 
     *rtlMsg({ payload }, { put, select }) {
-      console.log('rtlMsg');
+      console.log('rtlMsg', payload);
       try {
         const ratio = yield select(state => state.monitor.map.ratio);
+        const extent = yield select(state => state.monitor.map.extent);
         const person = yield select(state => state.monitor.person);
         const place = yield select(state => state.monitor.place);
         const places = yield select(state => state.monitor.places);
 
         const convertP = p => {
+          const x = p.x * ratio;
+          const y = extent[3] - p.y * ratio;
           const newP = {
             id: parseInt(p.staff_id, 10),
-            pos: {
-              x: p.x * ratio,
-              y: p.y * ratio,
-            },
+            pos: { x, y },
             visible: true,
           };
 
           return newP;
         };
 
+        const convertRegion = r => {
+          const x = r.pick1x * ratio;
+          const y = extent[3] - r.pick1y * ratio;
+          const w = (r.pick2x - r.pick1x) * ratio;
+          const h = (r.pick2y - r.pick1y) * ratio;
+
+          const nr = {
+            name: r.region_name,
+            rect: { x, y, w, h },
+            total: r.number,
+          };
+
+          return nr;
+        };
+
         const regions = [];
+        payload.data2.rows.forEach(r => {
+          regions.push(convertRegion(r));
+        });
 
         const people = [];
         if (person) {
@@ -278,6 +296,13 @@ export default {
       return {
         ...state,
         map: action.payload,
+      };
+    },
+
+    saveExtent(state, action) {
+      return {
+        ...state,
+        map: { ...state.map, extent: action.payload },
       };
     },
 

@@ -125,6 +125,7 @@ class Monitor extends Component {
     console.log('componentDidUpdate');
     const {
       monitor: { rtl, map, heatmap },
+      dispatch,
     } = this.props;
 
     this.regionLayer.getSource().clear();
@@ -146,6 +147,10 @@ class Monitor extends Component {
       image.src = map.url;
       image.onload = () => {
         const extent = [0, 0, image.width, image.height];
+        dispatch({
+          type: 'monitor/saveExtent',
+          payload: extent,
+        });
         const view = createView(extent);
         this.map.setView(view);
         const layer = createLayer(map.url, extent);
