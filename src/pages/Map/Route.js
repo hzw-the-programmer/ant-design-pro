@@ -137,47 +137,55 @@ class Route extends Component {
     }
 
     const {
-      map: { url, extent },
+      map: { url, ratio },
       locations,
     } = route;
 
     if (this.url !== url) {
       this.url = url;
 
-      const projection = new Projection({
-        code: 'hzw',
-        extent,
-      });
+      const image = new Image();
+      image.src = url;
+      image.onload = () => {
+        const extent = [0, 0, image.width, image.height];
+        const projection = new Projection({
+          code: 'hzw',
+          extent,
+        });
 
-      const view = new View({
-        center: getCenter(extent),
-        zoom: 2,
-        projection,
-      });
-      this.map.setView(view);
+        const view = new View({
+          center: getCenter(extent),
+          zoom: 2,
+          projection,
+        });
+        this.map.setView(view);
 
-      const mapLayer = new ImageLayer({
-        source: new ImageStatic({
-          url,
-          imageExtent: extent,
-        }),
-      });
-      this.map.getLayers().removeAt(0);
-      this.map.getLayers().insertAt(0, mapLayer);
+        const mapLayer = new ImageLayer({
+          source: new ImageStatic({
+            url,
+            imageExtent: extent,
+          }),
+        });
+        this.map.getLayers().removeAt(0);
+        this.map.getLayers().insertAt(0, mapLayer);
+
+        routeSource.clear();
+        const coords = [];
+        locations.forEach(location => {
+          routeSource.addFeature(
+            new Feature({
+              geometry: new Point(location.coord),
+              text: `${moment.unix(location.datetime).format()} ${location.duration}`,
+            })
+          );
+          let [x, y] = location.coord;
+          x *= ratio;
+          y = extent[3] - y * ratio;
+          coords.push([x, y]);
+        });
+        routeSource.addFeature(new Feature(new LineString(coords)));
+      };
     }
-
-    routeSource.clear();
-    const coords = [];
-    locations.forEach(location => {
-      routeSource.addFeature(
-        new Feature({
-          geometry: new Point(location.coord),
-          text: `${moment.unix(location.datetime).format()} ${location.duration}`,
-        })
-      );
-      coords.push(location.coord);
-    });
-    routeSource.addFeature(new Feature(new LineString(coords)));
   }
 
   changePerson(person) {

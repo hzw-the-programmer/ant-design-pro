@@ -1,3 +1,5 @@
+import { IDAS_HTTP_API_ROOT } from '@/services/constants';
+
 export function findAncestors(place, id, ids) {
   const r = place.children.filter(c => c.value === id);
 
@@ -45,4 +47,13 @@ export function getFirstPlace(place, ids) {
   if (place.children.length !== 0) {
     getFirstPlace(place.children[0], ids);
   }
+}
+
+export function convertMap(map) {
+  const newMap = {
+    url: IDAS_HTTP_API_ROOT + map.image,
+    ratio: map.ratio,
+  };
+
+  return newMap;
 }
