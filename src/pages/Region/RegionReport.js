@@ -68,8 +68,8 @@ function getOption(data) {
 
   data.forEach(d => {
     option.yAxis.data.push(d.name);
-    option.series[0].data.push(d.data[0].total);
-    option.series[1].data.push(d.data[1].total);
+    option.series[0].data.push(d.data[1].total);
+    option.series[1].data.push(d.data[0].total);
   });
 
   return option;
@@ -80,7 +80,7 @@ class RegionReport extends Component {
   state = {
     loading: false,
     params: {},
-    option: {},
+    data: [],
   };
 
   searchEvents = params => {
@@ -92,7 +92,7 @@ class RegionReport extends Component {
       console.log(response);
       this.setState({
         loading: false,
-        option: getOption(response.result),
+        data: response.result,
       });
     });
   };
@@ -200,14 +200,27 @@ class RegionReport extends Component {
     );
   };
 
+  onChartClick = (event, echart) => {
+    console.log('onChartClick', event, echart)
+  }
+
+  onChartLegendSelectChanged = (event, echart) => {
+    console.log('onChartLegendSelectChanged', event, echart)
+  }
+
   render() {
-    const { loading, option } = this.state;
+    const { loading, data } = this.state;
+    const onEvents = {
+      'click': this.onChartClick,
+      'legendselectchanged': this.onChartLegendSelectChanged,
+    }
+
     return (
       <PageHeaderWrapper>
         <Card>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm(loading)}</div>
-            <ReactEcharts option={option} />
+            <ReactEcharts option={getOption(data)} onEvents={onEvents} />
           </div>
         </Card>
       </PageHeaderWrapper>
