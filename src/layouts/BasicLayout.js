@@ -17,8 +17,10 @@ import Context from './MenuContext';
 import Exception403 from '../pages/Exception/403';
 import PageLoading from '@/components/PageLoading';
 import SiderMenu from '@/components/SiderMenu';
-import { title } from '../defaultSettings';
+// import { title } from '../defaultSettings';
 import styles from './BasicLayout.less';
+
+const title = formatMessage({ id: 'sh.title', defaultMessage: 'Location System' });
 
 // lazy load SettingDrawer
 const SettingDrawer = React.lazy(() => import('@/components/SettingDrawer'));
