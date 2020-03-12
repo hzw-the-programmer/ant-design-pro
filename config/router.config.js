@@ -23,6 +23,7 @@ export default [
         path: '/dashboard',
         name: 'dashboard',
         icon: 'dashboard',
+        hideInMenu: true,
         routes: [
           {
             path: '/dashboard/analysis',
@@ -46,6 +47,7 @@ export default [
         path: '/form',
         icon: 'form',
         name: 'form',
+        hideInMenu: true,
         routes: [
           {
             path: '/form/basic-form',
@@ -92,6 +94,7 @@ export default [
         path: '/list',
         icon: 'table',
         name: 'list',
+        hideInMenu: true,
         routes: [
           {
             path: '/list/table-list',
@@ -140,6 +143,7 @@ export default [
         path: '/profile',
         name: 'profile',
         icon: 'profile',
+        hideInMenu: true,
         routes: [
           // profile
           {
@@ -159,6 +163,7 @@ export default [
         name: 'result',
         icon: 'check-circle-o',
         path: '/result',
+        hideInMenu: true,
         routes: [
           // result
           {
@@ -173,6 +178,7 @@ export default [
         name: 'exception',
         icon: 'warning',
         path: '/exception',
+        hideInMenu: true,
         routes: [
           // exception
           {
@@ -202,6 +208,7 @@ export default [
         name: 'account',
         icon: 'user',
         path: '/account',
+        hideInMenu: true,
         routes: [
           {
             path: '/account/center',
@@ -256,72 +263,73 @@ export default [
         ],
       },
       {
-        path: '/station',
-        name: 'station',
+        path: '/monitor',
+        name: 'monitor',
         icon: 'dashboard',
-        routes: [
-          {
-            path: '/station/stationlist',
-            name: 'stationlist',
-            component: './Station/StationList',
-          },
-        ],
+        component: './Map/Monitor',
       },
       {
-        path: '/beacon',
-        name: 'beacon',
+        path: '/route',
+        name: 'route',
         icon: 'dashboard',
-        routes: [
-          {
-            path: '/beacon/beaconlist',
-            name: 'beaconlist',
-            component: './Beacon/BeaconList',
-          },
-        ],
+        component: './Map/Route',
       },
       {
-        path: '/staff',
-        name: 'staff',
+        path: '/activities',
+        name: 'activities',
         icon: 'dashboard',
-        routes: [
-          {
-            path: '/staff/stafflist',
-            name: 'stafflist',
-            component: './Staff/StaffList',
-          },
-          {
-            path: '/staff/teamlist',
-            name: 'teamlist',
-            component: './Staff/TeamList',
-          },
-        ],
+        component: './Region/RegionReport',
       },
       {
-        path: '/region',
-        name: 'region',
+        path: '/alarm',
+        name: 'alarm',
         icon: 'dashboard',
-        routes: [
-          {
-            path: '/region/regionreport',
-            name: 'regionreport',
-            component: './Region/RegionReport',
-          },   
-        ],
       },
       {
-        path: '/map',
-        name: 'map',
+        path: '/config',
+        name: 'config',
         icon: 'dashboard',
         routes: [
           {
-            path: '/map/monitor',
-            name: 'monitor',
-            component: './Map/Monitor',
+            path: '/config/station',
+            name: 'station',
+            icon: 'dashboard',
+            routes: [
+              {
+                path: '/config/station/stationlist',
+                name: 'stationlist',
+                component: './Station/StationList',
+              },
+            ],
           },
           {
-            path: '/map/route',
-            name: 'route',
-            component: './Map/Route',
+            path: '/config/beacon',
+            name: 'beacon',
+            icon: 'dashboard',
+            routes: [
+              {
+                path: '/config/beacon/beaconlist',
+                name: 'beaconlist',
+                component: './Beacon/BeaconList',
+              },
+            ],
+          },
+          {
+            path: '/config/staff',
+            name: 'staff',
+            icon: 'dashboard',
+            routes: [
+              {
+                path: '/config/staff/stafflist',
+                name: 'stafflist',
+                component: './Staff/StaffList',
+              },
+              {
+                path: '/config/staff/teamlist',
+                name: 'teamlist',
+                component: './Staff/TeamList',
+              },
+            ],
           },
         ],
       },

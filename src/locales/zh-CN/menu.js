@@ -35,17 +35,20 @@ export default {
   'menu.account.settings': '个人设置',
   'menu.account.trigger': '触发报错',
   'menu.account.logout': '退出登录',
-  'menu.map': '地图',
-  'menu.map.monitor': '实时监控',
-  'menu.map.route': '活动轨迹',
-  'menu.station': '基站管理',
-  'menu.station.stationlist': '基站列表',
-  'menu.beacon': '信标管理',
-  'menu.beacon.beaconlist': '信标列表',
-  'menu.staff': '人员管理',
-  'menu.staff.stafflist': '人员列表',
-  'menu.staff.teamlist': '组织列表',
-  'menu.map.table': '表格',
-  'menu.region': '活动管理',
-  'menu.region.regionreport': '活动日报表',
+
+  'menu.monitor': '实时监控',
+  'menu.route': '历史轨迹',
+  'menu.activities': '区域活动统计',
+  'menu.alarm': '限制区域报警',
+  'menu.config': '配置管理',
+
+  'menu.config.station': '基站管理',
+  'menu.config.station.stationlist': '基站列表',
+
+  'menu.config.beacon': '信标管理',
+  'menu.config.beacon.beaconlist': '信标列表',
+
+  'menu.config.staff': '人员管理',
+  'menu.config.staff.stafflist': '人员列表',
+  'menu.config.staff.teamlist': '组织列表',
 };
