@@ -33,7 +33,6 @@ export default {
   'sh.higher level organization': '上级组织',
   'sh.team_level': '组织级别',
   'sh.title': '人员定位系统',
-  // 'menu.staff': '人员管理',
-  // 'menu.staff.stafflist': '人员列表',
-  // 'menu.staff.teamlist': '组织列表',
+  'sh.date': '日期',
+  'sh.please-input-date': '请输入日期',
 };

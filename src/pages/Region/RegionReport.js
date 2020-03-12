@@ -1,22 +1,62 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Form, Row, Col, Card, Input , Button , List } from 'antd'
+import { Form, Row, Col, Card, Input , Button , DatePicker  } from 'antd'
 
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './RegionReport.less';
 
-// import { queryStations } from '@/services/sh';
+import { queryEvents } from '@/services/sh';
 
 @Form.create()
 class RegionReport extends Component {
 
     state = {
         loading: false,
-        params: {},
-        stations: [],
-        total: 0,
+        params: {}, 
     }
+
+    searchEvents = (params) => {
+      this.setState({
+        loading: true,
+      })
+  
+      queryEvents(params).then(response => {
+  
+          this.setState({
+            loading: false,      
+          })
+
+      })  
+    }
+
+    handleFormReset = () => {
+        const { form } = this.props;
+        
+        form.resetFields();
+        this.setState({
+          params: {},
+        })
+        console.log('取消')
+      };
+
+    handleSearch = e => {
+      e.preventDefault();
+    
+      const { form } = this.props;
+    
+      form.validateFields((err, fieldsValue) => {
+        if (err) return;
+    
+        const params = fieldsValue
+    
+          this.setState({
+            params,
+          })
+  
+          this.searchEvents(params)
+        });
+      }
 
     renderForm = loading => {
         const { form: { getFieldDecorator } } = this.props
@@ -40,8 +80,17 @@ class RegionReport extends Component {
                     </Form.Item>
                 </Col>     
             </Row>
-          
-            {/* <div style={{ overflow: 'hidden' }}>
+            <Row gutter={{ lg: 24, xl: 48 }}>
+              <Col md={8}>
+                <Form.Item label={formatMessage({ id: 'sh.date', defaultMessage: 'Date' })}>
+                  {getFieldDecorator('datetime')(
+                    <DatePicker style={{ width: '100%' }} placeholder={formatMessage({ id: 'sh.please-input-date', defaultMessage: 'Please input date' })}  />   
+                  )}
+                </Form.Item>      
+              </Col>
+            </Row>
+
+            <div style={{ overflow: 'hidden' }}>
               <div style={{ float: 'right', marginBottom: 24 }}>
                 <Button type="primary" htmlType="submit" loading={loading}>
                   {formatMessage({ id: 'sh.search', defaultMessage: 'Search' })}
@@ -50,16 +99,14 @@ class RegionReport extends Component {
                   {formatMessage({ id: 'sh.reset', defaultMessage: 'Reset' })}
                 </Button>
               </div>
-            </div> */}
-          </Form>
+            </div> 
+          </Form> 
         )
       }
 
 
     render() { 
-
-        const { loading} = this.state
-
+        const { loading } = this.state
         return (
           <PageHeaderWrapper>
             <Card>
@@ -71,9 +118,6 @@ class RegionReport extends Component {
             </Card>     
          </PageHeaderWrapper>
         );
-
-        
-
     }
 }
 export default RegionReport;

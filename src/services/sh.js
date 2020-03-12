@@ -172,3 +172,15 @@ export async function queryRoutes(person, datetime) {
     credentials: 'omit',
   });
 }
+
+
+//活动日报表
+export async function queryEvents(params) {
+
+  return request(`${HTTP_API_ROOT}/staff_event/daily`, {
+    method: 'POST',
+    body: params,
+    credentials: 'omit',
+  });
+}
+

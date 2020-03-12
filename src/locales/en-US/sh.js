@@ -33,4 +33,6 @@ export default {
   'sh.higher level organization': 'Higher level organization',
   'sh.team_level': 'Organization level',
   'sh.title': 'Location System',
+  'sh.date': 'Date',
+  'sh.please-input-date': 'Please input date',
 };
