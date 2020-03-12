@@ -46,4 +46,6 @@ export default {
   'menu.staff.stafflist': '人员列表',
   'menu.staff.teamlist': '组织列表',
   'menu.map.table': '表格',
+  'menu.region': '活动管理',
+  'menu.region.regionreport': '活动日报表',
 };

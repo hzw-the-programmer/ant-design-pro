@@ -297,6 +297,18 @@ export default [
         ],
       },
       {
+        path: '/region',
+        name: 'region',
+        icon: 'dashboard',
+        routes: [
+          {
+            path: '/region/regionreport',
+            name: 'regionreport',
+            component: './Region/RegionReport',
+          },   
+        ],
+      },
+      {
         path: '/map',
         name: 'map',
         icon: 'dashboard',

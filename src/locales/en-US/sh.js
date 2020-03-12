@@ -32,11 +32,5 @@ export default {
     'sh.team_name': 'Organization name',
     'sh.higher level organization': 'Higher level organization',
     'sh.team_level': 'Organization level',
-
-    'menu.staff': 'Staff Management',
-    'menu.staff.stafflist': 'Staff List',   
-    'menu.staff.teamlist': 'Team List',
-
-
 };
   

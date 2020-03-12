@@ -35,7 +35,6 @@ export default {
   'menu.account.settings': 'Account Settings',
   'menu.account.trigger': 'Trigger Error',
   'menu.account.logout': 'Logout',
-
   'menu.station': 'Station Management',
   'menu.station.stationlist': 'Station List',
   'menu.beacon': 'Beacon Management',
@@ -43,4 +42,6 @@ export default {
   'menu.staff': 'Staff Management',
   'menu.staff.stafflist': 'Staff List',
   'menu.staff.teamlist': 'Team List',
+  'menu.region': 'Activity Management',
+  'menu.region.regionreport': 'Activity Daily Report',
 };
