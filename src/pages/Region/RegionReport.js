@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Form, Row, Col, Card, Input, Button, DatePicker } from 'antd';
+import { Form, Row, Col, Card, Input, Button, DatePicker, Modal } from 'antd';
 
 import { formatMessage, FormattedMessage } from 'umi/locale';
 
@@ -75,12 +75,58 @@ function getOption(data) {
   return option;
 }
 
+function getDetailOption(d) {
+  const option = {
+    title: {
+      text: '活动区域时长统计',
+      // subtext: '纯属虚构',
+      left: 'center',
+    },
+    tooltip: {
+      trigger: 'item',
+      formatter: '{a} <br/>{b} : {c} ({d}%)',
+    },
+    legend: {
+      orient: 'vertical',
+      left: 'left',
+      data: [],
+    },
+    series: [
+      {
+        name: '访问来源',
+        type: 'pie',
+        radius: '55%',
+        center: ['50%', '60%'],
+        data: [],
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0, 0, 0, 0.5)',
+          },
+        },
+      },
+    ],
+  };
+
+  d.data.forEach(r => {
+    r.details.forEach(de => {
+      option.legend.data.push(de.region);
+      option.series[0].data.push({ value: de.num, name: de.region });
+    });
+  });
+
+  return option;
+}
+
 @Form.create()
 class RegionReport extends Component {
   state = {
     loading: false,
     params: {},
     data: [],
+    detailModalVisible: false,
+    detailIndex: 0,
   };
 
   searchEvents = params => {
@@ -201,19 +247,29 @@ class RegionReport extends Component {
   };
 
   onChartClick = (event, echart) => {
-    console.log('onChartClick', event, echart)
-  }
+    console.log('onChartClick', event, echart);
+    this.setState({
+      detailModalVisible: !this.state.detailModalVisible,
+      detailIndex: event.dataIndex,
+    });
+  };
 
   onChartLegendSelectChanged = (event, echart) => {
-    console.log('onChartLegendSelectChanged', event, echart)
-  }
+    console.log('onChartLegendSelectChanged', event, echart);
+  };
+
+  handleDetailModalOk = () => {
+    this.setState({
+      detailModalVisible: !this.state.detailModalVisible,
+    });
+  };
 
   render() {
-    const { loading, data } = this.state;
+    const { loading, data, detailModalVisible, detailIndex } = this.state;
     const onEvents = {
-      'click': this.onChartClick,
-      'legendselectchanged': this.onChartLegendSelectChanged,
-    }
+      click: this.onChartClick,
+      legendselectchanged: this.onChartLegendSelectChanged,
+    };
 
     return (
       <PageHeaderWrapper>
@@ -223,6 +279,19 @@ class RegionReport extends Component {
             <ReactEcharts option={getOption(data)} onEvents={onEvents} />
           </div>
         </Card>
+
+        <Modal
+          visible={detailModalVisible}
+          onOk={this.handleDetailModalOk}
+          onCancel={this.handleDetailModalOk}
+        >
+          {detailIndex < data.length
+            ? `${data[detailIndex].name} | ${data[detailIndex].number} | ${data[detailIndex].team}`
+            : ''}
+          <ReactEcharts
+            option={detailIndex < data.length ? getDetailOption(data[detailIndex]) : {}}
+          />
+        </Modal>
       </PageHeaderWrapper>
     );
   }
