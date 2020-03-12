@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Form, Row, Col, Card, Input, Button, DatePicker, Modal } from 'antd';
+import { Form, Row, Col, Card, Input, Button, DatePicker, Modal, Table } from 'antd';
 
 import { formatMessage, FormattedMessage } from 'umi/locale';
 
@@ -117,6 +117,38 @@ function getDetailOption(d) {
   });
 
   return option;
+}
+
+const detailColumns = [
+  {
+    title: '区域类型',
+    dataIndex: 'type',
+  },
+  {
+    title: '区域名称',
+    dataIndex: 'name',
+  },
+  {
+    title: '区域总时长',
+    dataIndex: 'duration',
+  },
+]
+
+function getDetailDataSource(d) {
+  const ds = []
+
+  d.data.forEach(di => {
+    di.details.forEach(dd => {
+      ds.push({
+        type: di.type,
+        name: dd.region,
+        duration: dd.min_num,
+        key: dd.region_id,
+      })
+    })
+  })
+
+  return ds
 }
 
 @Form.create()
@@ -291,6 +323,10 @@ class RegionReport extends Component {
           <ReactEcharts
             option={detailIndex < data.length ? getDetailOption(data[detailIndex]) : {}}
           />
+          <Table
+            columns={detailColumns}
+            dataSource={detailIndex < data.length ?
+              getDetailDataSource(data[detailIndex]) : []} />
         </Modal>
       </PageHeaderWrapper>
     );
