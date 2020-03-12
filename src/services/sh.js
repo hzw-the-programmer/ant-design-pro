@@ -184,3 +184,14 @@ export async function queryEvents(params) {
   });
 }
 
+export async function queryRegionDuration(params) {
+  const body = {
+    staff_id: params.id,
+    region_id: params.key,
+  }
+  return request(`${HTTP_API_ROOT}/region/duration`, {
+    method: 'POST',
+    body,
+    credentials: 'omit',
+  });
+}

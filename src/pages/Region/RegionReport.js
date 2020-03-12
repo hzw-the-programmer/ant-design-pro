@@ -9,7 +9,7 @@ import ReactEcharts from 'echarts-for-react';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './RegionReport.less';
 
-import { queryEvents } from '@/services/sh';
+import { queryEvents, queryRegionDuration } from '@/services/sh';
 
 function getOption(data) {
   const option = {
@@ -119,21 +119,6 @@ function getDetailOption(d) {
   return option;
 }
 
-const detailColumns = [
-  {
-    title: '区域类型',
-    dataIndex: 'type',
-  },
-  {
-    title: '区域名称',
-    dataIndex: 'name',
-  },
-  {
-    title: '区域总时长',
-    dataIndex: 'duration',
-  },
-]
-
 function getDetailDataSource(d) {
   const ds = []
 
@@ -144,12 +129,28 @@ function getDetailDataSource(d) {
         name: dd.region,
         duration: dd.min_num,
         key: dd.region_id,
+        id: d.staff_id,
       })
     })
   })
 
   return ds
 }
+
+const logColumns = [
+  {
+    title: '开始时间',
+    dataIndex: 'st',
+  },
+  {
+    title: '结束时间',
+    dataIndex: 'et',
+  },
+  {
+    title: '时长',
+    dataIndex: 'duration',
+  },
+]
 
 @Form.create()
 class RegionReport extends Component {
@@ -159,7 +160,27 @@ class RegionReport extends Component {
     data: [],
     detailModalVisible: false,
     detailIndex: 0,
+    logModalVisible: false,
+    logs: [],
   };
+
+  detailColumns = [
+    {
+      title: '区域类型',
+      dataIndex: 'type',
+    },
+    {
+      title: '区域名称',
+      dataIndex: 'name',
+      render: (text, record) => {
+        return <a onClick={() => this.handleRegionClick(record)}>{text}</a>
+      }
+    },
+    {
+      title: '区域总时长',
+      dataIndex: 'duration',
+    },
+  ]
 
   searchEvents = params => {
     this.setState({
@@ -296,8 +317,44 @@ class RegionReport extends Component {
     });
   };
 
+  handleRegionClick(record) {
+    this.setState({
+      logModalVisible: !this.state.logModalVisible,
+    });
+
+    queryRegionDuration(record).then(response => {
+      console.log('queryRegionDuration', response)
+      const logs = []
+      response.result[0].data[0].details.forEach((d, i) =>{
+        logs.push({
+          st: d.starttime,
+          et: d.endtime,
+          duration: d.min_num,
+          key: i,
+        })
+      })
+      this.setState({
+        logs,
+      })
+    })
+  }
+
+  handleLogModalOk = () => {
+    this.setState({
+      logModalVisible: !this.state.logModalVisible,
+    });
+  };
+
   render() {
-    const { loading, data, detailModalVisible, detailIndex } = this.state;
+    const {
+      loading,
+      data,
+      detailModalVisible,
+      detailIndex,
+      logModalVisible,
+      logs,
+    } = this.state;
+    
     const onEvents = {
       click: this.onChartClick,
       legendselectchanged: this.onChartLegendSelectChanged,
@@ -324,9 +381,19 @@ class RegionReport extends Component {
             option={detailIndex < data.length ? getDetailOption(data[detailIndex]) : {}}
           />
           <Table
-            columns={detailColumns}
+            columns={this.detailColumns}
             dataSource={detailIndex < data.length ?
               getDetailDataSource(data[detailIndex]) : []} />
+        </Modal>
+
+        <Modal
+          visible={logModalVisible}
+          onOk={this.handleLogModalOk}
+          onCancel={this.handleLogModalOk}
+        >
+          <Table
+            columns={logColumns}
+            dataSource={logs} />
         </Modal>
       </PageHeaderWrapper>
     );
