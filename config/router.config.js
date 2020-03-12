@@ -302,74 +302,14 @@ export default [
         icon: 'dashboard',
         routes: [
           {
-            path: '/map/map1',
-            name: 'map1',
-            component: './Map/Map1',
-          },
-          {
-            path: '/map/map2',
-            name: 'map2',
-            component: './Map/Map2',
-          },
-          {
-            path: '/map/map3',
-            name: 'map3',
-            component: './Map/Map3',
-          },
-          {
-            path: '/map/map4',
-            name: 'map4',
-            component: './Map/Map4',
-          },
-          {
-            path: '/map/map5',
-            name: 'map5',
-            component: './Map/Map5',
-          },
-          {
-            path: '/map/map6',
-            name: 'map6',
-            component: './Map/Map6',
-          },
-          {
-            path: '/map/map7',
-            name: 'map7',
-            component: './Map/Map7',
-          },
-          {
-            path: '/map/map8',
-            name: 'map8',
-            component: './Map/Map8',
-          },
-          {
-            path: '/map/map9',
-            name: 'map9',
-            component: './Map/Map9',
-          },
-          {
             path: '/map/monitor',
             name: 'monitor',
             component: './Map/Monitor',
           },
           {
-            path: '/map/map11',
-            name: 'map11',
-            component: './Map/Map11',
-          },
-          {
-            path: '/map/map12',
-            name: 'map12',
-            component: './Map/Map12',
-          },
-          {
             path: '/map/route',
             name: 'route',
             component: './Map/Route',
-          },
-          {
-            path: '/map/table',
-            name: 'table',
-            component: './Map/Table',
           },
         ],
       },
