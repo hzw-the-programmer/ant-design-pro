@@ -108,6 +108,7 @@ export function convertRegions(regions) {
     const y = parseInt(re.pick1y, 10)
     const w = re.pick2x - re.pick1x
     const h = re.pick2y - re.pick1y
+    
     r.push({
       id: parseInt(re.id, 10),
       name: re.region_name,
@@ -117,4 +118,20 @@ export function convertRegions(regions) {
   })
 
   return r
+}
+
+export function convertStations(stations) {
+  const s = []
+
+  stations.forEach(sa => {
+    const x = parseInt(sa.x, 10)
+    const y = parseInt(sa.y, 10)
+    
+    s.push({
+      extent: [x, y, 0, 0],
+      type: parseInt(sa.type, 10)
+    })
+  })
+
+  return s
 }

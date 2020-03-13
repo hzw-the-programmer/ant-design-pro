@@ -14,7 +14,7 @@ import { getCenter } from 'ol/extent'
 import Feature from 'ol/Feature'
 import Polygon from 'ol/geom/Polygon';
 import Point from 'ol/geom/Point';
-import { Style, Stroke, Fill, Text } from 'ol/style';
+import { Style, Stroke, Fill, Text, Icon } from 'ol/style';
 
 import styles from './Add.less'
 
@@ -54,6 +54,22 @@ const regionNormalStyle = new Style({
     }),
 });
 
+const stationGreen = new Style({
+    image: new Icon({
+        src: './station_green.png',
+        // anchor: [0.5, 1],
+        scale: 0.1,
+    })
+})
+
+const stationBlue = new Style({
+    image: new Icon({
+        src: './station_blue.png',
+        // anchor: [0.5, 1],
+        scale: 0.1,
+    })
+})
+
 @connect(({ station }) => ({
     station,
 }))
@@ -83,8 +99,24 @@ class Add extends PureComponent {
                 }
             }
         })
+
+        const stationLayer = new VectorLayer({
+            source: new VectorSource(),
+            style(feature) {
+                const type = feature.get('type')
+                if (type === 16) {
+                    return stationGreen
+                } else if (type === 17) {
+                    return stationBlue
+                }
+            }
+        })
         
-        const layers = [mapLayer, regionLayer]
+        const layers = [
+            mapLayer,
+            regionLayer,
+            stationLayer,
+        ]
         
         this.map = new Map({
             target: 'map',
@@ -111,7 +143,10 @@ class Add extends PureComponent {
     }
 
     updateMap() {
-        const { station: { map, regions }, dispatch } = this.props
+        const { station: { map, regions, stations }, dispatch } = this.props
+
+        const regionSource = this.map.getLayers().item(1).getSource()
+        const stationSource = this.map.getLayers().item(2).getSource()
 
         if (map.url === '' || this.url === map.url) {
             this.url = map.url
@@ -123,7 +158,6 @@ class Add extends PureComponent {
         img.src = map.url
         img.onload = ev => {
             const extent = [0, 0, img.width, img.height]
-            console.log(extent)
             dispatch({
                 type: 'station/saveMap',
                 payload: {...map, extent}
@@ -138,7 +172,7 @@ class Add extends PureComponent {
             // this.map.getLayers().removeAt(0);
             // this.map.getLayers().insertAt(0, layer);
 
-            const regionSource = this.map.getLayers().item(1).getSource()
+            regionSource.clear()
             regions.forEach(re => {
                 const l = re.extent[0] * map.ratio
                 const t = extent[3] - (re.extent[1] * map.ratio)
@@ -158,6 +192,18 @@ class Add extends PureComponent {
                     name: re.name,
                 })
                 regionSource.addFeature(pointFeature)
+            })
+
+            stationSource.clear()
+            stations.forEach(st => {
+                const pointFeature = new Feature({
+                    geometry: new Point([
+                        st.extent[0] * map.ratio,
+                        extent[3] - st.extent[1] * map.ratio,
+                    ]),
+                    type: st.type,
+                })
+                stationSource.addFeature(pointFeature)
             })
         }
     }

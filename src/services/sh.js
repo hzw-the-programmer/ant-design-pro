@@ -196,10 +196,24 @@ export async function queryRegionDuration(params) {
   });
 }
 
-export async function queryRegions(params) {
+export async function queryPlaceRegions(params) {
   const body = { place_id: params[params.length - 1] };
   
   return request(`${HTTP_API_ROOT}/region/region_list_place`, {
+    method: 'POST',
+    credentials: 'omit',
+    body,
+  });
+}
+
+export async function queryPlaceStations(params) {
+  const body = {
+    place_id: params[params.length - 1],
+    page: 1,
+    rows: 10000,
+  };
+  
+  return request(`${HTTP_API_ROOT}/basestation/station_list_place`, {
     method: 'POST',
     credentials: 'omit',
     body,

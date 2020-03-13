@@ -1,5 +1,17 @@
-import { queryPlaces, queryMap, queryRegions } from '@/services/sh'
-import { convertPlace, getFirstPlace, convertMap, convertRegions } from '@/utils/sh'
+import {
+  queryPlaces,
+  queryPlaceRegions,
+  queryPlaceStations,
+  queryMap,
+} from '@/services/sh'
+
+import {
+  convertPlace,
+  getFirstPlace,
+  convertRegions,
+  convertStations,
+  convertMap,
+} from '@/utils/sh'
 
 export default {
   namespace: 'station',
@@ -9,6 +21,7 @@ export default {
     place: [],
     map: {url: '', ratio: 0.0, extent: [0, 0, 0, 0]},
     regions: [],
+    stations: [],
   },
 
   effects: {
@@ -40,9 +53,11 @@ export default {
           payload,
         })
 
-        let response = yield call(queryRegions, payload)
+        let response = yield call(queryPlaceRegions, payload)
         const regions = convertRegions(response.result)
-        console.log(regions)
+
+        response = yield call(queryPlaceStations, payload)
+        const stations = convertStations(response.result)
 
         response = yield call(queryMap, payload)
         if (response.result.length === 0) {
@@ -53,6 +68,11 @@ export default {
         yield put({
           type: 'saveRegions',
           payload: regions,
+        });
+
+        yield put({
+          type: 'saveStations',
+          payload: stations,
         });
 
         yield put({
@@ -77,6 +97,9 @@ export default {
       return {
         ...state,
         place: action.payload,
+        map: {url: '', ratio: 0.0, extent: [0, 0, 0, 0]},
+        regions: [],
+        stations: [],
       }
     },
 
@@ -91,6 +114,13 @@ export default {
       return {
         ...state,
         regions: action.payload,
+      }
+    },
+
+    saveStations(state, action) {
+      return {
+        ...state,
+        stations: action.payload,
       }
     },
   },
