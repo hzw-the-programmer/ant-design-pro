@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 
 import { connect } from 'dva'
 
-import { Cascader } from 'antd'
+import { Cascader, Modal, Form, Input } from 'antd'
 
 import Map from 'ol/Map'
 import View from 'ol/View';
@@ -73,7 +73,12 @@ const stationBlue = new Style({
 @connect(({ station }) => ({
     station,
 }))
+@Form.create()
 class Add extends PureComponent {
+    state = {
+        modalVisible: false,
+    }
+
     componentDidMount() {
         const mapLayer = new ImageLayer({
             visible: false,
@@ -122,6 +127,8 @@ class Add extends PureComponent {
             target: 'map',
             layers,
         })
+
+        this.map.on('click', this.onMapClick)
 
         this.updateMap()
     }
@@ -208,8 +215,30 @@ class Add extends PureComponent {
         }
     }
 
+    onMapClick = ev => {
+        const { form } = this.props
+        const { modalVisible } = this.state
+        const { coordinate: [x, y] } = ev
+        
+        this.setState({
+            modalVisible: !modalVisible,
+        })
+        
+        form.setFieldsValue({x, y})
+    }
+
+    toggleModal = () => {
+        this.setState({
+            modalVisible: !this.state.modalVisible,
+        })
+    }
+
     render() {
-        const { station: { places, place } } = this.props
+        const {
+            station: { places, place },
+            form: { getFieldDecorator },
+        } = this.props
+        const { modalVisible } = this.state
 
         return (
             <div>
@@ -221,6 +250,24 @@ class Add extends PureComponent {
                     allowClear={false}
                 />
                 <div id="map" className={styles.map} />
+                <Modal
+                    visible={modalVisible}
+                    onOk={this.toggleModal}
+                    onCancel={this.toggleModal}
+                >
+                    <Form>
+                        <Form.Item label="X">
+                            {getFieldDecorator('x')(
+                                <Input />
+                            )}
+                        </Form.Item>
+                        <Form.Item label="Y">
+                            {getFieldDecorator('y')(
+                                <Input />
+                            )}
+                        </Form.Item>
+                    </Form>
+                </Modal>
             </div>
         )
     }
