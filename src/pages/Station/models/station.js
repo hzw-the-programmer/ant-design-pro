@@ -1,5 +1,5 @@
-import { queryPlaces, queryMap } from '@/services/sh'
-import { convertPlace, getFirstPlace, convertMap } from '@/utils/sh'
+import { queryPlaces, queryMap, queryRegions } from '@/services/sh'
+import { convertPlace, getFirstPlace, convertMap, convertRegions } from '@/utils/sh'
 
 export default {
   namespace: 'station',
@@ -7,7 +7,8 @@ export default {
   state: {
     places: [],
     place: [],
-    map: {url: '', ratio: 0.0, extent: [0, 0, 0, 0]}
+    map: {url: '', ratio: 0.0, extent: [0, 0, 0, 0]},
+    regions: [],
   },
 
   effects: {
@@ -39,11 +40,21 @@ export default {
           payload,
         })
 
-        const response = yield call(queryMap, payload)
+        let response = yield call(queryRegions, payload)
+        const regions = convertRegions(response.result)
+        console.log(regions)
+
+        response = yield call(queryMap, payload)
         if (response.result.length === 0) {
           return;
         }
         const map = convertMap(response.result[0]);
+        
+        yield put({
+          type: 'saveRegions',
+          payload: regions,
+        });
+
         yield put({
           type: 'saveMap',
           payload: map,
@@ -73,6 +84,13 @@ export default {
       return {
         ...state,
         map: action.payload,
+      }
+    },
+
+    saveRegions(state, action) {
+      return {
+        ...state,
+        regions: action.payload,
       }
     },
   },

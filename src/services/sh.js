@@ -195,3 +195,13 @@ export async function queryRegionDuration(params) {
     credentials: 'omit',
   });
 }
+
+export async function queryRegions(params) {
+  const body = { place_id: params[params.length - 1] };
+  
+  return request(`${HTTP_API_ROOT}/region/region_list_place`, {
+    method: 'POST',
+    credentials: 'omit',
+    body,
+  });
+}

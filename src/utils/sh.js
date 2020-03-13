@@ -79,7 +79,7 @@ export function getFirstPlace(place, ids) {
 export function convertMap(map) {
   const newMap = {
     url: IDAS_HTTP_API_ROOT + map.image,
-    ratio: map.ratio,
+    ratio: parseFloat(map.ratio),
     extent: [0, 0, 0, 0],
   };
 
@@ -98,4 +98,23 @@ export function convertPlace(place) {
   });
 
   return newPlace;
+}
+
+export function convertRegions(regions) {
+  const r = []
+
+  regions.forEach(re => {
+    const x = parseInt(re.pick1x, 10)
+    const y = parseInt(re.pick1y, 10)
+    const w = re.pick2x - re.pick1x
+    const h = re.pick2y - re.pick1y
+    r.push({
+      id: parseInt(re.id, 10),
+      name: re.region_name,
+      extent: [x, y, w, h],
+      type: parseInt(re.type, 10)
+    })
+  })
+
+  return r
 }
