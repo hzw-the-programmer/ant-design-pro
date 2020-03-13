@@ -80,7 +80,22 @@ export function convertMap(map) {
   const newMap = {
     url: IDAS_HTTP_API_ROOT + map.image,
     ratio: map.ratio,
+    extent: [0, 0, 0, 0],
   };
 
   return newMap;
+}
+
+export function convertPlace(place) {
+  const newPlace = {
+    label: place.name,
+    value: place.id,
+    children: [],
+  };
+
+  place.children.forEach(child => {
+    newPlace.children.push(convertPlace(child));
+  });
+
+  return newPlace;
 }

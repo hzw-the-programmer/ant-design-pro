@@ -300,6 +300,11 @@ export default [
                 name: 'stationlist',
                 component: './Station/StationList',
               },
+              {
+                path: '/config/station/add',
+                name: 'add',
+                component: './Station/Add',
+              },
             ],
           },
           {
