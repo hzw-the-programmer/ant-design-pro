@@ -251,11 +251,19 @@ class Add extends PureComponent {
         form.validateFields((err, fieldsValue) => {
             if (err) return
 
+            form.resetFields()
+            this.toggleModal()
             dispatch({
                 type: "region/addAndQueryRegions",
                 payload: {...fieldsValue, place},
             })
         })
+    }
+
+    onModalCancel = () => {
+        const { form } = this.props
+        form.resetFields()
+        this.toggleModal()
     }
 
     render() {
@@ -278,7 +286,7 @@ class Add extends PureComponent {
                 <Modal
                     visible={modalVisible}
                     onOk={this.onModalOk}
-                    onCancel={this.toggleModal}
+                    onCancel={this.onModalCancel}
                     title="添加基站"
                 >
                     <div className={styles.form}>
