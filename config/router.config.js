@@ -308,6 +308,18 @@ export default [
             ],
           },
           {
+            path: '/config/region',
+            name: 'region',
+            icon: 'dashboard',
+            routes: [
+              {
+                path: '/config/region/add',
+                name: 'add',
+                component: './Region/Add',
+              },
+            ],
+          },
+          {
             path: '/config/beacon',
             name: 'beacon',
             icon: 'dashboard',

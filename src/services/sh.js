@@ -231,3 +231,21 @@ export async function addStation(params) {
     body,
   });
 }
+
+export async function addRegion(params) {
+  const body = {
+    region_name: params.name,
+    pick1x: params.x,
+    pick1y: params.y,
+    pick2x: params.x + params.w,
+    pick2y: params.y + params.h,
+    place_id: params.place[params.place.length - 1],
+    type: params.type,
+  }
+  console.log(body)
+  return request(`${HTTP_API_ROOT}/region/region_add`, {
+    method: 'POST',
+    credentials: 'omit',
+    body,
+  });
+}
