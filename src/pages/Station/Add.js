@@ -236,11 +236,19 @@ class Add extends PureComponent {
             if (err) return
 
             fieldsValue['type'] = parseInt(fieldsValue['type'], 10)
+            form.resetFields()
+            this.toggleModal()
             dispatch({
                 type: "station/addAndQueryStation",
                 payload: {...fieldsValue, place},
             })
         })
+    }
+
+    onModalCancel = () => {
+        const { form } = this.props
+        form.resetFields()
+        this.toggleModal()
     }
 
     render() {
@@ -263,7 +271,7 @@ class Add extends PureComponent {
                 <Modal
                     visible={modalVisible}
                     onOk={this.onModalOk}
-                    onCancel={this.toggleModal}
+                    onCancel={this.onModalCancel}
                     title="添加基站"
                 >
                     <div className={styles.form}>
