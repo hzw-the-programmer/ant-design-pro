@@ -219,3 +219,15 @@ export async function queryPlaceStations(params) {
     body,
   });
 }
+
+export async function addStation(params) {
+  const body = {...params}
+  body.place_id = params.place[params.place.length - 1]
+  delete body.place
+  console.log(body)
+  return request(`${HTTP_API_ROOT}/basestation/station_add`, {
+    method: 'POST',
+    credentials: 'omit',
+    body,
+  });
+}

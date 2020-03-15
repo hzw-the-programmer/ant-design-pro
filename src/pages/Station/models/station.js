@@ -1,8 +1,11 @@
+import { message } from 'antd'
+
 import {
   queryPlaces,
   queryPlaceRegions,
   queryPlaceStations,
   queryMap,
+  addStation,
 } from '@/services/sh'
 
 import {
@@ -82,6 +85,22 @@ export default {
       } catch(e) {
         console.log(e)
       }
+    },
+
+    *addAndQueryStation({ payload }, { call }) {
+      let response = yield call(addStation, payload)
+      if (response.code !== 0) {
+        message.error(response.msg)
+        return
+      }
+      
+      response = yield call(queryPlaceStations, payload.place)
+      const stations = convertStations(response.result)
+
+      yield put({
+        type: 'saveStations',
+        payload: stations,
+      });
     }
   },
 

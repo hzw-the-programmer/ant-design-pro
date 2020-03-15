@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 
 import { connect } from 'dva'
 
-import { Cascader, Modal, Form, Input } from 'antd'
+import { Cascader, Modal, Form, Input, Row, Col, Select } from 'antd'
 
 import Map from 'ol/Map'
 import View from 'ol/View';
@@ -217,19 +217,29 @@ class Add extends PureComponent {
 
     onMapClick = ev => {
         const { form } = this.props
-        const { modalVisible } = this.state
         const { coordinate: [x, y] } = ev
         
-        this.setState({
-            modalVisible: !modalVisible,
-        })
-        
         form.setFieldsValue({x, y})
+        this.toggleModal()
     }
 
     toggleModal = () => {
+        const { modalVisible } = this.state
         this.setState({
-            modalVisible: !this.state.modalVisible,
+            modalVisible: !modalVisible,
+        })
+    }
+
+    onModalOk = () => {
+        const { form, station: { place }, dispatch } = this.props
+        form.validateFields((err, fieldsValue) => {
+            if (err) return
+
+            fieldsValue['type'] = parseInt(fieldsValue['type'], 10)
+            dispatch({
+                type: "station/addAndQueryStation",
+                payload: {...fieldsValue, place},
+            })
         })
     }
 
@@ -252,21 +262,55 @@ class Add extends PureComponent {
                 <div id="map" className={styles.map} />
                 <Modal
                     visible={modalVisible}
-                    onOk={this.toggleModal}
+                    onOk={this.onModalOk}
                     onCancel={this.toggleModal}
+                    title="添加基站"
                 >
-                    <Form>
-                        <Form.Item label="X">
-                            {getFieldDecorator('x')(
-                                <Input />
-                            )}
-                        </Form.Item>
-                        <Form.Item label="Y">
-                            {getFieldDecorator('y')(
-                                <Input />
-                            )}
-                        </Form.Item>
-                    </Form>
+                    <div className={styles.form}>
+                        <Form layout="inline">
+                            <Row>
+                                <Col>
+                                    <Form.Item label="X">
+                                        {getFieldDecorator('x')(
+                                            <Input />
+                                        )}
+                                    </Form.Item>
+                                </Col>
+                                <Col>
+                                    <Form.Item label="Y">
+                                        {getFieldDecorator('y')(
+                                            <Input />
+                                        )}
+                                    </Form.Item>
+                                </Col>
+                                <Col>
+                                    <Form.Item label="SN">
+                                        {getFieldDecorator('sn', {
+                                            rules: [{ required: true }],
+                                        })(
+                                            <Input />
+                                        )}
+                                    </Form.Item>
+                                </Col>
+                                <Col>
+                                    <Form.Item label="类型">
+                                        {getFieldDecorator('type', {
+                                            rules: [{ required: true }],
+                                        })(
+                                            <Select>
+                                                <Select.Option value="16">
+                                                    定位基站
+                                                </Select.Option>
+                                                <Select.Option value="17">
+                                                    门禁基站
+                                                </Select.Option>
+                                            </Select>
+                                        )}
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+                        </Form>
+                    </div>
                 </Modal>
             </div>
         )
