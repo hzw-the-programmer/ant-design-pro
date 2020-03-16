@@ -4,6 +4,8 @@ import { Form, Row, Col, Card, Input, Button, DatePicker, Modal, Table } from 'a
 
 import { formatMessage, FormattedMessage } from 'umi/locale';
 
+import moment from 'moment';
+
 import ReactEcharts from 'echarts-for-react';
 
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -68,8 +70,8 @@ function getOption(data) {
 
   data.forEach(d => {
     option.yAxis.data.push(d.name);
-    option.series[0].data.push(d.data[1].total);
-    option.series[1].data.push(d.data[0].total);
+    option.series[0].data.push(d.data[1].total );
+    option.series[1].data.push(d.data[0].total );
   });
 
   return option;
@@ -93,7 +95,7 @@ function getDetailOption(d) {
     },
     series: [
       {
-        name: '访问来源',
+        name: '活动时长',
         type: 'pie',
         radius: '55%',
         center: ['50%', '60%'],
@@ -127,7 +129,7 @@ function getDetailDataSource(d) {
       ds.push({
         type: di.type,
         name: dd.region,
-        duration: dd.min_num,
+        duration: dd.min_num + 'min',
         key: dd.region_id,
         id: d.staff_id,
       })
@@ -183,11 +185,13 @@ class RegionReport extends Component {
   ]
 
   searchEvents = params => {
+
     this.setState({
       loading: true,
     });
 
     queryEvents(params).then(response => {
+         
       console.log(response);
       this.setState({
         loading: false,
@@ -322,6 +326,14 @@ class RegionReport extends Component {
       logModalVisible: !this.state.logModalVisible,
     });
 
+    const { form } = this.props
+    const datetime = form.getFieldValue('datetime')
+    datetime.hour(0)
+    datetime.minute(0)
+    datetime.second(0)
+    record.starttime = datetime.unix()
+    record.endtime = datetime.unix() + 24 * 60 * 60
+
     queryRegionDuration(record).then(response => {
       console.log('queryRegionDuration', response)
       const logs = []
@@ -329,7 +341,7 @@ class RegionReport extends Component {
         logs.push({
           st: d.starttime,
           et: d.endtime,
-          duration: d.min_num,
+          duration: d.min_num + 'min',
           key: i,
         })
       })

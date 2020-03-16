@@ -176,18 +176,21 @@ export async function queryRoutes(person, datetime) {
 
 //活动日报表
 export async function queryEvents(params) {
-
+  const body = {...params, datetime: params.datetime.format('YYYY-MM-DD')}
   return request(`${HTTP_API_ROOT}/staff_event/daily`, {
     method: 'POST',
-    body: params,
+    body,
     credentials: 'omit',
   });
 }
 
 export async function queryRegionDuration(params) {
+  console.log('queryRegionDuration', params)
   const body = {
     staff_id: params.id,
     region_id: params.key,
+    starttime: params.starttime,
+    endtime: params.endtime,
   }
   return request(`${HTTP_API_ROOT}/region/duration`, {
     method: 'POST',
