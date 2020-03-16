@@ -139,6 +139,11 @@ function getDetailDataSource(d) {
   return ds
 }
 
+function disabledDate(current) {
+  // 不能选择今天及今天之后的时间
+  return current && current > moment().endOf('day');
+}
+
 const logColumns = [
   {
     title: '开始时间',
@@ -276,9 +281,12 @@ class RegionReport extends Component {
         <Row gutter={{ lg: 24, xl: 48 }}>
           <Col md={8}>
             <Form.Item label={formatMessage({ id: 'sh.date', defaultMessage: 'Date' })}>
-              {getFieldDecorator('datetime')(
+              {getFieldDecorator('datetime', {
+                rules: [{ required: true, message: '请输入日期！' }],
+                })(
                 <DatePicker
                   style={{ width: '100%' }}
+                  disabledDate={disabledDate}
                   placeholder={formatMessage({
                     id: 'sh.please-input-date',
                     defaultMessage: 'Please input date',
