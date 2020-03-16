@@ -119,17 +119,7 @@ class Add extends PureComponent {
         })
 
         const drawSource = new VectorSource()
-        drawSource.on('addfeature', ev => {
-            const { form } = this.props
-            const extent = ev.feature.get('geometry').getExtent()
-            const x = extent[0]
-            const y = extent[3] - extent[1]
-            const w = extent[2]
-            const h = extent[3]
-            form.setFieldsValue({x, y, w, h})
-            this.toggleModal()
-            drawSource.clear()
-        })
+        drawSource.on('addfeature', this.handleAddFeature)
         const drawLayer = new VectorLayer({
             source: drawSource,
         })
@@ -247,9 +237,14 @@ class Add extends PureComponent {
     }
 
     onModalOk = () => {
-        const { form, region: { place }, dispatch } = this.props
+        const { form, region: { place, map }, dispatch } = this.props
         form.validateFields((err, fieldsValue) => {
             if (err) return
+
+            fieldsValue.x = (fieldsValue.x / map.ratio)
+            fieldsValue.y = (fieldsValue.y / map.ratio)
+            fieldsValue.w = (fieldsValue.w / map.ratio)
+            fieldsValue.h = (fieldsValue.h / map.ratio)
 
             form.resetFields()
             this.toggleModal()
@@ -264,6 +259,22 @@ class Add extends PureComponent {
         const { form } = this.props
         form.resetFields()
         this.toggleModal()
+    }
+
+    handleAddFeature = ev => {
+        const { form } = this.props
+        const drawSource = this.map.getLayers().item(3).getSource()
+        
+        const extent = ev.feature.get('geometry').getExtent()
+        
+        const x = (extent[0]).toFixed(2)
+        const y = (extent[3] - extent[1]).toFixed(2)
+        const w = (extent[2] - extent[0]).toFixed(2)
+        const h = (extent[3] - extent[1]).toFixed(2)
+        
+        form.setFieldsValue({x, y, w, h})
+        this.toggleModal()
+        drawSource.clear()
     }
 
     render() {
