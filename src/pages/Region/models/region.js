@@ -6,6 +6,7 @@ import {
   queryPlaceStations,
   queryMap,
   addStation,
+  addRegion,
 } from '@/services/sh'
 
 import {
@@ -17,7 +18,7 @@ import {
 } from '@/utils/sh'
 
 export default {
-  namespace: 'station',
+  namespace: 'region',
 
   state: {
     places: [],
@@ -87,14 +88,14 @@ export default {
       }
     },
 
-    *addAndQueryStation({ payload }, { call }) {
-      let response = yield call(addStation, payload)
+    *addAndQueryRegions({ payload }, { call }) {
+      let response = yield call(addRegion, payload)
       if (response.code !== 0) {
         message.error(response.msg)
         return
       }
       
-      response = yield call(queryPlaceStations, payload.place)
+      response = yield call(queryPlaceRegions, payload.place)
       const stations = convertStations(response.result)
 
       yield put({

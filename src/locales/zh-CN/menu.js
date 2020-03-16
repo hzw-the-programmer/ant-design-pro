@@ -44,6 +44,10 @@ export default {
 
   'menu.config.station': '基站管理',
   'menu.config.station.stationlist': '基站列表',
+  'menu.config.station.add': '添加基站',
+
+  'menu.config.region': '区域管理',
+  'menu.config.region.add': '添加区域',
 
   'menu.config.beacon': '信标管理',
   'menu.config.beacon.beaconlist': '信标列表',

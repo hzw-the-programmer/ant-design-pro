@@ -198,3 +198,57 @@ export async function queryRegionDuration(params) {
     credentials: 'omit',
   });
 }
+
+export async function queryPlaceRegions(params) {
+  const body = { place_id: params[params.length - 1] };
+  
+  return request(`${HTTP_API_ROOT}/region/region_list_place`, {
+    method: 'POST',
+    credentials: 'omit',
+    body,
+  });
+}
+
+export async function queryPlaceStations(params) {
+  const body = {
+    place_id: params[params.length - 1],
+    page: 1,
+    rows: 10000,
+  };
+  
+  return request(`${HTTP_API_ROOT}/basestation/station_list_place`, {
+    method: 'POST',
+    credentials: 'omit',
+    body,
+  });
+}
+
+export async function addStation(params) {
+  const body = {...params}
+  body.place_id = params.place[params.place.length - 1]
+  delete body.place
+  console.log(body)
+  return request(`${HTTP_API_ROOT}/basestation/station_add`, {
+    method: 'POST',
+    credentials: 'omit',
+    body,
+  });
+}
+
+export async function addRegion(params) {
+  const body = {
+    region_name: params.name,
+    pick1x: params.x,
+    pick1y: params.y,
+    pick2x: params.x + params.w,
+    pick2y: params.y + params.h,
+    place_id: params.place[params.place.length - 1],
+    type: params.type,
+  }
+  console.log(body)
+  return request(`${HTTP_API_ROOT}/region/region_add`, {
+    method: 'POST',
+    credentials: 'omit',
+    body,
+  });
+}

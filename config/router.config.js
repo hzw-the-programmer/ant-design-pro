@@ -300,6 +300,23 @@ export default [
                 name: 'stationlist',
                 component: './Station/StationList',
               },
+              {
+                path: '/config/station/add',
+                name: 'add',
+                component: './Station/Add',
+              },
+            ],
+          },
+          {
+            path: '/config/region',
+            name: 'region',
+            icon: 'dashboard',
+            routes: [
+              {
+                path: '/config/region/add',
+                name: 'add',
+                component: './Region/Add',
+              },
             ],
           },
           {
