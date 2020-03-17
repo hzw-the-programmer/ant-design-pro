@@ -53,7 +53,7 @@ function getColumns(operations) {
             &nbsp;
             <Popconfirm
               title={formatMessage({ id: 'sh.bind-confirm', defaultMessage: 'Bind?' })}
-              onConfirm={() => operations.bind(record.id)}
+              onConfirm={() => operations.bind(record.id,record.staff_id)}
             >
               <a>{formatMessage({ id: 'sh.bind', defaultMessage: 'Bind' })}</a>
             </Popconfirm>
@@ -213,14 +213,16 @@ class BeaconList extends Component {
     })
   }
 
-  handleBind = id => {
+
+  // 绑定接口
+  handleBind = (id,staff_id) => {
     const { pagination, params } = this.state
 
     this.setState({
       loading: true,
     })
 
-    bindBeacon({ id }).then(response => {   
+    bindBeacon({ id,staff_id}).then(response => {   
       this.searchBeacons(pagination, params)
     })
   }
