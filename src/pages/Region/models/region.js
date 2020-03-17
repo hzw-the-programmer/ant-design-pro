@@ -88,20 +88,24 @@ export default {
       }
     },
 
-    *addAndQueryRegions({ payload }, { call }) {
-      let response = yield call(addRegion, payload)
-      if (response.code !== 0) {
-        message.error(response.msg)
-        return
+    *addAndQueryRegions({ payload }, { call, put }) {
+      try {
+        let response = yield call(addRegion, payload)
+        if (response.code !== 0) {
+          message.error(response.msg)
+          return
+        }
+        
+        response = yield call(queryPlaceRegions, payload.place)
+        const regions = convertRegions(response.result)
+  
+        yield put({
+          type: 'saveRegions',
+          payload: regions,
+        });
+      } catch (e) {
+        console.log(e)
       }
-      
-      response = yield call(queryPlaceRegions, payload.place)
-      const stations = convertStations(response.result)
-
-      yield put({
-        type: 'saveStations',
-        payload: stations,
-      });
     }
   },
 

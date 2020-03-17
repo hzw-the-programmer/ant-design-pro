@@ -227,7 +227,6 @@ export async function addStation(params) {
   const body = {...params}
   body.place_id = params.place[params.place.length - 1]
   delete body.place
-  console.log(body)
   return request(`${HTTP_API_ROOT}/basestation/station_add`, {
     method: 'POST',
     credentials: 'omit',
@@ -245,7 +244,6 @@ export async function addRegion(params) {
     place_id: params.place[params.place.length - 1],
     type: params.type,
   }
-  console.log(body)
   return request(`${HTTP_API_ROOT}/region/region_add`, {
     method: 'POST',
     credentials: 'omit',

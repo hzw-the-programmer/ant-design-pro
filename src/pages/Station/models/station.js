@@ -87,20 +87,24 @@ export default {
       }
     },
 
-    *addAndQueryStation({ payload }, { call }) {
-      let response = yield call(addStation, payload)
-      if (response.code !== 0) {
-        message.error(response.msg)
-        return
+    *addAndQueryStation({ payload }, { call, put }) {
+      try {
+        let response = yield call(addStation, payload)
+        if (response.code !== 0) {
+          message.error(response.msg)
+          return
+        }
+        
+        response = yield call(queryPlaceStations, payload.place)
+        const stations = convertStations(response.result)
+  
+        yield put({
+          type: 'saveStations',
+          payload: stations,
+        });
+      } catch (e) {
+        console.log(e)
       }
-      
-      response = yield call(queryPlaceStations, payload.place)
-      const stations = convertStations(response.result)
-
-      yield put({
-        type: 'saveStations',
-        payload: stations,
-      });
     }
   },
 

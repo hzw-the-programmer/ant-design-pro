@@ -4,6 +4,8 @@ import { connect } from 'dva'
 
 import { Cascader, Modal, Form, Input, Row, Col, Select } from 'antd'
 
+import { isEqual } from 'lodash'
+
 import Map from 'ol/Map'
 import View from 'ol/View';
 import { Image as ImageLayer, Vector as VectorLayer } from 'ol/layer'
@@ -79,6 +81,9 @@ class Add extends PureComponent {
     state = {
         modalVisible: false,
     }
+    url = ''
+    regions = []
+    stations = []
 
     componentDidMount() {
         const mapLayer = new ImageLayer({
@@ -119,17 +124,7 @@ class Add extends PureComponent {
         })
 
         const drawSource = new VectorSource()
-        drawSource.on('addfeature', ev => {
-            const { form } = this.props
-            const extent = ev.feature.get('geometry').getExtent()
-            const x = extent[0]
-            const y = extent[3] - extent[1]
-            const w = extent[2]
-            const h = extent[3]
-            form.setFieldsValue({x, y, w, h})
-            this.toggleModal()
-            drawSource.clear()
-        })
+        drawSource.on('addfeature', this.handleAddFeature)
         const drawLayer = new VectorLayer({
             source: drawSource,
         })
@@ -166,49 +161,78 @@ class Add extends PureComponent {
     }
 
     updateMap() {
-        const { region: { map, regions, stations }, dispatch } = this.props
+        const {
+            region: {
+                map: {
+                    url, ratio, extent,
+                },
+                regions,
+                stations
+            },
+            dispatch
+        } = this.props
 
+        const mapLayer = this.map.getLayers().item(0)
         const regionSource = this.map.getLayers().item(1).getSource()
         const stationSource = this.map.getLayers().item(2).getSource()
         const drawSource = this.map.getLayers().item(3).getSource()
 
-        if (map.url === '' || this.url === map.url) {
-            this.url = map.url
+        if (url === '') {
+            this.url = ''
+            this.regions = []
+            this.stations = []
+            
+            mapLayer.setVisible(false)
+            
+            regionSource.clear()
+            stationSource.clear()
+            
             return
         }
-        this.url = map.url
 
-        const img = new Image()
-        img.src = map.url
-        img.onload = ev => {
-            const extent = [0, 0, img.width, img.height]
-            dispatch({
-                type: 'region/saveMap',
-                payload: {...map, extent}
-            })
-            this.map.setView(createView(extent));
-            this.map.getLayers().item(0).setSource(new ImageStatic({
-                url: map.url,
-                imageExtent: extent,
-            }))
-            this.map.getLayers().item(0).setVisible(true)
-            // const layer = createLayer(map.url, extent);
-            // this.map.getLayers().removeAt(0);
-            // this.map.getLayers().insertAt(0, layer);
+        if (!isEqual(this.url, url)) {
+            this.url = url
+            
+            const img = new Image()
+            img.src = url
+            img.onload = () => {
+                const newExtent = [0, 0, img.width, img.height]
 
-            this.map.getInteractions().clear()
-            this.map.addInteraction(new Draw({
-                source: drawSource,
-                type: 'Circle',
-                geometryFunction: createBox(),
-            }))
+                this.map.setView(createView(newExtent));
+                
+                const source = new ImageStatic({
+                    url,
+                    imageExtent: newExtent,
+                })
+                mapLayer.setSource(source)
+                
+                mapLayer.setVisible(true)
+
+                this.map.getInteractions().clear()
+                this.map.addInteraction(new Draw({
+                    source: drawSource,
+                    type: 'Circle',
+                    geometryFunction: createBox(),
+                }))
+
+                dispatch({
+                    type: 'region/saveMap',
+                    payload: {url, ratio, extent: newExtent}
+                })
+            }
+        
+            return
+        }
+
+        if (!isEqual(this.regions, regions)) {
+            this.regions = regions
 
             regionSource.clear()
             regions.forEach(re => {
-                const l = re.extent[0] * map.ratio
-                const t = extent[3] - (re.extent[1] * map.ratio)
-                const r = (re.extent[0] + re.extent[2]) * map.ratio
-                const b = extent[3] - (re.extent[1] + re.extent[3]) * map.ratio
+                const l = re.extent[0] * ratio
+                const t = extent[3] - (re.extent[1] * ratio)
+                const r = (re.extent[0] + re.extent[2]) * ratio
+                const b = extent[3] - (re.extent[1] + re.extent[3]) * ratio
 
                 const polygonFeature = new Feature({
                     geometry: new Polygon(
@@ -224,13 +248,17 @@ class Add extends PureComponent {
                 })
                 regionSource.addFeature(pointFeature)
             })
+        }
+
+        if (!isEqual(this.stations, stations)) {
+            this.stations = stations
 
             stationSource.clear()
             stations.forEach(st => {
                 const pointFeature = new Feature({
                     geometry: new Point([
-                        st.extent[0] * map.ratio,
-                        extent[3] - st.extent[1] * map.ratio,
+                        st.extent[0] * ratio,
+                        extent[3] - st.extent[1] * ratio,
                     ]),
                     type: st.type,
                 })
@@ -247,9 +275,14 @@ class Add extends PureComponent {
     }
 
     onModalOk = () => {
-        const { form, region: { place }, dispatch } = this.props
+        const { form, region: { place, map }, dispatch } = this.props
         form.validateFields((err, fieldsValue) => {
             if (err) return
+
+            fieldsValue.x = (fieldsValue.x / map.ratio)
+            fieldsValue.y = (fieldsValue.y / map.ratio)
+            fieldsValue.w = (fieldsValue.w / map.ratio)
+            fieldsValue.h = (fieldsValue.h / map.ratio)
 
             form.resetFields()
             this.toggleModal()
@@ -264,6 +297,22 @@ class Add extends PureComponent {
         const { form } = this.props
         form.resetFields()
         this.toggleModal()
+    }
+
+    handleAddFeature = ev => {
+        const { form, region: { map } } = this.props
+        const drawSource = this.map.getLayers().item(3).getSource()
+        
+        const extent = ev.feature.get('geometry').getExtent()
+        
+        const x = (extent[0]).toFixed(2)
+        const y = (map.extent[3] - extent[3]).toFixed(2)
+        const w = (extent[2] - extent[0]).toFixed(2)
+        const h = (extent[3] - extent[1]).toFixed(2)
+        
+        form.setFieldsValue({x, y, w, h})
+        this.toggleModal()
+        drawSource.clear()
     }
 
     render() {
