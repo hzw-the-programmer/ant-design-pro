@@ -121,7 +121,7 @@ class Alarm extends PureComponent {
             <Radio.Group value={filter} onChange={this.handleFilterChange}>
                 <Radio.Button value={ALL}>全部</Radio.Button>
                 <Radio.Button value={UNHANDLED}>未处理</Radio.Button>
-                <Radio.Button value={HANDLED}>以处理</Radio.Button>
+                <Radio.Button value={HANDLED}>已处理</Radio.Button>
             </Radio.Group>
         );
         return (
