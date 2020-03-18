@@ -5,6 +5,8 @@ import { connect } from 'dva'
 
 import { formatMessage } from 'umi/locale';
 
+import moment from 'moment'
+
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
 import { ALL, UNHANDLED, HANDLED } from './constants'
@@ -30,7 +32,7 @@ const columns = [
         title: '时间',
         dataIndex: 'timestamp',
         render(value, record, index) {
-            return value.format('YYYY-MM-DD HH:mm:ss')
+            return moment.unix(value).format('YYYY-MM-DD HH:mm:ss')
         }
     },
 ]

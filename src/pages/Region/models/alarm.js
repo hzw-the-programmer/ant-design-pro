@@ -71,7 +71,7 @@ const dataSource = [
         name: '小问',
         region_name: '重症隔离区',
         alarm_type: 1,
-        timestamp: moment(),
+        timestamp: moment().unix(),
     },
     {
         id: 2,
@@ -79,7 +79,7 @@ const dataSource = [
         name: '小问',
         region_name: '重症隔离区',
         alarm_type: 1,
-        timestamp: moment(),
+        timestamp: moment().unix(),
     },
     {
         id: 3,
@@ -87,7 +87,7 @@ const dataSource = [
         name: '小问',
         region_name: '重症隔离区',
         alarm_type: 1,
-        timestamp: moment(),
+        timestamp: moment().unix(),
     },
     {
         id: 4,
@@ -95,7 +95,7 @@ const dataSource = [
         name: '小问',
         region_name: '重症隔离区',
         alarm_type: 1,
-        timestamp: moment(),
+        timestamp: moment().unix(),
     },
     {
         id: 5,
@@ -103,7 +103,7 @@ const dataSource = [
         name: '小问',
         region_name: '重症隔离区',
         alarm_type: 1,
-        timestamp: moment(),
+        timestamp: moment().unix(),
     },
     {
         id: 6,
@@ -111,7 +111,7 @@ const dataSource = [
         name: '小问',
         region_name: '重症隔离区',
         alarm_type: 1,
-        timestamp: moment(),
+        timestamp: moment().unix(),
     },
     {
         id: 7,
@@ -119,7 +119,7 @@ const dataSource = [
         name: '小问',
         region_name: '重症隔离区',
         alarm_type: 1,
-        timestamp: moment(),
+        timestamp: moment().unix(),
     },
     {
         id: 8,
@@ -127,7 +127,7 @@ const dataSource = [
         name: '小问',
         region_name: '重症隔离区',
         alarm_type: 1,
-        timestamp: moment(),
+        timestamp: moment().unix(),
     },
     {
         id: 9,
@@ -135,7 +135,7 @@ const dataSource = [
         name: '小问',
         region_name: '重症隔离区',
         alarm_type: 1,
-        timestamp: moment(),
+        timestamp: moment().unix(),
     },
     {
         id: 10,
@@ -143,7 +143,7 @@ const dataSource = [
         name: '小问',
         region_name: '重症隔离区',
         alarm_type: 1,
-        timestamp: moment(),
+        timestamp: moment().unix(),
     },
     {
         id: 11,
@@ -151,7 +151,7 @@ const dataSource = [
         name: '小问',
         region_name: '重症隔离区',
         alarm_type: 1,
-        timestamp: moment(),
+        timestamp: moment().unix(),
     },
     {
         id: 12,
@@ -159,6 +159,6 @@ const dataSource = [
         name: '小问',
         region_name: '重症隔离区',
         alarm_type: 1,
-        timestamp: moment(),
+        timestamp: moment().unix(),
     },
 ]
