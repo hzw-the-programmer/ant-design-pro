@@ -22,7 +22,7 @@ function getOption(data) {
       },
     },
 
-    color: ['#FF0000', '#00FF00'],
+    color: ['#C21D18', '#23BA23'],
 
     legend: {
       data: ['非工作区', '工作区'],
