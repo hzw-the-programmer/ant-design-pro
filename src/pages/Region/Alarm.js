@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 
-import { Card, Radio, Table } from 'antd'
+import { Card, Radio, Table, Popconfirm } from 'antd'
 import { connect } from 'dva'
 
 import { formatMessage } from 'umi/locale';
@@ -11,36 +11,56 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
 import { ALL, UNHANDLED, HANDLED } from './constants'
 
-const columns = [
-    {
-        title: '工号',
-        dataIndex: 'staff_id',
-    },
-    {
-        title: '姓名',
-        dataIndex: 'name',
-    },
-    {
-        title: '区域',
-        dataIndex: 'region_name',
-    },
-    {
-        title: '报警类型',
-        dataIndex: 'alarm_type',
-    },
-    {
-        title: '时间',
-        dataIndex: 'timestamp',
-        render(value, record, index) {
-            return moment.unix(value).format('YYYY-MM-DD HH:mm:ss')
-        }
-    },
-]
-
 @connect(({ alarm }) => ({
     alarm,
 }))
 class Alarm extends PureComponent {
+    columns = [
+        {
+            title: '工号',
+            dataIndex: 'staff_id',
+        },
+        {
+            title: '姓名',
+            dataIndex: 'name',
+        },
+        {
+            title: '区域',
+            dataIndex: 'region_name',
+        },
+        {
+            title: '报警类型',
+            dataIndex: 'alarm_type',
+            render(value) {
+                return value === 1 ? '进入' : '离开'
+            }
+        },
+        {
+            title: '时间',
+            dataIndex: 'timestamp',
+            render(value, record, index) {
+                return moment.unix(value).format('YYYY-MM-DD HH:mm:ss')
+            }
+        },
+        {
+            title: '操作',
+            render: (value, record, index) => {
+                if (value.handled === HANDLED) {
+                    return
+                }
+                
+                return (
+                    <Popconfirm
+                        title="确定处理吗？"
+                        onConfirm={() => this.handleProcess(value.id)}
+                    >
+                        <a>处理</a>
+                    </Popconfirm>
+                )
+            }
+        }
+    ]
+
     handleFilterChange = ev => {
         const {
             alarm: { pagination: { current, pageSize } },
@@ -49,7 +69,7 @@ class Alarm extends PureComponent {
         const { target: { value } } = ev
 
         dispatch({
-            type: 'alarm/fetchAlarm',
+            type: 'alarm/fetchAlarms',
             payload: { filter: value, current, pageSize },
         })
     }
@@ -61,8 +81,17 @@ class Alarm extends PureComponent {
         } = this.props
         
         dispatch({
-            type: 'alarm/fetchAlarm',
+            type: 'alarm/fetchAlarms',
             payload: { filter, current, pageSize },
+        })
+    }
+
+    handleProcess = id => {
+        const { dispatch } = this.props
+        
+        dispatch({
+            type: 'alarm/processAndFetchAlarms',
+            payload: { id, handle: 2 },
         })
     }
 
@@ -73,7 +102,7 @@ class Alarm extends PureComponent {
         } = this.props
         
         dispatch({
-            type: 'alarm/fetchAlarm',
+            type: 'alarm/fetchAlarms',
             payload: { filter, current, pageSize },
         })
     }
@@ -102,7 +131,7 @@ class Alarm extends PureComponent {
                     extra={extraContent}
                 >
                     <Table
-                        columns={columns}
+                        columns={this.columns}
                         dataSource={dataSource}
                         pagination={{...pagination, onChange: this.handlePageChange}}
                         rowKey="id"

@@ -250,3 +250,25 @@ export async function addRegion(params) {
     body,
   });
 }
+
+export async function queryAlarms(params) {
+  const body = {
+    type: params.filter,
+    page: params.current,
+    rows: params.pageSize,
+  }
+
+  return request(`${HTTP_API_ROOT}/region_alarm/list`, {
+    method: 'POST',
+    credentials: 'omit',
+    body,
+  });
+}
+
+export async function processAlarm(params) {
+  return request(`${HTTP_API_ROOT}/region_alarm/handle`, {
+    method: 'POST',
+    credentials: 'omit',
+    body: params,
+  });
+}

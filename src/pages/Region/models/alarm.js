@@ -1,4 +1,8 @@
+import { message } from 'antd'
+
 import moment from 'moment'
+
+import { queryAlarms, processAlarm } from '@/services/sh'
 
 import { ALL, UNHANDLED, HANDLED } from '../constants'
 
@@ -19,7 +23,7 @@ export default {
     },
 
     effects: {
-        fetchAlarm: [
+        fetchAlarms: [
             function*({ payload: { filter, current, pageSize} }, { call, put }) {
                 try {
                     yield put({
@@ -27,9 +31,25 @@ export default {
                         payload: true,
                     })
                     
-                    yield call(delay, 1000)
+                    const response = yield call(queryAlarms, {filter, current, pageSize})
+                    if (response.code !== 0) {
+                        message.error(response.msg)
+                        return
+                    }
+                    const total = parseInt(response.result.total, 10)
+                    const dataSource = []
+                    response.result.rows.forEach(row => {
+                        dataSource.push({
+                            id: parseInt(row.id, 10),
+                            staff_id: parseInt(row.staff_id, 10),
+                            name: row.name,
+                            region_name: row.region_name,
+                            alarm_type: parseInt(row.alarm_type, 10),
+                            timestamp: parseInt(row.time_stamp, 10),
+                            handled: parseInt(row.handle, 10),
+                        })
+                    })
                     
-                    const total = dataSource.length
                     yield put({
                         type: 'saveAlarm',
                         payload: {
@@ -44,7 +64,27 @@ export default {
                 }
             },
             {type: 'takeLatest'}
-        ]
+        ],
+
+        *processAndFetchAlarms({ payload }, { call, put, select }) {
+            try {
+                const filter = yield select(state => state.alarm.filter)
+                const { current, pageSize } = yield select(state => state.alarm.pagination)
+                
+                const response = yield call(processAlarm, payload)
+                if (response.code !== 0) {
+                    message.error(response.msg)
+                    return
+                }
+                
+                yield put({
+                    type: 'fetchAlarms',
+                    payload: { filter, current, pageSize },
+                })
+            } catch (e) {
+                console.log(e)
+            }
+        }
     },
 
     reducers: {
@@ -63,102 +103,3 @@ export default {
         },
     }
 }
-
-const dataSource = [
-    {
-        id: 1,
-        staff_id: 1,
-        name: '小问',
-        region_name: '重症隔离区',
-        alarm_type: 1,
-        timestamp: moment().unix(),
-    },
-    {
-        id: 2,
-        staff_id: 1,
-        name: '小问',
-        region_name: '重症隔离区',
-        alarm_type: 1,
-        timestamp: moment().unix(),
-    },
-    {
-        id: 3,
-        staff_id: 1,
-        name: '小问',
-        region_name: '重症隔离区',
-        alarm_type: 1,
-        timestamp: moment().unix(),
-    },
-    {
-        id: 4,
-        staff_id: 1,
-        name: '小问',
-        region_name: '重症隔离区',
-        alarm_type: 1,
-        timestamp: moment().unix(),
-    },
-    {
-        id: 5,
-        staff_id: 1,
-        name: '小问',
-        region_name: '重症隔离区',
-        alarm_type: 1,
-        timestamp: moment().unix(),
-    },
-    {
-        id: 6,
-        staff_id: 1,
-        name: '小问',
-        region_name: '重症隔离区',
-        alarm_type: 1,
-        timestamp: moment().unix(),
-    },
-    {
-        id: 7,
-        staff_id: 1,
-        name: '小问',
-        region_name: '重症隔离区',
-        alarm_type: 1,
-        timestamp: moment().unix(),
-    },
-    {
-        id: 8,
-        staff_id: 1,
-        name: '小问',
-        region_name: '重症隔离区',
-        alarm_type: 1,
-        timestamp: moment().unix(),
-    },
-    {
-        id: 9,
-        staff_id: 1,
-        name: '小问',
-        region_name: '重症隔离区',
-        alarm_type: 1,
-        timestamp: moment().unix(),
-    },
-    {
-        id: 10,
-        staff_id: 1,
-        name: '小问',
-        region_name: '重症隔离区',
-        alarm_type: 1,
-        timestamp: moment().unix(),
-    },
-    {
-        id: 11,
-        staff_id: 1,
-        name: '小问',
-        region_name: '重症隔离区',
-        alarm_type: 1,
-        timestamp: moment().unix(),
-    },
-    {
-        id: 12,
-        staff_id: 1,
-        name: '小问',
-        region_name: '重症隔离区',
-        alarm_type: 1,
-        timestamp: moment().unix(),
-    },
-]
