@@ -63,14 +63,14 @@ class Alarm extends PureComponent {
 
     handleFilterChange = ev => {
         const {
-            alarm: { pagination: { current, pageSize } },
+            alarm: { pagination: { pageSize } },
             dispatch,
         } = this.props
         const { target: { value } } = ev
 
         dispatch({
             type: 'alarm/fetchAlarms',
-            payload: { filter: value, current, pageSize },
+            payload: { filter: value, current: 1, pageSize },
         })
     }
 
