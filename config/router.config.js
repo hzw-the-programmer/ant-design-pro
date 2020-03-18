@@ -284,6 +284,7 @@ export default [
         path: '/alarm',
         name: 'alarm',
         icon: 'dashboard',
+        component: './Region/Alarm',
       },
       {
         path: '/config',

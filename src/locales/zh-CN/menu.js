@@ -39,7 +39,7 @@ export default {
   'menu.monitor': '实时监控',
   'menu.route': '历史轨迹',
   'menu.activities': '区域活动统计',
-  'menu.alarm': '限制区域报警',
+  'menu.alarm': '区域报警',
   'menu.config': '配置管理',
 
   'menu.config.station': '基站管理',
