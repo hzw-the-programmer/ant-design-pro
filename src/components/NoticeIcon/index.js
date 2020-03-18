@@ -134,9 +134,9 @@ export default class NoticeIcon extends PureComponent {
         </Badge>
       </span>
     );
-    if (!notificationBox) {
+    // if (!notificationBox) {
       return trigger;
-    }
+    // }
     const popoverProps = {};
     if ('popupVisible' in this.props) {
       popoverProps.visible = popupVisible;

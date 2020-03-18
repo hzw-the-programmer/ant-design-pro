@@ -272,3 +272,10 @@ export async function processAlarm(params) {
     body: params,
   });
 }
+
+export async function queryUnhandledAlarmsCount() {
+  return request(`${HTTP_API_ROOT}/region_alarm/unhandle_num`, {
+    method: 'POST',
+    credentials: 'omit',
+  });
+}

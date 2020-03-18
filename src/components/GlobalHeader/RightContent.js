@@ -88,6 +88,7 @@ export default class GlobalHeaderRight extends PureComponent {
       onNoticeClear,
       skeletonCount,
       theme,
+      sh,
     } = this.props;
     const menu = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
@@ -150,7 +151,7 @@ export default class GlobalHeaderRight extends PureComponent {
         </Tooltip> */}
         <NoticeIcon
           className={styles.action}
-          count={currentUser.unreadCount}
+          count={sh.unhandledAlarmsCount}
           onItemClick={(item, tabProps) => {
             console.log(item, tabProps); // eslint-disable-line
             this.changeReadState(item, tabProps);
