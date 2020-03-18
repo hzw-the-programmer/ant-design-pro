@@ -6,6 +6,8 @@ import HeaderDropdown from '../HeaderDropdown';
 import List from './NoticeList';
 import styles from './index.less';
 
+import Link from 'umi/link';
+
 const { TabPane } = Tabs;
 
 export default class NoticeIcon extends PureComponent {
@@ -128,11 +130,13 @@ export default class NoticeIcon extends PureComponent {
     const notificationBox = this.getNotificationBox();
     const NoticeBellIcon = bell || <Icon type="bell" className={styles.icon} />;
     const trigger = (
-      <span className={classNames(noticeButtonClass, { opened: visible })}>
-        <Badge count={count} style={{ boxShadow: 'none' }} className={styles.badge}>
-          {NoticeBellIcon}
-        </Badge>
-      </span>
+      <Link to="/alarm">
+        <span className={classNames(noticeButtonClass, { opened: visible })}>
+          <Badge count={count} style={{ boxShadow: 'none' }} className={styles.badge}>
+            {NoticeBellIcon}
+          </Badge>
+        </span>
+      </Link>
     );
     // if (!notificationBox) {
       return trigger;
