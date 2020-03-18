@@ -32,7 +32,7 @@ class Alarm extends PureComponent {
             title: '报警类型',
             dataIndex: 'alarm_type',
             render(value) {
-                return value === 1 ? '进入' : '离开'
+                return value === 1 ? '进入未许可区域' : '离开限制性区域'
             }
         },
         {
