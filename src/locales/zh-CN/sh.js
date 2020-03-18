@@ -32,7 +32,7 @@ export default {
   'sh.team_name': '组织名称',
   'sh.higher level organization': '上级组织',
   'sh.team_level': '组织级别',
-  'sh.title': '人员定位系统',
+  'sh.title': '智慧医院',
   'sh.date': '日期',
   'sh.please-input-date': '请输入日期',
 };
