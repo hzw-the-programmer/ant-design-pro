@@ -154,7 +154,7 @@ export default {
         regions.forEach(r => {
           let nr = r
           payload.data2.rows.forEach(row => {
-            if (row.region_name.localeCompare(r.name) === 0) {
+            if (r.id === parseInt(row.region_id, 10)) {
               nr = {...r, total: parseInt(row.number, 10)}
             }
           })
