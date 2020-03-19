@@ -20,12 +20,51 @@ import MousePosition from 'ol/control/MousePosition';
 import { defaults as defaultControls } from 'ol/control';
 import Polygon from 'ol/geom/Polygon';
 import Point from 'ol/geom/Point';
-import { Style, Stroke, Fill, Text } from 'ol/style';
+import { Style, Stroke, Fill, Text, Icon } from 'ol/style';
 import HeatmapLayer from 'ol/layer/Heatmap';
 
 import ReactEcharts from 'echarts-for-react';
 
 import styles from './Monitor.less';
+
+const peopleStyles = [
+  null,
+  new Style({
+    image: new Icon({
+        src: './doctor.png',
+        // anchor: [0.5, 1],
+        scale: 0.01,
+    })
+  }),
+  new Style({
+    image: new Icon({
+        src: './nurse.png',
+        // anchor: [0.5, 1],
+        scale: 0.01,
+    })
+  }),
+  new Style({
+    image: new Icon({
+        src: './patient.png',
+        // anchor: [0.5, 1],
+        scale: 0.01,
+    })
+  }),
+  new Style({
+    image: new Icon({
+        src: './severe_patient.png',
+        // anchor: [0.5, 1],
+        scale: 0.01,
+    })
+  }),
+  new Style({
+    image: new Icon({
+        src: './guard.png',
+        // anchor: [0.5, 1],
+        scale: 0.01,
+    })
+  }),
+]
 
 function createView(extent) {
   const projection = new Projection({
@@ -99,6 +138,12 @@ class Monitor extends Component {
 
     const peopleLayer = new VectorLayer({
       source: peopleSource,
+      style(feature) {
+        const type = feature.get('type')
+        if (type < peopleStyles.length) {
+          return peopleStyles[type]
+        }
+    }
     });
 
     const heatmapLayer = new HeatmapLayer({

@@ -165,7 +165,20 @@ export default {
         const convertP = p => {
           const x = parseFloat(p.x)
           const y = parseFloat(p.y)
-          const type = 1
+          let type
+          if (p.position.localeCompare('医生')) {
+            type = 1
+          } else if (p.position.localeCompare('护士')) {
+            type = 2
+          } else if (p.position.localeCompare('病人')) {
+            type = 3
+          } else if (p.position.localeCompare('重症病人')) {
+            type = 4
+          } else if (p.position.localeCompare('保安')) {
+            type = 5
+          } else {
+            type = 6
+          }
           return {
             extent: [x, y, 0, 0],
             type,
