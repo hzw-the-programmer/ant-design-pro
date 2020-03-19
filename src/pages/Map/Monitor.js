@@ -148,6 +148,8 @@ class Monitor extends Component {
       return;
     }
 
+    heatmapLayer.setVisible(heatmap)
+
     if (!isEqual(url, this.url)) {
       this.url = url
       const image = new Image()
@@ -192,6 +194,22 @@ class Monitor extends Component {
               total: re.total,
           })
           regionSource.addFeature(pointFeature)
+      })
+    }
+
+    if (!isEqual(this.people, people)) {
+      this.people = people
+
+      peopleSource.clear()
+      people.forEach(p => {
+          const pointFeature = new Feature({
+              geometry: new Point([
+                  p.extent[0] * ratio,
+                  extent[3] - p.extent[1] * ratio,
+              ]),
+              type: p.type,
+          })
+          peopleSource.addFeature(pointFeature)
       })
     }
   }
@@ -309,7 +327,7 @@ class Monitor extends Component {
         <Switch checked={heatmap} onChange={this.toggleHeatmap} />
         <Card>
           <div style={{ textAlign: 'center' }}>总人数</div>
-          <div style={{ textAlign: 'center', fontSize: 50 }}>{rtl.people && rtl.people.length}</div>
+          <div style={{ textAlign: 'center', fontSize: 50 }}>{rtl.total}</div>
         </Card>
         <Card>
           <ReactEcharts option={this.getOption()} />

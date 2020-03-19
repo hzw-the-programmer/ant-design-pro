@@ -149,6 +149,7 @@ export default {
     *rtlMsg({ payload }, { put, select }) {
       try {
         console.log('rtlMsg', payload);
+        
         const regions = yield select(state => state.monitor.rtl.regions);
         const rs = []
         regions.forEach(r => {
@@ -160,9 +161,55 @@ export default {
           })
           rs.push(nr)
         })
+        
+        const convertP = p => {
+          const x = parseFloat(p.x)
+          const y = parseFloat(p.y)
+          const type = 1
+          return {
+            extent: [x, y, 0, 0],
+            type,
+          }
+        }
+        const person = yield select(state => state.monitor.person);
+        const people = []
+        if (person) {
+          for (let i = 0; i < payload.data1.length; i++) {
+            const p = payload.data1[i]
+            if (person === parseInt(p.staff_id, 10)) {
+              people.push(convertP(p))
+              
+              const place = yield select(state => state.monitor.place);
+              
+              const places = yield select(state => state.monitor.places);
+              const pid = parseInt(p.place_id, 10);
+              const pids = [];
+              findAncestors({ value: 0, children: places }, pid, pids);
+              pids.push(pid);
+              pids.shift();
+
+              if (!isEqual(pids, place)) {
+                yield put({
+                  type: 'changePlace',
+                  payload: pids,
+                });
+                return;
+              }
+            }
+          }
+        } else {
+          payload.data.forEach(d => {
+            people.push(convertP(d))
+          })
+        }
+
         yield put({
           type: 'saveRtl',
-          payload: {regions: rs},
+          payload: {
+            regions: rs,
+            people,
+            total: payload.data2.total
+          },
         })
         // const ratio = yield select(state => state.monitor.map.ratio);
         // const extent = yield select(state => state.monitor.map.extent);
