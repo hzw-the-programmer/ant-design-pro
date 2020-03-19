@@ -175,6 +175,9 @@ class RegionReport extends Component {
     {
       title: '区域类型',
       dataIndex: 'type',
+      render(value) {
+          return value === 1 ? '工作区' : '非工作区'
+      }
     },
     {
       title: '区域名称',
