@@ -98,14 +98,19 @@ export default {
         const map = convertMap(response.result[0]);
 
         yield put({
-          type: 'saveRegions',
-          payload: regions,
+          type: 'saveRtl',
+          payload: {regions},
         })
         
         yield put({
           type: 'saveMap',
           payload: map,
         });
+
+        yield put({
+          type: 'rtlSub',
+          payload,
+        })
       } catch (e) {
         console.log(e);
       }
@@ -125,89 +130,6 @@ export default {
       });
     },
 
-    *rtlMsg({ payload }, { put, select }) {
-      console.log('rtlMsg', payload);
-      try {
-        const ratio = yield select(state => state.monitor.map.ratio);
-        const extent = yield select(state => state.monitor.map.extent);
-        const person = yield select(state => state.monitor.person);
-        const place = yield select(state => state.monitor.place);
-        const places = yield select(state => state.monitor.places);
-
-        const convertP = p => {
-          const x = p.x * ratio;
-          const y = extent[3] - p.y * ratio;
-          const newP = {
-            id: parseInt(p.staff_id, 10),
-            pos: { x, y },
-            visible: true,
-          };
-
-          return newP;
-        };
-
-        const convertRegion = r => {
-          const x = r.pick1x * ratio;
-          const y = extent[3] - r.pick1y * ratio;
-          const w = (r.pick2x - r.pick1x) * ratio;
-          const h = (r.pick2y - r.pick1y) * ratio;
-
-          const nr = {
-            name: r.region_name,
-            rect: { x, y, w, h },
-            total: r.number,
-          };
-
-          return nr;
-        };
-
-        const regions = [];
-        payload.data2.rows.forEach(r => {
-          regions.push(convertRegion(r));
-        });
-
-        const people = [];
-        if (person) {
-          for (let i = 0; i < payload.data1.length; i += 1) {
-            if (person === parseInt(payload.data1[i].staff_id, 10)) {
-              const pid = parseInt(payload.data1[i].place_id, 10);
-              const pids = [];
-              findAncestors({ value: 0, children: places }, pid, pids);
-              pids.push(pid);
-              pids.shift();
-              console.log(pids, place);
-
-              if (!isEqual(pids, place)) {
-                yield put({
-                  type: 'changePlace',
-                  payload: { place: pids, force: true },
-                });
-                return;
-              }
-            }
-          }
-        }
-
-        payload.data.forEach(p => {
-          const tp = convertP(p);
-          if (person && tp.id !== person) {
-            tp.visible = false;
-          }
-          people.push(tp);
-        });
-
-        yield put({
-          type: 'saveRtl',
-          payload: {
-            regions,
-            people,
-          },
-        });
-      } catch (e) {
-        console.log(e);
-      }
-    },
-
     rtlSub({ payload }) {
       if (payload.length === 0) {
         rtlWS.send({
@@ -221,6 +143,89 @@ export default {
           place_id: payload[payload.length - 1],
           action: 1,
         });
+      }
+    },
+
+    *rtlMsg({ payload }, { put, select }) {
+      try {
+        console.log('rtlMsg', payload);
+        const regions = yield select(state => state.monitor.rtl.regions);
+        const rs = []
+        regions.forEach(r => {
+          let nr = r
+          payload.data2.rows.forEach(row => {
+            if (row.region_name.localeCompare(r.name) === 0) {
+              nr = {...r, total: parseInt(row.number, 10)}
+            }
+          })
+          rs.push(nr)
+        })
+        yield put({
+          type: 'saveRtl',
+          payload: {regions: rs},
+        })
+        // const ratio = yield select(state => state.monitor.map.ratio);
+        // const extent = yield select(state => state.monitor.map.extent);
+        // const person = yield select(state => state.monitor.person);
+        // const place = yield select(state => state.monitor.place);
+        // const places = yield select(state => state.monitor.places);
+
+        // const convertP = p => {
+        //   const x = p.x * ratio;
+        //   const y = extent[3] - p.y * ratio;
+        //   const newP = {
+        //     id: parseInt(p.staff_id, 10),
+        //     pos: { x, y },
+        //     visible: true,
+        //   };
+
+        //   return newP;
+        // };
+
+        // const regions = [];
+        // payload.data2.rows.forEach(r => {
+        //   regions.push(convertRegion(r));
+        // });
+
+        // const people = [];
+        // if (person) {
+        //   for (let i = 0; i < payload.data1.length; i += 1) {
+        //     if (person === parseInt(payload.data1[i].staff_id, 10)) {
+        //       const pid = parseInt(payload.data1[i].place_id, 10);
+        //       const pids = [];
+        //       findAncestors({ value: 0, children: places }, pid, pids);
+        //       pids.push(pid);
+        //       pids.shift();
+        //       console.log(pids, place);
+
+        //       if (!isEqual(pids, place)) {
+        //         yield put({
+        //           type: 'changePlace',
+        //           payload: { place: pids, force: true },
+        //         });
+        //         return;
+        //       }
+        //     }
+        //   }
+        // }
+
+        // payload.data.forEach(p => {
+        //   const tp = convertP(p);
+        //   if (person && tp.id !== person) {
+        //     tp.visible = false;
+        //   }
+        //   people.push(tp);
+        // });
+
+        // yield put({
+        //   type: 'saveRtl',
+        //   payload: {
+        //     regions,
+        //     people,
+        //   },
+        // });
+      } catch (e) {
+        console.log(e);
       }
     },
   },
@@ -256,13 +261,6 @@ export default {
       };
     },
 
-    saveRegions(state, action) {
-      return {
-        ...state,
-        rtl: { ...state.rtl, regions: action.payload },
-      };
-    },
-
     saveMap(state, action) {
       return {
         ...state,
@@ -273,7 +271,7 @@ export default {
     saveRtl(state, action) {
       return {
         ...state,
-        rtl: action.payload,
+        rtl: {...state.rtl, ...action.payload},
       };
     },
 

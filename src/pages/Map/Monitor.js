@@ -59,14 +59,9 @@ function createLayer(url, extent) {
 class Monitor extends Component {
   componentDidMount() {
     const {
-      monitor: { heatmap, place },
+      monitor: { heatmap },
       dispatch,
     } = this.props;
-
-    dispatch({
-      type: 'monitor/rtlSub',
-      payload: place,
-    });
 
     const mapLayer = new ImageLayer({
       visible: false,
@@ -117,9 +112,19 @@ class Monitor extends Component {
       target: 'map',
       layers,
     });
+
+    this.update()
   }
 
   componentDidUpdate() {
+    this.update()
+  }
+
+  componentWillUnmount() {
+    this.map.setTarget(undefined);
+  }
+
+  update = () => {
     const {
       monitor: {
         rtl: { regions, people },
@@ -189,26 +194,6 @@ class Monitor extends Component {
           regionSource.addFeature(pointFeature)
       })
     }
-
-    // rtl.people.forEach(person => {
-    //   if (!person.visible) return;
-    //   const pointFeature = new Feature({
-    //     geometry: new Point([person.pos.x, person.pos.y]),
-    //     type: person.type,
-    //   });
-    //   this.peopleSource.addFeature(pointFeature);
-    // });
-  }
-
-  componentWillUnmount() {
-    const { dispatch } = this.props;
-
-    dispatch({
-      type: 'monitor/rtlSub',
-      payload: [],
-    });
-
-    this.map.setTarget(undefined);
   }
 
   getOption() {
