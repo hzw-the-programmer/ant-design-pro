@@ -1,30 +1,22 @@
 import { isEqual } from 'lodash';
 
-import { queryPlaces, queryMap, queryPeople, rtlWS } from '@/services/sh';
+import {
+  queryPlaces,
+  queryMap,
+  queryPeople,
+  rtlWS,
+  queryPlaceRegions
+} from '@/services/sh';
+
 import { IDAS_HTTP_API_ROOT, LOCATION_WEBSOCKET_API_ROOT } from '@/services/constants';
 
-function convertPlace(place) {
-  const newPlace = {
-    label: place.name,
-    value: place.id,
-    children: [],
-  };
-
-  place.children.forEach(child => {
-    newPlace.children.push(convertPlace(child));
-  });
-
-  return newPlace;
-}
-
-function convertMap(map) {
-  const newMap = {
-    url: IDAS_HTTP_API_ROOT + map.image,
-    ratio: map.ratio,
-  };
-
-  return newMap;
-}
+import {
+  convertPlace,
+  getFirstPlace,
+  convertRegions,
+  convertMap,
+  findAncestors,
+} from '@/utils/sh'
 
 function convertPerson(person) {
   const newPerson = {
@@ -35,128 +27,84 @@ function convertPerson(person) {
   return newPerson;
 }
 
-function getFirstPlace(place, ids) {
-  ids.push(place.value);
-  if (place.children.length !== 0) {
-    getFirstPlace(place.children[0], ids);
-  }
-}
-
-function findAncestors(place, id, ids) {
-  const r = place.children.filter(c => c.value === id);
-
-  if (r.length !== 0) {
-    ids.push(place.value);
-    return true;
-  }
-
-  for (let i = 0; i < place.children.length; i += 1) {
-    if (findAncestors(place.children[i], id, ids)) {
-      ids.unshift(place.value);
-      return true;
-    }
-  }
-
-  return false;
-}
-
-const DEFAULT_MAP = { url: '', ratio: 0.0, extent: [] };
-const DEFAULT_RTL = { regions: [], people: [] };
-
 export default {
   namespace: 'monitor',
 
   state: {
     places: [],
-    people: [],
     place: [],
+
+    people: [],
     person: null,
-    map: DEFAULT_MAP,
-    rtl: DEFAULT_RTL,
+    
+    map: { url: '', ratio: 0.0, extent: [0, 0, 0, 0] },
+    rtl: { regions: [], people: [], total: 0},
+    
     heatmap: false,
   },
 
   effects: {
-    placesWatcher: [
-      function*({ call, put }) {
+    *queryPlacesAndChangePlace(_, { call, put }) {
+      try {
         const response = yield call(queryPlaces);
         const places = convertPlace(response).children;
         yield put({
           type: 'savePlaces',
           payload: places,
         });
-
+  
         const ids = [];
         getFirstPlace({ value: 0, children: places }, ids);
         ids.shift();
         yield put({
           type: 'changePlace',
-          payload: { place: ids, force: false },
+          payload: ids,
         });
-      },
-      { type: 'watcher' },
-    ],
+      } catch (e) {
+        console.log(e)
+      }
+    },
 
-    peopleWatcher: [
-      function*({ call, put }) {
-        try {
-          const response = yield call(queryPeople);
-          const people = [];
-          response.result.forEach(person => {
-            people.push(convertPerson(person));
-          });
-          yield put({
-            type: 'savePeople',
-            payload: people,
-          });
-        } catch (e) {
-          console.log(e);
-        }
-      },
-      { type: 'watcher' },
-    ],
+    *queryPeople(_, { call, put }) {
+      try {
+        const response = yield call(queryPeople);
+        const people = [];
+        response.result.forEach(person => {
+          people.push(convertPerson(person));
+        });
+        yield put({
+          type: 'savePeople',
+          payload: people,
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    },
 
     *changePlace({ payload }, { call, put, select }) {
       try {
-        const { place, force } = payload;
-
-        const person = yield select(state => state.monitor.person);
-        if (person && !force) return;
-
         yield put({
           type: 'savePlace',
-          payload: place,
+          payload,
         });
 
-        yield put({
-          type: 'clearMap',
-        });
+        let response = yield call(queryPlaceRegions, payload)
+        const regions = convertRegions(response.result)
+        regions.forEach(r => {
+          r.total = 0
+        })
 
-        yield put({
-          type: 'clearRtl',
-        });
-
-        if (place.length === 0) {
-          yield put({
-            type: 'rtlSub',
-            payload: [],
-          });
-          return;
-        }
-
-        const response = yield call(queryMap, place);
-        if (response.result.length === 0) {
-          return;
-        }
+        response = yield call(queryMap, payload);
         const map = convertMap(response.result[0]);
+
+        yield put({
+          type: 'saveRegions',
+          payload: regions,
+        })
+        
         yield put({
           type: 'saveMap',
           payload: map,
-        });
-
-        yield put({
-          type: 'rtlSub',
-          payload: place,
         });
       } catch (e) {
         console.log(e);
@@ -289,41 +237,8 @@ export default {
       return {
         ...state,
         place: action.payload,
-      };
-    },
-
-    saveMap(state, action) {
-      return {
-        ...state,
-        map: action.payload,
-      };
-    },
-
-    saveExtent(state, action) {
-      return {
-        ...state,
-        map: { ...state.map, extent: action.payload },
-      };
-    },
-
-    clearMap(state) {
-      return {
-        ...state,
-        map: DEFAULT_MAP,
-      };
-    },
-
-    saveRtl(state, action) {
-      return {
-        ...state,
-        rtl: action.payload,
-      };
-    },
-
-    clearRtl(state) {
-      return {
-        ...state,
-        rtl: DEFAULT_RTL,
+        map: { url: '', ratio: 0.0, extent: [0, 0, 0, 0] },
+        rtl: { regions: [], people: [], total: 0 },
       };
     },
 
@@ -341,6 +256,27 @@ export default {
       };
     },
 
+    saveRegions(state, action) {
+      return {
+        ...state,
+        rtl: { ...state.rtl, regions: action.payload },
+      };
+    },
+
+    saveMap(state, action) {
+      return {
+        ...state,
+        map: action.payload,
+      };
+    },
+
+    saveRtl(state, action) {
+      return {
+        ...state,
+        rtl: action.payload,
+      };
+    },
+
     saveHeatmap(state, action) {
       return {
         ...state,
@@ -352,6 +288,14 @@ export default {
   subscriptions: {
     setup({ dispatch }) {
       rtlWS.open(LOCATION_WEBSOCKET_API_ROOT, dispatch);
+
+      dispatch({
+        type: 'queryPlacesAndChangePlace',
+      })
+      
+      dispatch({
+        type: 'queryPeople',
+      })
     },
   },
 };

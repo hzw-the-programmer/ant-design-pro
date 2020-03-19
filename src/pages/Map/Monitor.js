@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import { Switch, Card, Cascader, Select } from 'antd';
 
+import { isEqual } from 'lodash'
+
 import 'ol/ol.css';
 
 import Map from 'ol/Map';
@@ -33,7 +35,7 @@ function createView(extent) {
 
   const view = new View({
     center: getCenter(extent),
-    zoom: 2,
+    zoom: 1,
     projection,
   });
 
@@ -67,9 +69,7 @@ class Monitor extends Component {
     });
 
     const mapLayer = new ImageLayer({
-      source: new ImageStatic({
-        visible: false,
-      }),
+      visible: false,
     });
 
     const regionBgStyle = new Style({
@@ -82,7 +82,7 @@ class Monitor extends Component {
       }),
     });
 
-    this.regionLayer = new VectorLayer({
+    const regionLayer = new VectorLayer({
       source: new VectorSource(),
       style(feature) {
         const name = feature.get('name');
@@ -100,90 +100,104 @@ class Monitor extends Component {
       },
     });
 
-    this.peopleSource = new VectorSource();
+    const peopleSource = new VectorSource()
 
-    this.peopleLayer = new VectorLayer({
-      source: this.peopleSource,
+    const peopleLayer = new VectorLayer({
+      source: peopleSource,
     });
 
-    this.heatmapLayer = new HeatmapLayer({
-      source: this.peopleSource,
+    const heatmapLayer = new HeatmapLayer({
+      source: peopleSource,
       visible: heatmap,
     });
 
-    const layers = [mapLayer, this.regionLayer, this.peopleLayer, this.heatmapLayer];
-
-    const mousePositionControl = new MousePosition();
+    const layers = [mapLayer, regionLayer, peopleLayer, heatmapLayer];
 
     this.map = new Map({
       target: 'map',
       layers,
-      controls: defaultControls().extend([mousePositionControl]),
     });
   }
 
-  // componentDidUpdate(prevProps, prevState, snapshot) {
   componentDidUpdate() {
-    console.log('componentDidUpdate');
     const {
-      monitor: { rtl, map, heatmap },
+      monitor: {
+        rtl: { regions, people },
+        map: { url, ratio, extent },
+        heatmap
+      },
       dispatch,
     } = this.props;
 
-    this.regionLayer.getSource().clear();
-    this.peopleSource.clear();
-    this.heatmapLayer.setVisible(heatmap);
+    const mapLayer = this.map.getLayers().item(0)
+    const regionSource = this.map.getLayers().item(1).getSource()
+    const peopleSource = this.map.getLayers().item(2).getSource()
+    const heatmapLayer = this.map.getLayers().item(3)
 
-    if (map.url === '') {
-      this.url = map.url;
-      this.map
-        .getLayers()
-        .item(0)
-        .setVisible(false);
+    if (url === '') {
+      this.url = url
+      mapLayer.setVisible(false)
+      regionSource.clear()
+      peopleSource.clear()
+      heatmapLayer.setVisible(false);
       return;
     }
 
-    if (map.url !== this.url) {
-      this.url = map.url;
-      const image = new Image();
-      image.src = map.url;
+    if (!isEqual(url, this.url)) {
+      this.url = url
+      const image = new Image()
+      image.src = url
       image.onload = () => {
         const extent = [0, 0, image.width, image.height];
         dispatch({
-          type: 'monitor/saveExtent',
-          payload: extent,
+          type: 'monitor/saveMap',
+          payload: { url, ratio, extent },
         });
         const view = createView(extent);
         this.map.setView(view);
-        const layer = createLayer(map.url, extent);
+        const layer = createLayer(url, extent);
         this.map.getLayers().removeAt(0);
         this.map.getLayers().insertAt(0, layer);
       };
+
+      return
     }
 
-    rtl.regions.forEach(region => {
-      const l = region.rect.x;
-      const b = region.rect.y - region.rect.h;
-      const r = region.rect.x + region.rect.w;
-      const t = region.rect.y;
-      const polygonFeature = new Feature(new Polygon([[[l, b], [r, b], [r, t], [l, t]]]));
-      this.regionLayer.getSource().addFeature(polygonFeature);
-      const pointFeature = new Feature({
-        geometry: new Point([l, t]),
-        name: region.name,
-        total: region.total,
-      });
-      this.regionLayer.getSource().addFeature(pointFeature);
-    });
+    if (!isEqual(this.regions, regions)) {
+      this.regions = regions
 
-    rtl.people.forEach(person => {
-      if (!person.visible) return;
-      const pointFeature = new Feature({
-        geometry: new Point([person.pos.x, person.pos.y]),
-        type: person.type,
-      });
-      this.peopleSource.addFeature(pointFeature);
-    });
+      regionSource.clear()
+      regions.forEach(re => {
+          const l = re.extent[0] * ratio
+          const t = extent[3] - (re.extent[1] * ratio)
+          const r = (re.extent[0] + re.extent[2]) * ratio
+          const b = extent[3] - (re.extent[1] + re.extent[3]) * ratio
+
+          const polygonFeature = new Feature({
+              geometry: new Polygon(
+                  [[[l, b], [r, b], [r, t], [l, t]]]
+              ),
+              type: re.type,
+          })
+          regionSource.addFeature(polygonFeature)
+
+          const pointFeature = new Feature({
+              geometry: new Point([l, t]),
+              name: re.name,
+              total: re.total,
+          })
+          regionSource.addFeature(pointFeature)
+      })
+    }
+
+    // rtl.people.forEach(person => {
+    //   if (!person.visible) return;
+    //   const pointFeature = new Feature({
+    //     geometry: new Point([person.pos.x, person.pos.y]),
+    //     type: person.type,
+    //   });
+    //   this.peopleSource.addFeature(pointFeature);
+    // });
   }
 
   componentWillUnmount() {
@@ -265,7 +279,7 @@ class Monitor extends Component {
 
     dispatch({
       type: 'monitor/changePlace',
-      payload: { place, force: false },
+      payload: place,
     });
   };
 
