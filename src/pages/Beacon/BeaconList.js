@@ -50,13 +50,9 @@ function getColumns(operations) {
             >
               <a>{formatMessage({ id: 'sh.debind', defaultMessage: 'Debind' })}</a>
             </Popconfirm>
-            &nbsp;
-            <Popconfirm
-              title={formatMessage({ id: 'sh.bind-confirm', defaultMessage: 'Bind?' })}
-              onConfirm={() => operations.bind(record.id,record.staff_id)}
-            >
-              <a>{formatMessage({ id: 'sh.bind', defaultMessage: 'Bind' })}</a>
-            </Popconfirm>
+            &nbsp;           
+              <a onClick={() => operations.handleBindClick(record)}>
+              {formatMessage({ id: 'sh.bind', defaultMessage: 'Bind' })}</a>
           </span> 
     },
   ];
@@ -99,6 +95,55 @@ const CreateForm = Form.create()(props => {
     </Modal>
   );
 });
+
+
+const CreateBindForm = Form.create()(props => {
+  const {form, bindModalVisible,handleBind,handleBindModalVisible } = props;
+
+  const handleBindOk =() => {
+
+      form.validateFields((err, fieldsValue) => {
+        if (err) return;
+        form.resetFields();
+        handleBind(fieldsValue);
+      });
+    };
+
+  return (
+    <Modal
+    title={formatMessage({ id: 'sh.bind', defaultMessage: 'Bind' })}
+    visible={bindModalVisible}
+    onOk={handleBindOk}
+    onCancel={() => handleBindModalVisible()}
+    >
+      <Form.Item
+        labelCol={{ span: 5 }}
+        wrapperCol={{ span: 15 }}
+        label={formatMessage({ id: 'sh.mac', defaultMessage: 'Mac' })}>
+        {form.getFieldDecorator('id', {
+        rules: [{
+          required: true,
+          message: formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input'}),
+          // min: 4,
+          // max: 4
+        }],
+        })(<Input placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })} />)}
+      </Form.Item>
+      <Form.Item
+        labelCol={{ span: 5 }}
+        wrapperCol={{ span: 15 }}
+        label={formatMessage({ id: 'sh.name', defaultMessage: 'Name' })}>
+        {form.getFieldDecorator('staff_id', {
+        rules: [{
+          required: true,
+          message: formatMessage({ id: 'sh.please-input-name', defaultMessage: 'Please input name'}),
+        }],
+        })(<Input placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })} />)}
+      </Form.Item>
+    </Modal>
+  );
+});
+
 @Form.create()
 class BeaconList extends Component {
   state = {
@@ -111,6 +156,7 @@ class BeaconList extends Component {
     beacons: [],
     total: 0,
     modalVisible: false,
+    bindModalVisible: false,
   }
 
   searchBeacons = (pagination, params) => {
@@ -201,6 +247,13 @@ class BeaconList extends Component {
     })
   };
 
+  handleBindModalVisible = flag => {
+    this.setState({
+      bindModalVisible: !!flag,
+    });
+  };
+
+
   handleDebind = id => {
     const { pagination, params } = this.state
 
@@ -215,17 +268,45 @@ class BeaconList extends Component {
 
 
   // 绑定接口
-  handleBind = (id,staff_id) => {
-    const { pagination, params } = this.state
+  handleBindClick = (record) => {
+    this.setState({
+      bindModalVisible: !this.state.bindModalVisible,
+    });
+    console.log(record.staff_id,record.id)
+  }
+
+
+  // handleBind = (id,staff_id) => {
+  //   const { pagination, params } = this.state
+
+  //   this.setState({
+  //     loading: true,
+  //   })
+
+  //   bindBeacon({ id,staff_id}).then(response => {   
+  //     this.searchBeacons(pagination, params)
+  //   })
+  // }
+
+  handleBind = fields => {
+    const { from,pagination, params} = this.state
 
     this.setState({
       loading: true,
     })
 
-    bindBeacon({ id,staff_id}).then(response => {   
+    // const { form } = this.props
+    // const id = form.getFieldValue('mac')
+    // const staff_id = form.getFieldValue('name')
+    // console.log(id,staff_id)
+
+    bindBeacon(fields).then(response => {
+      message.success(formatMessage({ id: 'sh.bind-success', defaultMessage: 'Bind success!' }));
+      this.handleBindModalVisible();
       this.searchBeacons(pagination, params)
     })
-  }
+  };
+
 
   renderForm = loading => {
     const { form: { getFieldDecorator } } = this.props
@@ -271,12 +352,18 @@ class BeaconList extends Component {
   }
 
   render() {
-    const { loading, pagination: { page, pageSize }, beacons, total, modalVisible } = this.state
+    const { loading, pagination: { page, pageSize }, beacons, total, modalVisible,bindModalVisible,handleBindModalVisible } = this.state
 
     const parentMethods = {
       handleAdd: this.handleAdd,
       handleModalVisible: this.handleModalVisible,
+     
     };
+
+    const bindMethods = {
+      handleBind: this.handleBind,
+      handleBindModalVisible: this.handleBindModalVisible
+    }
 
     return (
       <PageHeaderWrapper>
@@ -296,6 +383,7 @@ class BeaconList extends Component {
                 delete: this.handleDelete,
                 debind: this.handleDebind,
                 bind: this.handleBind,
+                handleBindClick: this.handleBindClick,
               })}
               rowKey="id"
               loading={loading}
@@ -304,6 +392,7 @@ class BeaconList extends Component {
           </div>
         </Card>
         <CreateForm {...parentMethods} modalVisible={modalVisible} />
+        <CreateBindForm {...bindMethods} bindModalVisible={bindModalVisible}/>
      </PageHeaderWrapper>
     );
   }

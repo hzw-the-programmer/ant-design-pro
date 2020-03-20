@@ -35,4 +35,6 @@ export default {
   'sh.title': 'Location System',
   'sh.date': 'Date',
   'sh.please-input-date': 'Please input date',
+  'sh.please-input-name': 'Please input name',
+  'sh.bind-success': 'Bind success!',
 };

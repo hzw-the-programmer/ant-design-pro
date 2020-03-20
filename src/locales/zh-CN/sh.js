@@ -35,4 +35,6 @@ export default {
   'sh.title': '智慧医院',
   'sh.date': '日期',
   'sh.please-input-date': '请输入日期',
+  'sh.please-input-name': '请输入姓名',
+  'sh.bind-success': '绑定成功',
 };
