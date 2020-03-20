@@ -119,19 +119,6 @@ const CreateBindForm = Form.create()(props => {
       <Form.Item
         labelCol={{ span: 5 }}
         wrapperCol={{ span: 15 }}
-        label={formatMessage({ id: 'sh.mac', defaultMessage: 'Mac' })}>
-        {form.getFieldDecorator('id', {
-        rules: [{
-          required: true,
-          message: formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input'}),
-          // min: 4,
-          // max: 4
-        }],
-        })(<Input placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })} />)}
-      </Form.Item>
-      <Form.Item
-        labelCol={{ span: 5 }}
-        wrapperCol={{ span: 15 }}
         label={formatMessage({ id: 'sh.name', defaultMessage: 'Name' })}>
         {form.getFieldDecorator('staff_id', {
         rules: [{
@@ -157,6 +144,7 @@ class BeaconList extends Component {
     total: 0,
     modalVisible: false,
     bindModalVisible: false,
+    beacon_bind_id: 0,
   }
 
   searchBeacons = (pagination, params) => {
@@ -271,34 +259,19 @@ class BeaconList extends Component {
   handleBindClick = (record) => {
     this.setState({
       bindModalVisible: !this.state.bindModalVisible,
+      beacon_bind_id: record.id
     });
-    console.log(record.staff_id,record.id)
+    console.log(record.id)
   }
 
-
-  // handleBind = (id,staff_id) => {
-  //   const { pagination, params } = this.state
-
-  //   this.setState({
-  //     loading: true,
-  //   })
-
-  //   bindBeacon({ id,staff_id}).then(response => {   
-  //     this.searchBeacons(pagination, params)
-  //   })
-  // }
-
   handleBind = fields => {
-    const { from,pagination, params} = this.state
+    const { from,pagination, params ,beacon_bind_id} = this.state
+
+    fields.id = this.state.beacon_bind_id
 
     this.setState({
       loading: true,
     })
-
-    // const { form } = this.props
-    // const id = form.getFieldValue('mac')
-    // const staff_id = form.getFieldValue('name')
-    // console.log(id,staff_id)
 
     bindBeacon(fields).then(response => {
       message.success(formatMessage({ id: 'sh.bind-success', defaultMessage: 'Bind success!' }));
