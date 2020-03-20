@@ -153,7 +153,7 @@ export default {
         const regions = yield select(state => state.monitor.rtl.regions);
         const rs = []
         regions.forEach(r => {
-          let nr = r
+          let nr = {...r, total: 0}
           payload.data2.rows.forEach(row => {
             if (r.id === parseInt(row.region_id, 10)) {
               nr = {...r, total: parseInt(row.number, 10)}
