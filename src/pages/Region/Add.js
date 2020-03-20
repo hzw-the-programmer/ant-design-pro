@@ -336,7 +336,7 @@ class Add extends PureComponent {
                     visible={modalVisible}
                     onOk={this.onModalOk}
                     onCancel={this.onModalCancel}
-                    title="添加基站"
+                    title="添加区域"
                 >
                     <div className={styles.form}>
                         <Form layout="inline">
