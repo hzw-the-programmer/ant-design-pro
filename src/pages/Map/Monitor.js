@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import { connect } from 'dva';
-import { Switch, Card, Cascader, Select } from 'antd';
+import { Switch, Card, Cascader, Select, Modal, Table } from 'antd';
 
 import { isEqual } from 'lodash'
 
@@ -22,6 +22,7 @@ import Polygon from 'ol/geom/Polygon';
 import Point from 'ol/geom/Point';
 import { Style, Stroke, Fill, Text, Icon } from 'ol/style';
 import HeatmapLayer from 'ol/layer/Heatmap';
+import SelectOl from 'ol/interaction/Select'
 
 import ReactEcharts from 'echarts-for-react';
 
@@ -92,6 +93,36 @@ function createLayer(url, extent) {
   return layer;
 }
 
+const columns = [
+  {
+    title: '姓名',
+    dataIndex: 'name',
+  },
+  {
+    title: '工号',
+    dataIndex: 'workid',
+  },
+  {
+    title: '时间',
+    dataIndex: 'time',
+  },
+  {
+    title: '区域',
+    dataIndex: 'region_name',
+  },
+  {
+    title: '班组',
+    dataIndex: 'team',
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
+    render(value) {
+      return value === 1 ? '在线' : '离线'
+    }
+  },
+]
+
 @connect(({ monitor }) => ({
   monitor,
 }))
@@ -157,6 +188,40 @@ class Monitor extends Component {
       target: 'map',
       layers,
     });
+
+    const select = new SelectOl()
+    select.on('select', e => {
+      const { dispatch } = this.props
+      
+      const features = e.target.getFeatures()
+      
+      const feature = features.item(0)
+      if (!feature) {
+        dispatch({
+          type: 'monitor/saveSelection',
+          payload: { rid: -1, pid: -1},
+        })
+        return
+      }
+
+      const id = feature.get('id')
+      const geometry = feature.getGeometry()
+      const type = geometry.getType()
+      if (type === 'Point') {
+        dispatch({
+          type: 'monitor/saveSelection',
+          payload: { rid: -1, pid: id},
+        })
+      } else if (type === 'Polygon') {
+        dispatch({
+          type: 'monitor/saveSelection',
+          payload: { rid: id, pid: -1},
+        })
+      }
+
+      features.clear()
+    })
+    this.map.addInteraction(select)
 
     this.update()
   }
@@ -229,6 +294,7 @@ class Monitor extends Component {
               geometry: new Polygon(
                   [[[l, b], [r, b], [r, t], [l, t]]]
               ),
+              id: re.id,
               type: re.type,
           })
           regionSource.addFeature(polygonFeature)
@@ -252,6 +318,7 @@ class Monitor extends Component {
                   p.extent[0] * ratio,
                   extent[3] - p.extent[1] * ratio,
               ]),
+              id: p.id,
               type: p.type,
           })
           peopleSource.addFeature(pointFeature)
@@ -340,9 +407,17 @@ class Monitor extends Component {
     });
   };
 
+  clearSelection = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'monitor/saveSelection',
+      payload: { rid: -1, pid: -1},
+    })
+  }
+
   render() {
     const {
-      monitor: { places, place, rtl, people, person, heatmap },
+      monitor: { places, place, rtl, people, person, heatmap, selection },
     } = this.props;
 
     return (
@@ -377,6 +452,31 @@ class Monitor extends Component {
         <Card>
           <ReactEcharts option={this.getOption()} />
         </Card>
+        <Modal
+          title="区域详情"
+          visible={selection.rid !== -1}
+          onOk={this.clearSelection}
+          onCancel={this.clearSelection}
+        >
+          {selection.region ? (
+            <div>
+              {`${selection.region.name} | 共${selection.region.total}人`}
+              <Table
+                columns={columns}
+                dataSource={selection.region.people}
+                rowKey="id"
+              />
+            </div>
+          ): ''}
+        </Modal>
+        <Modal
+          title="人员详情"
+          visible={selection.pid !== -1}
+          onOk={this.clearSelection}
+          onCancel={this.clearSelection}
+        >
+
+        </Modal>
       </div>
     );
   }

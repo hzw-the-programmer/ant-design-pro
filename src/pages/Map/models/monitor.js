@@ -41,6 +41,8 @@ export default {
     rtl: { regions: [], people: [], total: 0},
     
     heatmap: false,
+
+    selection: { rid: -1, pid: -1 },
   },
 
   effects: {
@@ -163,6 +165,13 @@ export default {
         })
         
         const convertP = p => {
+          const id = parseInt(p.staff_id, 10)
+          const name = p.name
+          const workid = parseInt(p.number, 10)
+          const time = p.time
+          const region_name = p.region_name
+          const team = p.team
+          const status = parseInt(p.status, 10)
           const x = parseFloat(p.x)
           const y = parseFloat(p.y)
           let type
@@ -180,6 +189,13 @@ export default {
             type = 6
           }
           return {
+            id,
+            name,
+            workid,
+            time,
+            region_name,
+            team,
+            status,
             extent: [x, y, 0, 0],
             type,
           }
@@ -216,6 +232,19 @@ export default {
           })
         }
 
+        const selection = yield select(state => state.monitor.selection)
+        let region
+        if (selection.rid !== -1) {
+          let result = rs.filter(d => d.id === selection.rid)
+          if (result.length !== 0) {
+            region = {...result[0], people: []}
+            result = payload.data.filter(d => parseInt(d.region_id, 10) === selection.rid)
+            result.forEach(d => {
+              region.people.push(convertP(d))
+            })
+          }
+        }
+
         yield put({
           type: 'saveRtl',
           payload: {
@@ -224,66 +253,11 @@ export default {
             total: payload.data2.total
           },
         })
-        // const ratio = yield select(state => state.monitor.map.ratio);
-        // const extent = yield select(state => state.monitor.map.extent);
-        // const person = yield select(state => state.monitor.person);
-        // const place = yield select(state => state.monitor.place);
-        // const places = yield select(state => state.monitor.places);
 
-        // const convertP = p => {
-        //   const x = p.x * ratio;
-        //   const y = extent[3] - p.y * ratio;
-        //   const newP = {
-        //     id: parseInt(p.staff_id, 10),
-        //     pos: { x, y },
-        //     visible: true,
-        //   };
-
-        //   return newP;
-        // };
-
-        // const regions = [];
-        // payload.data2.rows.forEach(r => {
-        //   regions.push(convertRegion(r));
-        // });
-
-        // const people = [];
-        // if (person) {
-        //   for (let i = 0; i < payload.data1.length; i += 1) {
-        //     if (person === parseInt(payload.data1[i].staff_id, 10)) {
-        //       const pid = parseInt(payload.data1[i].place_id, 10);
-        //       const pids = [];
-        //       findAncestors({ value: 0, children: places }, pid, pids);
-        //       pids.push(pid);
-        //       pids.shift();
-        //       console.log(pids, place);
-
-        //       if (!isEqual(pids, place)) {
-        //         yield put({
-        //           type: 'changePlace',
-        //           payload: { place: pids, force: true },
-        //         });
-        //         return;
-        //       }
-        //     }
-        //   }
-        // }
-
-        // payload.data.forEach(p => {
-        //   const tp = convertP(p);
-        //   if (person && tp.id !== person) {
-        //     tp.visible = false;
-        //   }
-        //   people.push(tp);
-        // });
-
-        // yield put({
-        //   type: 'saveRtl',
-        //   payload: {
-        //     regions,
-        //     people,
-        //   },
-        // });
+        yield put({
+          type: 'saveSelection',
+          payload: { region },
+        })
       } catch (e) {
         console.log(e);
       }
@@ -340,6 +314,13 @@ export default {
         ...state,
         heatmap: action.payload,
       };
+    },
+
+    saveSelection(state, action) {
+      return {
+        ...state,
+        selection: { ...state.selection, ...action.payload }
+      }
     },
   },
 
