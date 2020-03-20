@@ -475,7 +475,15 @@ class Monitor extends Component {
           onOk={this.clearSelection}
           onCancel={this.clearSelection}
         >
-
+          {selection.person ? (
+            <div>
+              <Table
+                columns={columns}
+                dataSource={[selection.person]}
+                rowKey="id"
+              />
+            </div>
+          ): ''}
         </Modal>
       </div>
     );

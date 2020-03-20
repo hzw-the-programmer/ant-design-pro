@@ -233,6 +233,7 @@ export default {
         }
 
         const selection = yield select(state => state.monitor.selection)
+        
         let region
         if (selection.rid !== -1) {
           let result = rs.filter(d => d.id === selection.rid)
@@ -242,6 +243,14 @@ export default {
             result.forEach(d => {
               region.people.push(convertP(d))
             })
+          }
+        }
+
+        let sperson
+        if (selection.pid !== -1) {
+          let result = payload.data.filter(d => parseInt(d.staff_id, 10) === selection.pid)
+          if (result.length !== 0) {
+            sperson = convertP(result[0])
           }
         }
 
@@ -256,7 +265,7 @@ export default {
 
         yield put({
           type: 'saveSelection',
-          payload: { region },
+          payload: { region, person: sperson },
         })
       } catch (e) {
         console.log(e);
