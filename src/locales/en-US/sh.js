@@ -37,4 +37,6 @@ export default {
   'sh.please-input-date': 'Please input date',
   'sh.please-input-name': 'Please input name',
   'sh.bind-success': 'Bind success!',
+  'sh.un-bind': 'Unbind',
+  'sh.binded': 'Binded',
 };

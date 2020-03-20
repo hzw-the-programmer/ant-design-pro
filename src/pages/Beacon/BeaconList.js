@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Form, Row, Col, Card, Button, Table, Modal, Input, Popconfirm, message } from 'antd';
+import { Form, Row, Col, Card, Button, Table, Modal, Input, Popconfirm, message,Select } from 'antd';
 
 import { formatMessage, FormattedMessage } from 'umi/locale';
 
@@ -306,8 +306,20 @@ class BeaconList extends Component {
         <Row gutter={{ lg: 24, xl: 48 }}>
           <Col md={8}>
             <Form.Item label={formatMessage({ id: 'sh.type', defaultMessage: 'Type' })}>
-              {getFieldDecorator('type')(<Input placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })} />)}
-            </Form.Item>      
+              {getFieldDecorator('type')(
+                <Select
+                  placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })} 
+                  allowClear
+                >
+                <Select.Option value="0">
+                  {formatMessage({ id: 'sh.un-bind', defaultMessage: 'Unbind' })} 
+                </Select.Option>
+                <Select.Option value="1">
+                  {formatMessage({ id: 'sh.binded', defaultMessage: 'Binded' })} 
+                </Select.Option>
+                </Select>
+              )}
+            </Form.Item>          
           </Col>
         </Row>
         <div style={{ overflow: 'hidden' }}>

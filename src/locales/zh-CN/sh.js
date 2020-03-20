@@ -37,4 +37,6 @@ export default {
   'sh.please-input-date': '请输入日期',
   'sh.please-input-name': '请输入姓名',
   'sh.bind-success': '绑定成功',
+  'sh.un-bind': '未绑定',
+  'sh.binded': '已绑定',
 };
