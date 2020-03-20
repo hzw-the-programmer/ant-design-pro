@@ -55,4 +55,7 @@ export default {
   'menu.config.staff': '人员管理',
   'menu.config.staff.stafflist': '人员列表',
   'menu.config.staff.teamlist': '组织列表',
+
+  'menu.patrol': '巡更',
+  'menu.patrol.config_search': '配置查询',
 };

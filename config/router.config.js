@@ -287,6 +287,19 @@ export default [
         component: './Region/Alarm',
       },
       {
+        path: '/patrol',
+        name: 'patrol',
+        icon: 'dashboard',
+        routes: [
+          {
+            path: '/patrol/config_search',
+            name: 'config_search',
+            icon: 'dashboard',
+            component: './Patrol/ConfigSearch',
+          }
+        ],
+      },
+      {
         path: '/config',
         name: 'config',
         icon: 'dashboard',

@@ -279,3 +279,18 @@ export async function queryUnhandledAlarmsCount() {
     credentials: 'omit',
   });
 }
+
+export async function queryPatrolConfig(params) {
+  const body = {...params}
+  body.page = body.current
+  delete body.current
+  body.rows = body.pageSize
+  delete body.pageSize
+  
+  // return request(`${HTTP_API_ROOT}/patrol/query_staff_patrol_config`, {
+  return request(`http://10.0.37.15:8002/patrol/spc_list`, {
+    method: 'POST',
+    credentials: 'omit',
+    body: params,
+  });
+}
