@@ -337,7 +337,11 @@ class Add extends PureComponent {
                                 <Col>
                                     <Form.Item label="SN">
                                         {getFieldDecorator('sn', {
-                                            rules: [{ required: true }],
+                                            rules: [{
+                                                required: true
+                                            }, {
+                                                len: 14
+                                            }],
                                         })(
                                             <Input />
                                         )}
