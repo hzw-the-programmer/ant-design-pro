@@ -296,7 +296,13 @@ export default [
             name: 'config_search',
             icon: 'dashboard',
             component: './Patrol/ConfigSearch',
-          }
+          },
+          {
+            path: '/patrol/map',
+            name: 'map',
+            icon: 'dashboard',
+            component: './Patrol/Map',
+          },
         ],
       },
       {

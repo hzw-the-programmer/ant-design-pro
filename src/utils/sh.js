@@ -135,3 +135,12 @@ export function convertStations(stations) {
 
   return s
 }
+
+export function convertPerson(person) {
+  const newPerson = {
+    id: parseInt(person.id, 10),
+    name: person.name,
+  };
+
+  return newPerson;
+}

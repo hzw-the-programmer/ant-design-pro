@@ -58,4 +58,6 @@ export default {
 
   'menu.patrol': '巡更',
   'menu.patrol.config_search': '配置查询',
+
+  'menu.patrol.map': ' 地图查询',
 };
