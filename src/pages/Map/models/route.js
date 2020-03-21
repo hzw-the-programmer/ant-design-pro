@@ -20,28 +20,13 @@ export default {
   namespace: 'route',
 
   state: {
-    person: undefined,
-    datetime: [],
     routes: [],
     places: [],
     place: [],
+    formValues: {},
   },
 
   effects: {
-    *changePerson({ payload }, { put }) {
-      yield put({
-        type: 'savePerson',
-        payload,
-      });
-    },
-
-    *changeDatetime({ payload }, { put }) {
-      yield put({
-        type: 'saveDatetime',
-        payload,
-      });
-    },
-
     *fetchRoutes(
       {
         payload: { person, datetime },
@@ -147,20 +132,6 @@ export default {
   },
 
   reducers: {
-    savePerson(state, { payload }) {
-      return {
-        ...state,
-        person: payload,
-      };
-    },
-
-    saveDatetime(state, { payload }) {
-      return {
-        ...state,
-        datetime: payload,
-      };
-    },
-
     saveRoutes(state, { payload }) {
       return {
         ...state,
@@ -192,6 +163,13 @@ export default {
 
           return route;
         }),
+      };
+    },
+
+    saveFormValues(state, { payload }) {
+      return {
+        ...state,
+        formValues: payload,
       };
     },
   },

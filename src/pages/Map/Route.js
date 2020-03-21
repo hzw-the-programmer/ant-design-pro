@@ -2,7 +2,15 @@ import React, { Component } from 'react';
 
 import { connect } from 'dva';
 
-import { Select, DatePicker, Button, Cascader } from 'antd';
+import {
+  Select,
+  DatePicker,
+  Button,
+  Cascader,
+  Form,
+  Row,
+  Col,
+} from 'antd';
 
 import { isEqual } from 'lodash';
 
@@ -17,6 +25,8 @@ import { getCenter } from 'ol/extent';
 import Feature from 'ol/Feature';
 import { Point, LineString } from 'ol/geom';
 import { Style, Stroke, Icon, Circle, Fill, Text } from 'ol/style';
+
+import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
 import styles from './Route.less';
 
@@ -76,15 +86,8 @@ function styleFunction(feature) {
   monitor,
   route,
 }))
+@Form.create()
 class Route extends Component {
-  constructor(props) {
-    super(props);
-    this.changePerson = this.changePerson.bind(this);
-    this.changeDatetime = this.changeDatetime.bind(this);
-    this.handleSearch = this.handleSearch.bind(this);
-    this.changePlace = this.changePlace.bind(this);
-  }
-
   componentDidMount() {
     const mapLayer = new ImageLayer({
       visible: false,
@@ -188,38 +191,23 @@ class Route extends Component {
     }
   }
 
-  changePerson(person) {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'route/changePerson',
-      payload: person,
-    });
+  handleFormSubmit = e => {
+    const { form, dispatch } = this.props
+    e.preventDefault()
+    form.validateFields((errors, formValues) => {
+      if (errors) return
+      dispatch({
+        type: 'route/fetchRoutes',
+        payload: formValues,
+      })
+      dispatch({
+        type: 'route/saveFormValues',
+        payload: formValues,
+      })
+    })
   }
 
-  changeDatetime(datetime) {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'route/changeDatetime',
-      payload: datetime,
-    });
-  }
-
-  handleSearch() {
-    const {
-      dispatch,
-      route: { person, datetime },
-    } = this.props;
-
-    dispatch({
-      type: 'route/fetchRoutes',
-      payload: {
-        person,
-        datetime,
-      },
-    });
-  }
-
-  changePlace(place) {
+  changePlace = place => {
     const { dispatch } = this.props;
     dispatch({
       type: 'route/changePlace',
@@ -230,35 +218,56 @@ class Route extends Component {
   render() {
     const {
       monitor: { people },
-      route: { person, datetime, places, place },
+      route: { places, place, formValues },
+      form: { getFieldDecorator },
     } = this.props;
 
     return (
-      <div>
-        <Select
-          style={{ width: '178px' }}
-          placeholder="请选择人员"
-          allowClear
-          onChange={this.changePerson}
-          value={person}
-        >
-          {people.map(p => (
-            <Select.Option key={p.id} id={p.id}>
-              {p.name}
-            </Select.Option>
-          ))}
-        </Select>
-        <br />
-        <DatePicker.RangePicker
-          showTime={{ format: 'HH:mm:ss' }}
-          onChange={this.changeDatetime}
-          value={datetime}
-        />
-        <br />
-        <Button type="primary" onClick={this.handleSearch}>
-          查询
-        </Button>
-        <br />
+      <PageHeaderWrapper>
+        <div className={styles.form}>
+          <Form layout="inline" onSubmit={this.handleFormSubmit}>
+            <Row>
+              <Col md={12}>
+                <Form.Item label="姓名">
+                  {getFieldDecorator('person', {
+                    rules: [{required: true}],
+                    initialValue: formValues.person,
+                  })(
+                    <Select>
+                      {people.map(p => (
+                        <Select.Option key={p.id} value={p.id}>
+                          {p.name}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  )}
+                </Form.Item>  
+              </Col>
+              <Col md={12}>
+                <Form.Item label="时间">
+                  {getFieldDecorator('datetime', {
+                    rules: [{required: true}],
+                    initialValue: formValues.datetime,
+                  })(
+                    <DatePicker.RangePicker
+                      showTime={{ format: 'HH:mm:ss' }}
+                    />
+                  )}
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row>
+              <Col md={12}>
+                <div className={styles.submitButtons}>
+                  <Button type="primary" htmlType="submit">
+                    查询
+                  </Button>
+                </div>
+              </Col>
+            </Row>
+          </Form>
+        </div>
+
         <Cascader
           options={places}
           value={place}
@@ -266,7 +275,7 @@ class Route extends Component {
           placeholder="请选择地址"
         />
         <div id="map" className={styles.map} />
-      </div>
+      </PageHeaderWrapper>
     );
   }
 }
