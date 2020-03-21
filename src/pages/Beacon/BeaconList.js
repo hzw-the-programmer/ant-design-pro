@@ -8,6 +8,7 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './BeaconList.less';
 
 import { queryBeacons, deleteBeacon, createBeacon, debindBeacon, bindBeacon } from '@/services/sh';
+import { UNBIND, BINDED } from './constants'
 
 function getColumns(operations) {
   const columns = [
@@ -311,10 +312,10 @@ class BeaconList extends Component {
                   placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })} 
                   allowClear
                 >
-                <Select.Option value="0">
+                <Select.Option value={UNBIND}>
                   {formatMessage({ id: 'sh.un-bind', defaultMessage: 'Unbind' })} 
                 </Select.Option>
-                <Select.Option value="1">
+                <Select.Option value={BINDED}>
                   {formatMessage({ id: 'sh.binded', defaultMessage: 'Binded' })} 
                 </Select.Option>
                 </Select>
