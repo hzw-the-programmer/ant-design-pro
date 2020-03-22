@@ -144,3 +144,25 @@ export function convertPerson(person) {
 
   return newPerson;
 }
+
+export function combinePlaces(data) {
+  const res = []
+
+  data.forEach(d => {
+      const fr = res.filter(r => r.value === d.value)
+      if (fr.length === 0) {
+          res.push(d)
+      } else {
+          if (!fr[0].children) {
+              fr[0].children = []
+          }
+          if (!d.children) {
+              d.children = []
+          }
+          const children = [...fr[0].children, ...d.children]
+          fr[0].children = combinePlaces(children)
+      }
+  })
+
+  return res
+}

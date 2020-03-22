@@ -14,6 +14,7 @@ import {
     findAncestors,
     getPlace,
     convertMap,
+    combinePlaces,
 } from '@/utils/sh'
   
 export default {
@@ -107,7 +108,6 @@ export default {
     
                     pls.push(pids);
                 })
-                
 
                 const rPlaces = [];
                 pls.forEach(pl => {
@@ -118,6 +118,9 @@ export default {
                         }
                     });
                 });
+
+                const fPlaces = combinePlaces(rPlaces)
+                console.log(fPlaces)
                 
                 yield put({
                     type: 'saveTimeRange',
@@ -126,7 +129,7 @@ export default {
 
                 yield put({
                     type: 'savePls',
-                    payload: rPlaces,
+                    payload: fPlaces,
                 })
             } catch (e) {
                 console.log(e)
