@@ -5,6 +5,7 @@ import {
     queryPlaces,
     queryPatrolTimeRanges,
     queryPatrolLog,
+    queryMap,
 } from '@/services/sh'
 
 import {
@@ -12,6 +13,7 @@ import {
     convertPlace,
     findAncestors,
     getPlace,
+    convertMap,
 } from '@/utils/sh'
   
 export default {
@@ -133,9 +135,24 @@ export default {
 
         *changePlace({ payload }, { call, put }) {
             try {
+                const response = yield call(queryMap, payload)
+                if (response.code !== 0) {
+                    message.error(response.msg)
+                    return
+                }
+                if (response.result.length === 0) {
+                    return
+                }
+                const map = convertMap(response.result[0])
+
                 yield put({
                     type: 'savePlace',
                     payload,
+                })
+
+                yield put({
+                    type: 'saveMap',
+                    payload: map,
                 })
             } catch(e) {
                 console.log(e)
@@ -184,6 +201,12 @@ export default {
             return {
                 ...state,
                 place: payload,
+            }
+        },
+        saveMap(state, { payload }) {
+            return {
+                ...state,
+                map: payload,
             }
         },
     },
