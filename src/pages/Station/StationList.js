@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 
-import { Form, Row, Col, Card, Button, Table, Input, Popconfirm, message } from 'antd';
+import { Form, Row, Col, Card, Button, Table, Input, Popconfirm, message,Cascader } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './StationList.less';
 
-import { queryStations } from '@/services/sh';
+import { queryStations,queryPlaces } from '@/services/sh';
 
 import { formatDate } from '@/utils/sh';
 
@@ -20,7 +20,7 @@ function getColumns(operations) {
       dataIndex: 'sn',
     },
     {
-      title: formatMessage({id: 'sh.placeId', defaultMessage: 'PlaceId'}),
+      title: formatMessage({id: 'sh.place', defaultMessage: 'Place'}),
       dataIndex: 'placeId',
     },
     {
@@ -57,6 +57,21 @@ function getColumns(operations) {
   return columns
 }
 
+
+function getPlace(places) {
+  const res = []
+    if (places) {
+      places.forEach(d => {
+        res.push({
+          value: d.id,
+          label: d.name,
+          children: getPlace(d.children)
+      })
+    })
+  }
+  return res
+}
+
 @Form.create()
 class StationList extends Component {
 
@@ -69,6 +84,18 @@ class StationList extends Component {
     params: {},
     stations: [],
     total: 0,
+    places: [],
+  }
+
+  componentDidMount() {
+
+    //查询位置
+    queryPlaces().then(response => {
+        this.setState({
+          places: response.children,
+        })
+    })
+
   }
 
   searchStations = (pagination, params) => {
@@ -88,6 +115,11 @@ class StationList extends Component {
         // console.log(response.result.length)
       // }, 3000)
     })
+  }
+
+  onChangePlaces = value => {
+
+    console.log(value[value.length -1]);
   }
 
   handleSearch = e => {
@@ -129,9 +161,9 @@ class StationList extends Component {
     this.searchStations(pagination, params)
   }
 
-  renderForm = loading => {
+  renderForm = (loading,places) => {
     const { form: { getFieldDecorator } } = this.props
-    
+  
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ lg: 24, xl: 48 }}>
@@ -141,15 +173,16 @@ class StationList extends Component {
             </Form.Item>      
           </Col>
           <Col md={8}>
-            <Form.Item label={formatMessage({ id: 'sh.placeId', defaultMessage: 'PlaceId' })}>
-              {getFieldDecorator('place_id')(<Input placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })} />)}
+            <Form.Item label={formatMessage({ id: 'sh.place', defaultMessage: 'Place' })}>
+              {getFieldDecorator('place_id') (        
+              <Cascader
+                  options={getPlace(places)}
+                  onChange={this.onChangePlaces}                    
+                  placeholder={formatMessage({ id: 'sh.please-input-place', defaultMessage: 'Please input place'})}
+              />
+              )}
             </Form.Item>
           </Col>
-          {/* <Col md={8}>
-            <Form.Item label={formatMessage({ id: 'sh.work-number', defaultMessage: 'Number' })}>
-              {getFieldDecorator('number')(<Input placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })} />)}
-            </Form.Item>
-          </Col> */}
         </Row>
 
         <div style={{ overflow: 'hidden' }}>
@@ -166,14 +199,14 @@ class StationList extends Component {
     )
   }
   render() {
-    const { loading, pagination: { page, pageSize }, stations, total} = this.state
+    const { loading, pagination: { page, pageSize }, stations, total,places,place_id} = this.state
 
     return (
       <PageHeaderWrapper>
         <Card>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>
-              {this.renderForm(loading)}
+              {this.renderForm(loading,places,place_id)}
             </div>
 
             <Table 

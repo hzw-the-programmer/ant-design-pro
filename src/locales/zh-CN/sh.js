@@ -20,7 +20,7 @@ export default {
   'sh.bind-confirm': '确定绑定？',
   'sh.bind': '绑定',
   'sh.Station-sn': 'Sn',
-  'sh.placeId': '车间Id',
+  'sh.place': '车间',
   'sh.stSn': '基站Sn',
   'sh.region': '所处区域',
   'sh.single': '当前信号强度',
@@ -39,4 +39,5 @@ export default {
   'sh.bind-success': '绑定成功',
   'sh.un-bind': '未绑定',
   'sh.binded': '已绑定',
+  'sh.please-input-place' :'请选择位置',
 };

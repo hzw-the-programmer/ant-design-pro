@@ -20,7 +20,7 @@ export default {
   'sh.bind-confirm': 'Bind?',
   'sh.bind': 'Bind',
   'sh.Station-sn': 'Sn',
-  'sh.placeId': 'PlaceId',
+  'sh.place': 'Place',
   'sh.stSn': 'Station Sn',
   'sh.region': 'Region',
   'sh.single': 'Single',
@@ -39,4 +39,6 @@ export default {
   'sh.bind-success': 'Bind success!',
   'sh.un-bind': 'Unbind',
   'sh.binded': 'Binded',
+  'sh.please-input-place' :'Please input place',
+
 };

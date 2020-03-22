@@ -52,6 +52,9 @@ export async function queryStations(pagination, params) {
   const body = { ...pagination, ...params };
   body.rows = body.pageSize;
   delete body.pageSize;
+  if(body.place_id){
+    body.place_id = body.place_id[body.place_id.length-1]
+  }
 
   return request(`${HTTP_API_ROOT}/basestation/station_list`, {
     method: 'POST',

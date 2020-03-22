@@ -37,6 +37,7 @@ function getOption(data) {
 
     xAxis: {
       type: 'value',
+      name: 'Hours'
     },
 
     yAxis: {
