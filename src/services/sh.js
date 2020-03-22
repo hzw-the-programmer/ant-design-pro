@@ -296,8 +296,10 @@ export async function queryPatrolConfig(params) {
 }
 
 export async function queryPatrolTimeRanges(params) {
-  const body = {...params}
-  body.date = params.date.format('YYYY-MM-DD')
+  const body = {
+    staff_id: params.name,
+    date: params.date.format('YYYY-MM-DD'),
+  }
   
   return request(`http://10.0.37.15:8002/patrol/spc_staff_date`, {
     method: 'POST',

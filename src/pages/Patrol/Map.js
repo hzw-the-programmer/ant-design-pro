@@ -46,10 +46,18 @@ class Map extends PureComponent {
         })
     }
 
+    handleChangePlace = place => {
+        const { dispatch } = this.props
+        dispatch({
+            type: 'map/changePlace',
+            payload: place,
+        })
+    }
+
     render() {
         const {
             form: { getFieldDecorator },
-            map: { people, formFields, timeRanges, timeRange, pls },
+            map: { people, formFields, timeRanges, timeRange, pls, place },
         } = this.props
         
         return (
@@ -66,7 +74,7 @@ class Map extends PureComponent {
                                         })(
                                             <Select>
                                                 {people.map(p => (
-                                                    <Select.Option value={p.name} key={p.id}>
+                                                    <Select.Option value={p.id} key={p.id}>
                                                         {p.name}
                                                     </Select.Option>
                                                 ))}
@@ -107,6 +115,8 @@ class Map extends PureComponent {
                                         <Cascader
                                             options={pls}
                                             allowClear={false}
+                                            value={place}
+                                            onChange={this.handleChangePlace}
                                         />
                                     </Form.Item>
                                 </Col>

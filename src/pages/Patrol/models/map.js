@@ -24,6 +24,8 @@ export default {
         formFields: {},
         timeRanges: [],
         timeRange: undefined,
+        place: [],
+        map: { url: '', ratio: 0.0, extent: [0, 0, 0, 0] },
     },
 
     effects: {
@@ -93,7 +95,6 @@ export default {
                 }
                 
                 const places = yield select(state => state.map.places)
-                console.log(places)
                 const pls = []
                 Object.keys(response.result.data).forEach(pid => {
                     pid = parseInt(pid, 10)
@@ -126,6 +127,17 @@ export default {
                     payload: rPlaces,
                 })
             } catch (e) {
+                console.log(e)
+            }
+        },
+
+        *changePlace({ payload }, { call, put }) {
+            try {
+                yield put({
+                    type: 'savePlace',
+                    payload,
+                })
+            } catch(e) {
                 console.log(e)
             }
         },
@@ -166,6 +178,12 @@ export default {
             return {
                 ...state,
                 pls: payload,
+            }
+        },
+        savePlace(state, { payload }) {
+            return {
+                ...state,
+                place: payload,
             }
         },
     },
