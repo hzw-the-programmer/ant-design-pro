@@ -29,6 +29,7 @@ export default {
         timeRange: undefined,
         place: [],
         map: { url: '', ratio: 0.0, extent: [0, 0, 0, 0] },
+        patrolLog: {},
     },
 
     effects: {
@@ -120,7 +121,6 @@ export default {
                 });
 
                 const fPlaces = combinePlaces(rPlaces)
-                console.log(fPlaces)
                 
                 yield put({
                     type: 'saveTimeRange',
@@ -131,12 +131,17 @@ export default {
                     type: 'savePls',
                     payload: fPlaces,
                 })
+
+                yield put({
+                    type: 'savePatrolLogs',
+                    payload: response.result.data,
+                })
             } catch (e) {
                 console.log(e)
             }
         },
 
-        *changePlace({ payload }, { call, put }) {
+        *changePlace({ payload }, { call, put, select }) {
             try {
                 const response = yield call(queryMap, payload)
                 if (response.code !== 0) {
@@ -156,6 +161,12 @@ export default {
                 yield put({
                     type: 'saveMap',
                     payload: map,
+                })
+
+                const patrolLogs = yield select(state => state.map.patrolLogs)
+                yield put({
+                    type: 'savePatrolLog',
+                    payload: patrolLogs[payload[1]],
                 })
             } catch(e) {
                 console.log(e)
@@ -210,6 +221,18 @@ export default {
             return {
                 ...state,
                 map: payload,
+            }
+        },
+        savePatrolLogs(state, { payload }) {
+            return {
+                ...state,
+                patrolLogs: payload,
+            }
+        },
+        savePatrolLog(state, { payload }) {
+            return {
+                ...state,
+                patrolLog: payload,
             }
         },
     },

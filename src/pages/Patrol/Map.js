@@ -23,10 +23,39 @@ import View from 'ol/View';
 import Projection from 'ol/proj/Projection';
 import { getCenter } from 'ol/extent'
 import ImageStatic from 'ol/source/ImageStatic'
+import Feature from 'ol/Feature'
+import Point from 'ol/geom/Point'
+import { Style, Stroke, Fill, Text, Icon, Circle } from 'ol/style';
 
 import PageHeaderWrapper from '@/components/PageHeaderWrapper'
 
 import styles from './Map.less'
+
+const patrolNormalStyle = new Style({
+    image: new Circle({
+        radius: 7,
+        stroke: new Stroke({
+            color: '#3399cc',
+            width: 1.25,
+        }),
+        fill: new Fill({
+            color: [35, 186, 35, 1],
+        }),
+    }),
+});
+
+const patrolNotNormalStyle = new Style({
+    image: new Circle({
+        radius: 7,
+        stroke: new Stroke({
+            color: '#3399cc',
+            width: 1.25,
+        }),
+        fill: new Fill({
+            color: [194, 29, 24, 1],
+        }),
+    }),
+});
 
 function createView(extent) {
     const projection = new Projection({
@@ -54,6 +83,14 @@ class PatrolMap extends PureComponent {
         })
         const patrolLayer = new VectorLayer({
             source: new VectorSource(),
+            style(feature) {
+                const normal = feature.get('normal')
+                if (normal) {
+                    return patrolNormalStyle
+                } else {
+                    return patrolNotNormalStyle
+                }
+            }
         })
         this.map = new Map({
             target: 'map',
@@ -107,12 +144,14 @@ class PatrolMap extends PureComponent {
             map: {
                 map: {
                     url, ratio, extent
-                }
+                },
+                patrolLog,
             },
             dispatch,
         } = this.props
 
         const mapLayer = this.map.getLayers().item(0)
+        const patrolSource = this.map.getLayers().item(1).getSource()
 
         if (url === '') {
             this.url = url
@@ -144,6 +183,23 @@ class PatrolMap extends PureComponent {
             }
         
             return
+        }
+
+        if (!isEqual(this.patrolLog, patrolLog)) {
+            this.patrolLog = patrolLog
+            
+            patrolSource.clear()
+            patrolLog.forEach(pl => {
+                const x = parseFloat(pl.x) * ratio
+                // const y = extent[3] - parseFloat(pl.y) * ratio
+                const y = parseFloat(pl.y) * ratio
+                console.log(x, y)
+                const pointFeature = new Feature({
+                    geometry: new Point([x, y]),
+                    normal: pl.normal,
+                })
+                patrolSource.addFeature(pointFeature)
+            })
         }
     }
 
