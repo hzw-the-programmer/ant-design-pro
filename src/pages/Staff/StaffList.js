@@ -7,7 +7,7 @@ import { formatMessage, FormattedMessage } from 'umi/locale';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './StaffList.less';
 
-import { queryStaffs,queryPeople } from '@/services/sh';
+import { queryStaffs, queryPeople } from '@/services/sh';
 
 function getColumns(operations) {
 
@@ -30,7 +30,6 @@ function getColumns(operations) {
     return columns
 }
 
-
 @Form.create()
 
 class StaffList extends Component {
@@ -50,8 +49,9 @@ class StaffList extends Component {
 
     //查询人员
     queryPeople().then(response => {
+
         this.setState({
-          staffnames: response.result,
+          staffnames: response.result
         })
     })
 

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Form, Row, Col, Card, Input, Button, DatePicker, Modal, Table } from 'antd';
+import { Form, Row, Col, Card, Input, Button, DatePicker, Modal, Table ,Select } from 'antd';
 
 import { formatMessage, FormattedMessage } from 'umi/locale';
 
@@ -11,7 +11,7 @@ import ReactEcharts from 'echarts-for-react';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './RegionReport.less';
 
-import { queryEvents, queryRegionDuration } from '@/services/sh';
+import { queryEvents, queryRegionDuration, queryPeople } from '@/services/sh';
 
 function getOption(data) {
   const option = {
@@ -142,7 +142,7 @@ function getDetailDataSource(d) {
 
 function disabledDate(current) {
   // 不能选择今天及今天之后的时间
-  return current && current > moment().endOf('day');
+  return  current > moment().add(-1, 'd');
 }
 
 const logColumns = [
@@ -170,7 +170,20 @@ class RegionReport extends Component {
     detailIndex: 0,
     logModalVisible: false,
     logs: [],
+    staffnames: [],
   };
+
+  componentDidMount() {
+
+    //查询人员
+    queryPeople().then(response => {
+        
+        this.setState({
+          staffnames: response.result,
+        })
+    })
+
+  }
 
   detailColumns = [
     {
@@ -237,7 +250,7 @@ class RegionReport extends Component {
     });
   };
 
-  renderForm = loading => {
+  renderForm = (loading,staffnames) => {
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -248,12 +261,16 @@ class RegionReport extends Component {
           <Col md={8}>
             <Form.Item label={formatMessage({ id: 'sh.name', defaultMessage: 'Name' })}>
               {getFieldDecorator('name')(
-                <Input
-                  placeholder={formatMessage({
-                    id: 'sh.please-input',
-                    defaultMessage: 'Please input',
-                  })}
-                />
+                <Select  
+                  placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })}
+                  allowClear
+                >                   
+                {staffnames.map(p => (
+                  <Select.Option key={p.id} value={p.name}>
+                    {p.name}
+                    </Select.Option>
+                  ))}
+                </Select>
               )}
             </Form.Item>
           </Col>
@@ -377,6 +394,7 @@ class RegionReport extends Component {
       detailIndex,
       logModalVisible,
       logs,
+      staffnames
     } = this.state;
     
     const onEvents = {
@@ -388,7 +406,7 @@ class RegionReport extends Component {
       <PageHeaderWrapper>
         <Card>
           <div className={styles.tableList}>
-            <div className={styles.tableListForm}>{this.renderForm(loading)}</div>
+            <div className={styles.tableListForm}>{this.renderForm(loading,staffnames)}</div>
             <ReactEcharts option={getOption(data)} onEvents={onEvents} />
           </div>
         </Card>
