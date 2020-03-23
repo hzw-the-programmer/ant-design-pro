@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 
-import { Form, Row, Col, Card, Button, Table, Input, Popconfirm, message } from 'antd';
+import { Form, Row, Col, Card, Button, Table, Input, Popconfirm, message,Select } from 'antd';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './StaffList.less';
 
-import { queryStaffs } from '@/services/sh';
+import { queryStaffs,queryPeople } from '@/services/sh';
 
 function getColumns(operations) {
 
@@ -29,6 +29,8 @@ function getColumns(operations) {
 
     return columns
 }
+
+
 @Form.create()
 
 class StaffList extends Component {
@@ -41,6 +43,18 @@ class StaffList extends Component {
     params: {},
     staffs: [],
     total: 0,
+    staffnames: [],
+  }
+
+  componentDidMount() {
+
+    //查询人员
+    queryPeople().then(response => {
+        this.setState({
+          staffnames: response.result,
+        })
+    })
+
   }
 
   searchStaffs = (pagination, params) => {
@@ -101,7 +115,7 @@ class StaffList extends Component {
     this.searchStaffs(pagination, params)
   }
 
-  renderForm = loading => {
+  renderForm = (loading,staffnames) => {
     const { form: { getFieldDecorator } } = this.props
     
     return (
@@ -109,7 +123,18 @@ class StaffList extends Component {
         <Row gutter={{ lg: 24, xl: 48 }}>
           <Col md={8}>
             <Form.Item label={formatMessage({ id: 'sh.name', defaultMessage: 'Name' })}>
-              {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })} />)}
+              {getFieldDecorator('name')(
+                  <Select  
+                    placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })}
+                    allowClear
+                  >                   
+                  {staffnames.map(p => (
+                    <Select.Option key={p.id} value={p.name}>
+                      {p.name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                )}
             </Form.Item>      
           </Col>
           <Col md={8}>
@@ -137,14 +162,14 @@ class StaffList extends Component {
     )
   }
   render() {
-    const { loading, pagination: { page, pageSize }, staffs, total} = this.state
+    const { loading, pagination: { page, pageSize }, staffs, total,staffnames} = this.state
 
     return (
       <PageHeaderWrapper>
         <Card>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>
-              {this.renderForm(loading)}
+              {this.renderForm(loading,staffnames)}
             </div>
 
             <Table 
