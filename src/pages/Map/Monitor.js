@@ -1,7 +1,17 @@
 import React, { Component } from 'react';
 
 import { connect } from 'dva';
-import { Switch, Card, Cascader, Select, Modal, Table } from 'antd';
+import {
+  Switch,
+  Card,
+  Cascader,
+  Select,
+  Modal,
+  Table,
+  Form,
+  Row,
+  Col,
+} from 'antd';
 
 import { isEqual } from 'lodash'
 
@@ -25,6 +35,8 @@ import HeatmapLayer from 'ol/layer/Heatmap';
 import SelectOl from 'ol/interaction/Select'
 
 import ReactEcharts from 'echarts-for-react';
+
+import PageHeaderWrapper from '@/components/PageHeaderWrapper'
 
 import styles from './Monitor.less';
 
@@ -421,71 +433,89 @@ class Monitor extends Component {
     } = this.props;
 
     return (
-      <div>
-        <Cascader
-          options={places}
-          value={place}
-          onChange={this.changePlace}
-          placeholder="请选择地址"
-          allowClear={false}
-        />
-        <br />
-        <Select
-          style={{ width: '178px' }}
-          placeholder="找人"
-          allowClear
-          onChange={this.changePerson}
-          value={person}
-        >
-          {people.map(p => (
-            <Select.Option key={p.id} value={p.id}>
-              {p.name}
-            </Select.Option>
-          ))}
-        </Select>
-        <div id="map" className={styles.map} />
-        <Switch checked={heatmap} onChange={this.toggleHeatmap} />
+      <PageHeaderWrapper>
         <Card>
-          <div style={{ textAlign: 'center' }}>总人数</div>
-          <div style={{ textAlign: 'center', fontSize: 50 }}>{rtl.total}</div>
+          <div className={styles.form}>
+            <Form layout="inline">
+              <Row gutter={{md: 8}}>
+                <Col md={8}>
+                  <Form.Item label="位置">
+                    <Cascader
+                      options={places}
+                      value={place}
+                      onChange={this.changePlace}
+                      allowClear={false}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col md={8}>
+                  <Form.Item label="姓名">
+                    <Select
+                      value={person}
+                      onChange={this.changePerson}
+                      allowClear
+                    >
+                      {people.map(p => (
+                        <Select.Option key={p.id} value={p.id}>
+                          {p.name}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col md={8}>
+                  <Form.Item label="热力图">
+                    <Switch checked={heatmap} onChange={this.toggleHeatmap} />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Form>
+          </div>
+
+          <div id="map" className={styles.map} />
+
+          <Card>
+            <div style={{ textAlign: 'center' }}>总人数</div>
+            <div style={{ textAlign: 'center', fontSize: 50 }}>{rtl.total}</div>
+          </Card>
+          <Card>
+            <ReactEcharts option={this.getOption()} />
+          </Card>
+          <Modal
+            title="区域详情"
+            visible={selection.rid !== -1}
+            onOk={this.clearSelection}
+            onCancel={this.clearSelection}
+          >
+            {selection.region ? (
+              <div>
+                {`${selection.region.name} | 共${selection.region.total}人`}
+                <Table
+                  columns={columns}
+                  dataSource={selection.region.people}
+                  rowKey="id"
+                />
+              </div>
+            ): ''}
+          </Modal>
+          <Modal
+            title="人员详情"
+            visible={selection.pid !== -1}
+            onOk={this.clearSelection}
+            onCancel={this.clearSelection}
+          >
+            {selection.person ? (
+              <div>
+                <Table
+                  columns={columns}
+                  dataSource={[selection.person]}
+                  rowKey="id"
+                />
+              </div>
+            ): ''}
+          </Modal>
         </Card>
-        <Card>
-          <ReactEcharts option={this.getOption()} />
-        </Card>
-        <Modal
-          title="区域详情"
-          visible={selection.rid !== -1}
-          onOk={this.clearSelection}
-          onCancel={this.clearSelection}
-        >
-          {selection.region ? (
-            <div>
-              {`${selection.region.name} | 共${selection.region.total}人`}
-              <Table
-                columns={columns}
-                dataSource={selection.region.people}
-                rowKey="id"
-              />
-            </div>
-          ): ''}
-        </Modal>
-        <Modal
-          title="人员详情"
-          visible={selection.pid !== -1}
-          onOk={this.clearSelection}
-          onCancel={this.clearSelection}
-        >
-          {selection.person ? (
-            <div>
-              <Table
-                columns={columns}
-                dataSource={[selection.person]}
-                rowKey="id"
-              />
-            </div>
-          ): ''}
-        </Modal>
-      </div>
+      </PageHeaderWrapper>
     );
   }
 }

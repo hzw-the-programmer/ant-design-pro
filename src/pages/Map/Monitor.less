@@ -1,4 +1,26 @@
 .map {
   width: 100%;
   height: 400px;
+  margin-bottom: 24px;
+}
+
+.form {
+  :global {
+    .ant-form-item {
+      display: flex;
+      margin-bottom: 24px;
+      margin-right: 0px;
+      .ant-form-item-label {
+        width: auto;
+        padding-right: 8px;
+        line-height: 32px;
+      }
+      .ant-form-item-control-wrapper {
+        flex: 1;
+        .ant-form-item-control {
+          line-height: 32px;
+        }
+      }
+    }
+  }
 }
