@@ -1,9 +1,9 @@
-import { queryNormalPatrolLog } from '@/services/sh'
+import { queryAbnormalPatrolLog } from '@/services/sh'
 
 const delay = t => new Promise(r => setTimeout(r, t))
 
 export default {
-    namespace: 'normal_patrol_log',
+    namespace: 'abnormal_patrol_log',
 
     state: {
         formValues: {},
@@ -13,7 +13,7 @@ export default {
     },
 
     effects: {
-        *queryNormalPatrolLog({ payload }, { call, put, select }) {
+        *queryAbnormalPatrolLog({ payload }, { call, put }) {
             try {                
                 yield put({
                     type: 'saveLoading',
@@ -21,7 +21,7 @@ export default {
                 })
 
                 // yield call(delay, 1000)
-                const response = yield call(queryNormalPatrolLog, payload)
+                const response = yield call(queryAbnormalPatrolLog, payload)
                 
                 if (response.code !== 0) {
                     message.error(response.msg)
@@ -39,7 +39,7 @@ export default {
 
                 yield put({
                     type: 'saveLogs',
-                    payload: response.result.rows,
+                    payload: response.result,
                 })
 
                 yield put({
@@ -47,7 +47,7 @@ export default {
                     payload: {
                         current: payload.current,
                         pageSize: payload.pageSize,
-                        total: parseInt(response.result.total, 10),
+                        total: response.result.length,
                     },
                 })
                 

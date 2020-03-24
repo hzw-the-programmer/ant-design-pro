@@ -323,7 +323,7 @@ export async function queryPatrolLog(params) {
   });
 }
 
-export async function queryNormalPatroLog(params) {
+export async function queryNormalPatrolLog(params) {
   const body = {
     page: params.current,
     rows: params.pageSize,
@@ -335,8 +335,28 @@ export async function queryNormalPatroLog(params) {
     body.starttime = params.datetime[0].format('YYYY-MM-DD HH:mm:ss')
     body.endtime = params.datetime[1].format('YYYY-MM-DD HH:mm:ss')
   }
-  console.log(body)
+
   return request(`${HTTP_API_ROOT}/patrol/patrol_log`, {
+    method: 'POST',
+    credentials: 'omit',
+    body,
+  })
+}
+
+export async function queryAbnormalPatrolLog(params) {
+  const body = {
+    page: params.current,
+    rows: params.pageSize,
+  }
+  if (params.name) {
+    body.staff_id = params.name
+  }
+  if (params.datetime) {
+    body.starttime = params.datetime[0].format('YYYY-MM-DD HH:mm:ss')
+    body.endtime = params.datetime[1].format('YYYY-MM-DD HH:mm:ss')
+  }
+
+  return request(`${HTTP_API_ROOT}/patrol/all_patrol_list`, {
     method: 'POST',
     credentials: 'omit',
     body,
