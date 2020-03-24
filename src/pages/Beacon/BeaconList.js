@@ -8,7 +8,7 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './BeaconList.less';
 
 import { queryBeacons, deleteBeacon, createBeacon, debindBeacon, bindBeacon, queryPeople } from '@/services/sh';
-import { UNBIND, BINDED } from './constants'
+import { UNBIND, BINDED, BIND_SUCCESS,REQUEST_PARA,BIND_FAIL,NO_STAFF,BEACON_BINDED,STAFF_BINDED} from './constants'
 
 function getColumns(operations) {
   const columns = [
@@ -301,7 +301,23 @@ class BeaconList extends Component {
     })
 
     bindBeacon(fields).then(response => {
-      message.success(formatMessage({ id: 'sh.bind-success', defaultMessage: 'Bind success!' }));
+   
+      let res = response.code 
+    
+      if(res == BIND_SUCCESS) {
+        message.success(formatMessage({ id: 'sh.bind-success', defaultMessage: 'Bind success!' }));
+      }else if(res == REQUEST_PARA) {
+        message.error(formatMessage({ id: 'sh.request-para-fail', defaultMessage: 'Request parameters failed!' }));
+      }else if(res == BIND_FAIL) {
+        message.error(formatMessage({ id: 'sh.bind-fail', defaultMessage: 'Bind failed!' }));
+      }else if(res == NO_STAFF) {
+        message.error(formatMessage({ id: 'sh.no-staff', defaultMessage: 'Staff does not exist!' }));
+      } else if(res == BEACON_BINDED) {
+        message.error(formatMessage({ id: 'sh.beacon-binded', defaultMessage: 'Beacon binded!' }));
+      }else if(res == STAFF_BINDED) {
+        message.error(formatMessage({ id: 'sh.staff-binded', defaultMessage: 'Staff binded!' }));
+      }
+
       this.handleBindModalVisible();
       this.searchBeacons(pagination, params)
     })

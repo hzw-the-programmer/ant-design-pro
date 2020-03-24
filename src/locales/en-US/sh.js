@@ -40,5 +40,10 @@ export default {
   'sh.un-bind': 'Unbind',
   'sh.binded': 'Binded',
   'sh.please-input-place' :'Please input place',
-
+  'sh.request-para-fail' :'Request parameters failed!',
+  'sh.bind-fail': 'Bind failed!',
+  'sh.no-staff' :'Staff does not exist!',
+  'sh.beacon-binded': 'Beacon binded!',
+  'sh.staff-binded': 'Staff binded!'
+ 
 };

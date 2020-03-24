@@ -36,8 +36,13 @@ export default {
   'sh.date': '日期',
   'sh.please-input-date': '请输入日期',
   'sh.please-input-name': '请输入姓名',
-  'sh.bind-success': '绑定成功',
+  'sh.bind-success': '绑定成功!',
   'sh.un-bind': '未绑定',
   'sh.binded': '已绑定',
   'sh.please-input-place' :'请选择位置',
+  'sh.request-para-fail' :'请求参数错误!',
+  'sh.bind-fail': '绑定失败!',
+  'sh.no-staff' :'人员不存在!',
+  'sh.beacon-binded': 'Beacon已被绑定!',
+  'sh.staff-binded': '人员已被绑定!'
 };
