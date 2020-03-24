@@ -10,6 +10,8 @@ import {
   Form,
   Row,
   Col,
+  Card,
+  Switch,
 } from 'antd';
 
 import { isEqual } from 'lodash';
@@ -118,29 +120,25 @@ class Route extends Component {
     this.map.setTarget(undefined);
   }
 
-  updateMap() {
+  updateMap = () => {
     const {
-      route: { place, routes },
+      route: { place, routes, displayTime },
+      dispatch,
     } = this.props;
-    const fr = routes.filter(r => isEqual(r.place, place));
-    const [route] = fr;
+    
+    const [ route ] = routes.filter(r => isEqual(r.place, place));
 
-    const routeSource = this.map
-      .getLayers()
-      .item(1)
-      .getSource();
+    const routeSource = this.map.getLayers().item(1).getSource();
+    
     if (!route) {
       this.url = undefined;
-      this.map
-        .getLayers()
-        .item(0)
-        .setVisible(false);
+      this.map.getLayers().item(0).setVisible(false);
       routeSource.clear();
       return;
     }
 
     const {
-      map: { url, ratio },
+      map: { url, ratio, extent },
       locations,
     } = route;
 
@@ -150,15 +148,15 @@ class Route extends Component {
       const image = new Image();
       image.src = url;
       image.onload = () => {
-        const extent = [0, 0, image.width, image.height];
+        const newExtent = [0, 0, image.width, image.height];
         const projection = new Projection({
           code: 'hzw',
-          extent,
+          extent: newExtent,
         });
 
         const view = new View({
-          center: getCenter(extent),
-          zoom: 2,
+          center: getCenter(newExtent),
+          zoom: 1,
           projection,
         });
         this.map.setView(view);
@@ -166,29 +164,48 @@ class Route extends Component {
         const mapLayer = new ImageLayer({
           source: new ImageStatic({
             url,
-            imageExtent: extent,
+            imageExtent: newExtent,
           }),
         });
         this.map.getLayers().removeAt(0);
         this.map.getLayers().insertAt(0, mapLayer);
 
-        routeSource.clear();
-        const coords = [];
-        locations.forEach(location => {
-          let [x, y] = location.coord;
-          x *= ratio;
-          y = extent[3] - y * ratio;
-          routeSource.addFeature(
-            new Feature({
-              geometry: new Point([x, y]),
-              text: `${moment.unix(location.datetime).format()} ${location.duration}`,
-            })
-          );
-          coords.push([x, y]);
-        });
-        routeSource.addFeature(new Feature(new LineString(coords)));
+        dispatch({
+          type: 'route/saveMap',
+          payload: {
+            place,
+            map: {url, ratio, extent: newExtent},
+          }
+        })
       };
+
+      return
     }
+
+    routeSource.clear();
+    const coords = [];
+    locations.forEach(location => {
+      let [x, y] = location.coord;
+      x *= ratio;
+      y = extent[3] - y * ratio;
+      if (displayTime) {
+        routeSource.addFeature(
+          new Feature({
+            geometry: new Point([x, y]),
+            text: `${moment.unix(location.datetime).format('YYYY-MM-DD HH:mm:ss')} ${location.duration}`,
+          })
+        );
+      } else {
+        routeSource.addFeature(
+          new Feature({
+            geometry: new Point([x, y]),
+          })
+        );
+      }
+      
+      coords.push([x, y]);
+    });
+    routeSource.addFeature(new Feature(new LineString(coords)));
   }
 
   handleFormSubmit = e => {
@@ -215,66 +232,88 @@ class Route extends Component {
     });
   }
 
+  toggleDisplayTime = () => {
+    const { dispatch, route: { displayTime } } = this.props
+    dispatch({
+      type: 'route/saveDisplayTime',
+      payload: !displayTime,
+    })
+  }
+
   render() {
     const {
       monitor: { people },
-      route: { places, place, formValues },
+      route: { places, place, formValues, displayTime },
       form: { getFieldDecorator },
     } = this.props;
 
     return (
       <PageHeaderWrapper>
-        <div className={styles.form}>
-          <Form layout="inline" onSubmit={this.handleFormSubmit}>
-            <Row>
-              <Col md={12}>
-                <Form.Item label="姓名">
-                  {getFieldDecorator('person', {
-                    rules: [{required: true}],
-                    initialValue: formValues.person,
-                  })(
-                    <Select>
-                      {people.map(p => (
-                        <Select.Option key={p.id} value={p.id}>
-                          {p.name}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  )}
-                </Form.Item>  
-              </Col>
-              <Col md={12}>
-                <Form.Item label="时间">
-                  {getFieldDecorator('datetime', {
-                    rules: [{required: true}],
-                    initialValue: formValues.datetime,
-                  })(
-                    <DatePicker.RangePicker
-                      showTime={{ format: 'HH:mm:ss' }}
-                    />
-                  )}
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={12}>
-                <div className={styles.submitButtons}>
-                  <Button type="primary" htmlType="submit">
-                    查询
-                  </Button>
-                </div>
-              </Col>
-            </Row>
-          </Form>
-        </div>
-
-        <Cascader
-          options={places}
-          value={place}
-          onChange={this.changePlace}
-          placeholder="请选择地址"
-        />
-        <div id="map" className={styles.map} />
+        <Card>
+          <div className={styles.form}>
+            <Form layout="inline" onSubmit={this.handleFormSubmit} hideRequiredMark>
+              <Row gutter={{md: 8}}>
+                <Col md={8}>
+                  <Form.Item label="姓名">
+                    {getFieldDecorator('person', {
+                      rules: [{required: true}],
+                      initialValue: formValues.person,
+                    })(
+                      <Select>
+                        {people.map(p => (
+                          <Select.Option key={p.id} value={p.id}>
+                            {p.name}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Form.Item>  
+                </Col>
+                <Col md={8}>
+                  <Form.Item label="时间">
+                    {getFieldDecorator('datetime', {
+                      rules: [{required: true}],
+                      initialValue: formValues.datetime,
+                    })(
+                      <DatePicker.RangePicker
+                        showTime={{ format: 'HH:mm:ss' }}
+                        style={{width: '100%'}}
+                      />
+                    )}
+                  </Form.Item>
+                </Col>
+                <Col md={8}>
+                  <div className={styles.submitButtons}>
+                    <Button type="primary" htmlType="submit">
+                      查询
+                    </Button>
+                  </div>
+                </Col>
+              </Row>
+            </Form>
+            
+            <Form>
+              <Row gutter={{md: 8}}>
+                <Col md={8}>
+                  <Form.Item label="位置">
+                    <Cascader
+                      options={places}
+                      value={place}
+                      onChange={this.changePlace}
+                    />                  
+                  </Form.Item>
+                </Col>
+                <Col md={8}>
+                  <Form.Item label="时间">
+                    <Switch checked={displayTime} onChange={this.toggleDisplayTime} />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Form>
+          </div>
+          
+          <div id="map" className={styles.map} />
+        </Card>
       </PageHeaderWrapper>
     );
   }

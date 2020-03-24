@@ -2,7 +2,13 @@ import moment from 'moment';
 import { isEqual } from 'lodash';
 
 import { queryRoutes, queryMap } from '@/services/sh';
-import { findAncestors, getPlace, getFirstPlace, convertMap } from '@/utils/sh';
+import {
+  findAncestors,
+  getPlace,
+  getFirstPlace,
+  convertMap,
+  combinePlaces
+} from '@/utils/sh';
 
 function convertLocation(d) {
   const { x, y } = d;
@@ -24,6 +30,7 @@ export default {
     places: [],
     place: [],
     formValues: {},
+    displayTime: false,
   },
 
   effects: {
@@ -82,9 +89,11 @@ export default {
 
         // console.log(rPlaces);
 
+        const fPlaces = combinePlaces(rPlaces)
+
         yield put({
           type: 'savePlaces',
-          payload: rPlaces,
+          payload: fPlaces,
         });
 
         const rPlace = [];
@@ -170,6 +179,13 @@ export default {
       return {
         ...state,
         formValues: payload,
+      };
+    },
+
+    saveDisplayTime(state, { payload }) {
+      return {
+        ...state,
+        displayTime: payload,
       };
     },
   },
