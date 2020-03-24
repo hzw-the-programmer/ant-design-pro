@@ -7,7 +7,7 @@ import { formatMessage, FormattedMessage } from 'umi/locale';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './BeaconList.less';
 
-import { queryBeacons, deleteBeacon, createBeacon, debindBeacon, bindBeacon } from '@/services/sh';
+import { queryBeacons, deleteBeacon, createBeacon, debindBeacon, bindBeacon, queryPeople } from '@/services/sh';
 import { UNBIND, BINDED } from './constants'
 
 function getColumns(operations) {
@@ -99,7 +99,7 @@ const CreateForm = Form.create()(props => {
 
 
 const CreateBindForm = Form.create()(props => {
-  const {form, bindModalVisible,handleBind,handleBindModalVisible } = props;
+  const {form, bindModalVisible,handleBind,handleBindModalVisible,staffnames } = props;
 
   const handleBindOk =() => {
 
@@ -109,6 +109,8 @@ const CreateBindForm = Form.create()(props => {
         handleBind(fieldsValue);
       });
     };
+
+   
 
   return (
     <Modal
@@ -126,7 +128,19 @@ const CreateBindForm = Form.create()(props => {
           required: true,
           message: formatMessage({ id: 'sh.please-input-name', defaultMessage: 'Please input name'}),
         }],
-        })(<Input placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })} />)}
+        })(        
+          <Select  
+          placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })}
+          allowClear
+          style={{ width: '100%' }}
+        >                   
+        {staffnames.map(p => (
+          <Select.Option key={p.id} value={p.id}>
+            {p.name}
+            </Select.Option>
+          ))}
+        </Select>        
+        )}
       </Form.Item>
     </Modal>
   );
@@ -146,6 +160,18 @@ class BeaconList extends Component {
     modalVisible: false,
     bindModalVisible: false,
     beacon_bind_id: 0,
+    staffnames: [],
+  }
+
+  componentDidMount() {
+
+    //查询人员
+    queryPeople().then(response => {
+
+        this.setState({
+          staffnames: response.result
+        })
+    })
   }
 
   searchBeacons = (pagination, params) => {
@@ -282,7 +308,7 @@ class BeaconList extends Component {
   };
 
 
-  renderForm = loading => {
+  renderForm = (loading,staffnames) => {
     const { form: { getFieldDecorator } } = this.props
     
     return (
@@ -295,7 +321,18 @@ class BeaconList extends Component {
           </Col>
           <Col md={8}>
             <Form.Item label={formatMessage({ id: 'sh.name', defaultMessage: 'Name' })}>
-              {getFieldDecorator('name')(<Input placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })} />)}
+              {getFieldDecorator('name')(
+                <Select  
+                  placeholder={formatMessage({ id: 'sh.please-input', defaultMessage: 'Please input' })}
+                  allowClear
+                >                   
+                {staffnames.map(p => (
+                  <Select.Option key={p.id} value={p.name}>
+                    {p.name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              )}            
             </Form.Item>
           </Col>
           <Col md={8}>
@@ -338,7 +375,9 @@ class BeaconList extends Component {
   }
 
   render() {
-    const { loading, pagination: { page, pageSize }, beacons, total, modalVisible,bindModalVisible,handleBindModalVisible } = this.state
+    const { loading, pagination: { page, pageSize }, 
+    beacons, total,  modalVisible,bindModalVisible,
+    handleBindModalVisible,staffnames } = this.state
 
     const parentMethods = {
       handleAdd: this.handleAdd,
@@ -356,7 +395,7 @@ class BeaconList extends Component {
         <Card>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>
-              {this.renderForm(loading)}
+              {this.renderForm(loading,staffnames)}
             </div>
             <div className={styles.tableListOperator}>
               <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
@@ -378,7 +417,7 @@ class BeaconList extends Component {
           </div>
         </Card>
         <CreateForm {...parentMethods} modalVisible={modalVisible} />
-        <CreateBindForm {...bindMethods} bindModalVisible={bindModalVisible}/>
+        <CreateBindForm {...bindMethods} bindModalVisible={bindModalVisible} staffnames = {staffnames}/>
      </PageHeaderWrapper>
     );
   }
