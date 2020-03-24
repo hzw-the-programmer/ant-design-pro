@@ -290,8 +290,7 @@ export async function queryPatrolConfig(params) {
   body.rows = body.pageSize
   delete body.pageSize
   
-  // return request(`${HTTP_API_ROOT}/patrol/query_staff_patrol_config`, {
-  return request(`http://10.0.37.15:8002/patrol/spc_list`, {
+  return request(`${HTTP_API_ROOT}/patrol/spc_list`, {
     method: 'POST',
     credentials: 'omit',
     body: params,
@@ -322,4 +321,24 @@ export async function queryPatrolLog(params) {
     credentials: 'omit',
     body,
   });
+}
+
+export async function queryNormalPatroLog(params) {
+  const body = {
+    page: params.current,
+    rows: params.pageSize,
+  }
+  if (params.name) {
+    body.staff_id = params.name
+  }
+  if (params.datetime) {
+    body.starttime = params.datetime[0].format('YYYY-MM-DD HH:mm:ss')
+    body.endtime = params.datetime[1].format('YYYY-MM-DD HH:mm:ss')
+  }
+  console.log(body)
+  return request(`${HTTP_API_ROOT}/patrol/patrol_log`, {
+    method: 'POST',
+    credentials: 'omit',
+    body,
+  })
 }

@@ -303,6 +303,18 @@ export default [
             icon: 'dashboard',
             component: './Patrol/Map',
           },
+          {
+            path: '/patrol/normal_patrol_log',
+            name: 'normal_patrol_log',
+            icon: 'dashboard',
+            component: './Patrol/NormalPatrolLog',
+          },
+          {
+            path: '/patrol/abnormal_patrol_log',
+            name: 'abnormal_patrol_log',
+            icon: 'dashboard',
+            component: './Patrol/AbnormalPatrolLog',
+          },
         ],
       },
       {
