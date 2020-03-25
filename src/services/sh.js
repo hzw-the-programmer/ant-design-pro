@@ -283,17 +283,21 @@ export async function queryUnhandledAlarmsCount() {
   });
 }
 
-export async function queryPatrolConfig(params) {
+export async function queryPatrolConfigs(params) {
   const body = {...params}
   body.page = body.current
   delete body.current
   body.rows = body.pageSize
   delete body.pageSize
+  body.staff_id = params.name,
+  delete body.name
+
+  console.log(body)
   
   return request(`${HTTP_API_ROOT}/patrol/spc_list`, {
     method: 'POST',
     credentials: 'omit',
-    body: params,
+    body,
   });
 }
 

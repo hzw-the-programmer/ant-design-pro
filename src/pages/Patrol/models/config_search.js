@@ -1,6 +1,6 @@
 import { message } from 'antd';
 
-import { queryPatrolConfig } from '@/services/sh'
+import { queryPatrolConfigs } from '@/services/sh'
 
 const delay = timeout => new Promise(resolve => setTimeout(resolve, timeout))
 
@@ -24,9 +24,9 @@ export default {
                     payload: true,
                 })
                 
-                yield call(delay, 1000)
+                // yield call(delay, 1000)
                 
-                const response = yield call(queryPatrolConfig, payload)
+                const response = yield call(queryPatrolConfigs, payload)
                 if (response.code !== 0) {
                     message.error(response.msg)
                     return

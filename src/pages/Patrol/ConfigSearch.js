@@ -6,7 +6,9 @@ import {
     Button,
     Row,
     Col,
-    Table
+    Table,
+    Card,
+    Select,
 } from 'antd'
 
 import { connect } from 'dva'
@@ -45,8 +47,8 @@ const columns = [
     },
 ]
 
-@connect(({ config_search }) => ({
-    config_search,
+@connect(({ config_search, patrol_log }) => ({
+    config_search, patrol_log,
 }))
 @Form.create()
 class ConfigSearch extends PureComponent {
@@ -114,39 +116,49 @@ class ConfigSearch extends PureComponent {
                 pagination,
                 data,
                 loading,
-            }
+            },
+            patrol_log: { people },
         } = this.props
         
         return (
             <PageHeaderWrapper>
-                <div className={styles.form}>
-                    <Form layout="inline" onSubmit={this.onSubmit}>
-                        <Row>
-                            <Col md={8}>
-                                <Form.Item label="姓名">
-                                    {getFieldDecorator('name')(
-                                        <Input />
-                                    )}
-                                </Form.Item>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col md={8}>
-                                <Button htmlType="submit" loading={loading}>查询</Button>
-                            </Col>
-                            {/* <Col md={8}>
-                                <Button onClick={this.handleReset} loading={loading}>重置</Button>
-                            </Col> */}
-                        </Row>
-                    </Form>
-                </div>
-                <Table
-                    columns={columns}
-                    dataSource={data}
-                    pagination={{...pagination, onChange: this.onPaginationChange}}
-                    rowKey="id"
-                    loading={loading}
-                />
+                <Card>
+                    <div className={styles.form}>
+                        <Form layout="inline" onSubmit={this.onSubmit}>
+                            <Row gutter={{md: 8}}>
+                                <Col md={8}>
+                                    <Form.Item label="姓名">
+                                        {getFieldDecorator('name')(
+                                            <Select>
+                                                {people.map(p => (
+                                                    <Select.Option key={p.id} value={p.id}>
+                                                        {p.name}
+                                                    </Select.Option>
+                                                ))}
+                                            </Select>
+                                        )}
+                                    </Form.Item>
+                                </Col>
+                                <Col md={8}>
+                                    <Button
+                                        htmlType="submit"
+                                        loading={loading}
+                                        style={{'margin-bottom': '24px'}}
+                                    >
+                                        查询
+                                    </Button>
+                                </Col>
+                            </Row>
+                        </Form>
+                    </div>
+                    <Table
+                        columns={columns}
+                        dataSource={data}
+                        pagination={{...pagination, onChange: this.onPaginationChange}}
+                        rowKey="id"
+                        loading={loading}
+                    />
+                </Card>
             </PageHeaderWrapper>
         )
     }

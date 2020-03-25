@@ -29,7 +29,8 @@ export default {
         timeRange: undefined,
         place: [],
         map: { url: '', ratio: 0.0, extent: [0, 0, 0, 0] },
-        patrolLog: {},
+        patrolLogs: {},
+        patrolLog: [],
     },
 
     effects: {

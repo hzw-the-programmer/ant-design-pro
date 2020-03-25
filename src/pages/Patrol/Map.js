@@ -154,7 +154,10 @@ class PatrolMap extends PureComponent {
         const patrolSource = this.map.getLayers().item(1).getSource()
 
         if (url === '') {
-            this.url = url
+            this.url = ''
+            this.patrolLog = []
+            mapLayer.setVisible(false)
+            patrolSource.clear()
             return
         }
 
@@ -177,13 +180,15 @@ class PatrolMap extends PureComponent {
                 mapLayer.setVisible(true)
 
                 dispatch({
-                    type: 'region/saveMap',
+                    type: 'map/saveMap',
                     payload: {url, ratio, extent: newExtent}
                 })
             }
         
             return
         }
+
+        if (isEqual(extent, [0, 0, 0, 0])) return
 
         if (!isEqual(this.patrolLog, patrolLog)) {
             this.patrolLog = patrolLog
@@ -192,7 +197,6 @@ class PatrolMap extends PureComponent {
             patrolLog.forEach(pl => {
                 const x = parseFloat(pl.x) * ratio
                 const y = extent[3] - parseFloat(pl.y) * ratio
-                console.log(x, y)
                 const pointFeature = new Feature({
                     geometry: new Point([x, y]),
                     normal: pl.normal,

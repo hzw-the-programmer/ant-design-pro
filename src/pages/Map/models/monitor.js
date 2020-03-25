@@ -142,7 +142,7 @@ export default {
 
     *rtlMsg({ payload }, { put, select }) {
       try {
-        console.log('rtlMsg', payload);
+        // console.log('rtlMsg', payload);
         
         const regions = yield select(state => state.monitor.rtl.regions);
         const rs = []
