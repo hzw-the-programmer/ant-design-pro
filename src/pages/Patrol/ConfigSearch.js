@@ -52,11 +52,6 @@ const columns = [
 }))
 @Form.create()
 class ConfigSearch extends PureComponent {
-    componentDidMount() {
-        const { form, config_search: { fields } } = this.props
-        form.setFieldsValue(fields)
-    }
-
     onSubmit = ev => {
         ev.preventDefault()
         const {
@@ -92,21 +87,6 @@ class ConfigSearch extends PureComponent {
         })
     }
 
-    handleReset = () => {
-        const {
-            form,
-            dispatch,
-            config_search: {
-                pagination: { pageSize }
-            }
-        } = this.props
-        
-        dispatch({
-            type: 'config_search/queryPatrolConfigs',
-            payload: {current: 1, pageSize}
-        })
-    }
-
     render() {
         const {
             form: {
@@ -116,10 +96,11 @@ class ConfigSearch extends PureComponent {
                 pagination,
                 data,
                 loading,
+                fields,
             },
             patrol_log: { people },
         } = this.props
-        
+
         return (
             <PageHeaderWrapper>
                 <Card>
@@ -128,8 +109,17 @@ class ConfigSearch extends PureComponent {
                             <Row gutter={{md: 8}}>
                                 <Col md={8}>
                                     <Form.Item label="姓名">
-                                        {getFieldDecorator('name')(
-                                            <Select>
+                                        {getFieldDecorator('name', {
+                                            initialValue: fields.name,
+                                        })(
+                                            <Select
+                                                allowClear
+                                                showSearch={true}
+                                                filterOption={(input, option) => {
+                                                    const re = new RegExp(`.*${input}.*`)
+                                                    return re.exec(option.props.children) !== null
+                                                }}
+                                            >
                                                 {people.map(p => (
                                                     <Select.Option key={p.id} value={p.id}>
                                                         {p.name}
@@ -143,7 +133,7 @@ class ConfigSearch extends PureComponent {
                                     <Button
                                         htmlType="submit"
                                         loading={loading}
-                                        style={{'margin-bottom': '24px'}}
+                                        style={{marginBottom: '24px'}}
                                     >
                                         查询
                                     </Button>

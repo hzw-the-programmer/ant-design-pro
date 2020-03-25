@@ -259,7 +259,13 @@ class Route extends Component {
                       rules: [{required: true}],
                       initialValue: formValues.person,
                     })(
-                      <Select>
+                      <Select
+                        showSearch={true}
+                        filterOption={(input, option) => {
+                            const re = new RegExp(`.*${input}.*`)
+                            return re.exec(option.props.children) !== null
+                        }}
+                      >
                         {people.map(p => (
                           <Select.Option key={p.id} value={p.id}>
                             {p.name}

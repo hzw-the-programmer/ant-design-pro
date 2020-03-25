@@ -224,7 +224,13 @@ class PatrolMap extends PureComponent {
                                             rules: [{required: true}],
                                             initialValue: formFields.name,
                                         })(
-                                            <Select>
+                                            <Select
+                                                showSearch={true}
+                                                filterOption={(input, option) => {
+                                                    const re = new RegExp(`.*${input}.*`)
+                                                    return re.exec(option.props.children) !== null
+                                                }}
+                                            >
                                                 {people.map(p => (
                                                     <Select.Option value={p.id} key={p.id}>
                                                         {p.name}

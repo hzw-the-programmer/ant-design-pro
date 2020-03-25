@@ -91,7 +91,14 @@ class NormalPatrolLog extends PureComponent {
                                         {getFieldDecorator('name', {
                                             initialValue: formValues.name,
                                         })(
-                                            <Select allowClear>
+                                            <Select
+                                                allowClear
+                                                showSearch={true}
+                                                filterOption={(input, option) => {
+                                                    const re = new RegExp(`.*${input}.*`)
+                                                    return re.exec(option.props.children) !== null
+                                                }}    
+                                            >
                                                 {people.map(p => (
                                                     <Select.Option value={p.id} key={p.id}>
                                                         {p.name}

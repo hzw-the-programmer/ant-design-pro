@@ -454,6 +454,11 @@ class Monitor extends Component {
                       value={person}
                       onChange={this.changePerson}
                       allowClear
+                      showSearch={true}
+                      filterOption={(input, option) => {
+                          const re = new RegExp(`.*${input}.*`)
+                          return re.exec(option.props.children) !== null
+                      }}
                     >
                       {people.map(p => (
                         <Select.Option key={p.id} value={p.id}>

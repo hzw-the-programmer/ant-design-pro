@@ -291,8 +291,6 @@ export async function queryPatrolConfigs(params) {
   delete body.pageSize
   body.staff_id = params.name,
   delete body.name
-
-  console.log(body)
   
   return request(`${HTTP_API_ROOT}/patrol/spc_list`, {
     method: 'POST',
