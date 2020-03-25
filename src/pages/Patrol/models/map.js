@@ -137,6 +137,16 @@ export default {
                     type: 'savePatrolLogs',
                     payload: response.result.data,
                 })
+
+                yield put({
+                    type: 'savePlace',
+                    payload: [],
+                })
+
+                yield put({
+                    type: 'saveMap',
+                    payload: {url: '', ratio: 0.0, extent: [0, 0, 0, 0]},
+                })
             } catch (e) {
                 console.log(e)
             }
