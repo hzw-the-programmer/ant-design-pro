@@ -191,8 +191,7 @@ class PatrolMap extends PureComponent {
             patrolSource.clear()
             patrolLog.forEach(pl => {
                 const x = parseFloat(pl.x) * ratio
-                // const y = extent[3] - parseFloat(pl.y) * ratio
-                const y = parseFloat(pl.y) * ratio
+                const y = extent[3] - parseFloat(pl.y) * ratio
                 console.log(x, y)
                 const pointFeature = new Feature({
                     geometry: new Point([x, y]),
