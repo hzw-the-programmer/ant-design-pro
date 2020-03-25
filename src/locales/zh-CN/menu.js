@@ -59,6 +59,6 @@ export default {
   'menu.patrol': '巡更',
   'menu.patrol.config_search': '配置查询',
   'menu.patrol.map': ' 地图查询',
-  'menu.patrol.normal_patrol_log': '正常巡更',
+  'menu.patrol.normal_patrol_log': '巡更记录',
   'menu.patrol.abnormal_patrol_log': '异常巡更',
 };
