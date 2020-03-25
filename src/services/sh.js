@@ -303,7 +303,7 @@ export async function queryPatrolTimeRanges(params) {
     date: params.date.format('YYYY-MM-DD'),
   }
   
-  return request(`http://10.0.37.15:8002/patrol/spc_staff_date`, {
+  return request(`${HTTP_API_ROOT}/patrol/spc_staff_date`, {
     method: 'POST',
     credentials: 'omit',
     body,
@@ -316,7 +316,7 @@ export async function queryPatrolLog(params) {
     date: params.date.format('YYYY-MM-DD'),
   }
   
-  return request(`http://10.0.37.15:8002/patrol/map_patrol_log`, {
+  return request(`${HTTP_API_ROOT}/patrol/map_patrol_log`, {
     method: 'POST',
     credentials: 'omit',
     body,
