@@ -85,6 +85,23 @@ export default {
                     type: 'saveTimeRanges',
                     payload: timeRanges,
                 })
+                yield put({
+                    type: 'saveTimeRange',
+                    payload: undefined,
+                })
+
+                yield put({
+                    type: 'savePls',
+                    payload: [],
+                })
+                yield put({
+                    type: 'savePlace',
+                    payload: [],
+                })
+                yield put({
+                    type: 'saveMap',
+                    payload: {url: '', ratio: 0.0, extent: [0, 0, 0, 0]},
+                })
             } catch (e) {
                 console.log(e)
             }
