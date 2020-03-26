@@ -334,8 +334,8 @@ export async function queryNormalPatrolLog(params) {
     body.staff_id = params.name
   }
   if (params.datetime) {
-    body.starttime = params.datetime[0].format('YYYY-MM-DD HH:mm:ss')
-    body.endtime = params.datetime[1].format('YYYY-MM-DD HH:mm:ss')
+    body.starttime = params.datetime[0].format('YYYY-MM-DD')
+    body.endtime = params.datetime[1].format('YYYY-MM-DD')
   }
 
   return request(`${HTTP_API_ROOT}/patrol/patrol_log`, {
@@ -354,8 +354,8 @@ export async function queryAbnormalPatrolLog(params) {
     body.staff_id = params.name
   }
   if (params.datetime) {
-    body.starttime = params.datetime[0].format('YYYY-MM-DD HH:mm:ss')
-    body.endtime = params.datetime[1].format('YYYY-MM-DD HH:mm:ss')
+    body.starttime = params.datetime[0].format('YYYY-MM-DD')
+    body.endtime = params.datetime[1].format('YYYY-MM-DD')
   }
 
   return request(`${HTTP_API_ROOT}/patrol/all_patrol_list`, {

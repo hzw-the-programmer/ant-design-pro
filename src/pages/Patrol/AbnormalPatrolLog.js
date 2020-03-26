@@ -119,7 +119,6 @@ class AbnormalPatrolLog extends PureComponent {
                                         })(
                                             <DatePicker.RangePicker
                                                 style={{width: '100%'}}
-                                                showTime
                                             />
                                         )}
                                     </Form.Item>
