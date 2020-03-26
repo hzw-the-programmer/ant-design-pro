@@ -41,7 +41,7 @@ export default {
                     response.result.rows.forEach(row => {
                         dataSource.push({
                             id: parseInt(row.id, 10),
-                            staff_id: parseInt(row.staff_id, 10),
+                            number: parseInt(row.number, 10),
                             name: row.name,
                             region_name: row.region_name,
                             alarm_type: parseInt(row.alarm_type, 10),

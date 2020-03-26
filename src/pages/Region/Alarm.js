@@ -18,7 +18,7 @@ class Alarm extends PureComponent {
     columns = [
         {
             title: '工号',
-            dataIndex: 'staff_id',
+            dataIndex: 'number',
         },
         {
             title: '姓名',
