@@ -1,13 +1,19 @@
 import moment from 'moment';
 import { isEqual } from 'lodash';
 
-import { queryRoutes, queryMap } from '@/services/sh';
+import {
+  queryRoutes,
+  queryMap,
+  queryPlaceRegions,
+} from '@/services/sh';
+
 import {
   findAncestors,
   getPlace,
   getFirstPlace,
   convertMap,
-  combinePlaces
+  combinePlaces,
+  convertRegions,
 } from '@/utils/sh';
 
 function convertLocation(d) {
@@ -31,15 +37,12 @@ export default {
     place: [],
     formValues: {},
     displayTime: false,
+    regions: [],
+    map: {url: '', ratio: 0.0, extent: [0, 0, 0, 0]}
   },
 
   effects: {
-    *fetchRoutes(
-      {
-        payload: { person, datetime },
-      },
-      { call, select, put }
-    ) {
+    *queryRoutes({payload: { person, datetime },}, {call, select, put}) {
       try {
         const places = yield select(state => state.monitor.places);
 
@@ -63,7 +66,6 @@ export default {
 
           const route = {
             place: pids,
-            map: { url: '', ratio: 0.0, extent: [] },
             locations,
           };
 
@@ -75,8 +77,6 @@ export default {
           payload: routes,
         });
 
-        // console.log(routes)
-
         const rPlaces = [];
         pls.forEach(pl => {
           places.forEach(p => {
@@ -86,9 +86,6 @@ export default {
             }
           });
         });
-
-        // console.log(rPlaces);
-
         const fPlaces = combinePlaces(rPlaces)
 
         yield put({
@@ -99,7 +96,6 @@ export default {
         const rPlace = [];
         getFirstPlace({ value: 0, children: rPlaces }, rPlace);
         rPlace.shift();
-        console.log(rPlace);
 
         yield put({
           type: 'changePlace',
@@ -112,27 +108,32 @@ export default {
 
     *changePlace({ payload }, { put, call }) {
       try {
-        yield put({
-          type: 'savePlace',
-          payload,
-        });
-
         if (payload.length === 0) {
           return;
         }
 
-        const response = yield call(queryMap, payload);
+        let response = yield call(queryPlaceRegions, payload)
+        const regions = convertRegions(response.result)
+
+        response = yield call(queryMap, payload);
         if (response.result.length === 0) {
           return;
         }
         const map = convertMap(response.result[0]);
 
         yield put({
+          type: 'savePlace',
+          payload,
+        });
+
+        yield put({
+          type: 'saveRegions',
+          payload: regions,
+        })
+
+        yield put({
           type: 'saveMap',
-          payload: {
-            place: payload,
-            map,
-          },
+          payload: map,
         });
       } catch (e) {
         console.log(e);
@@ -141,6 +142,13 @@ export default {
   },
 
   reducers: {
+    saveFormValues(state, { payload }) {
+      return {
+        ...state,
+        formValues: payload,
+      };
+    },
+
     saveRoutes(state, { payload }) {
       return {
         ...state,
@@ -152,6 +160,8 @@ export default {
       return {
         ...state,
         places: payload,
+        place: [],
+        map: {url: '', ratio: 0.0, extent: [0, 0, 0, 0]},
       };
     },
 
@@ -162,23 +172,17 @@ export default {
       };
     },
 
-    saveMap(state, { payload }) {
+    saveRegions(state, { payload }) {
       return {
         ...state,
-        routes: state.routes.map(route => {
-          if (isEqual(route.place, payload.place)) {
-            return { ...route, map: { ...route.map, ...payload.map } };
-          }
-
-          return route;
-        }),
+        regions: payload,
       };
     },
 
-    saveFormValues(state, { payload }) {
+    saveMap(state, { payload }) {
       return {
         ...state,
-        formValues: payload,
+        map: payload,
       };
     },
 
